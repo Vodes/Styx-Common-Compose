@@ -30,7 +30,21 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(compose.runtime)
+                implementation(compose.material3)
+                implementation(compose.materialIconsExtended)
+
                 api(libs.styx.common)
+                
+                // Other stuff
+                implementation(libs.multiplatform.settings)
+
+                // Navigation (Voyager)
+                api(libs.voyager.nav)
+                api(libs.voyager.transitions)
+                api(libs.voyager.screenmodel)
+                api(libs.voyager.tabnav)
+                api(libs.voyager.bottomsheetnav)
             }
         }
         val androidMain by getting

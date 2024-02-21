@@ -5,10 +5,19 @@ agp = "8.2.2"
 kotlin = "1.9.22"
 compose = "1.5.12"
 styx-common = "0.0.1"
+voyager = "1.0.0"
+multiplatform-settings = "1.1.1"
 
 
 [libraries]
 styx-common = { module = "moe.styx:styx-common", version.ref = "styx-common" }
+voyager-nav = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
+voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
+voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
+voyager-tabnav = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
+voyager-bottomsheetnav = { module = "cafe.adriel.voyager:voyager-bottom-sheet-navigator", version.ref = "voyager" }
+multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
+
 
 [plugins]
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
