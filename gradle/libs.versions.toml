@@ -1,0 +1,17 @@
+[versions]
+android-minSdk = "28"
+android-compileSdk = "34"
+agp = "8.2.2"
+kotlin = "1.9.22"
+compose = "1.5.12"
+styx-common = "0.0.1"
+
+
+[libraries]
+styx-common = { module = "moe.styx:styx-common", version.ref = "styx-common" }
+
+[plugins]
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }

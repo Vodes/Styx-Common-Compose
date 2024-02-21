@@ -1,0 +1,29 @@
+name: "Publish macos build to maven repo"
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    env:
+      STYX_REPO_TOKEN: ${{ secrets.STYX_REPO_TOKEN }}
+      STYX_REPO_SECRET: ${{ secrets.STYX_REPO_SECRET }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: "Setup JDK"
+        id: setup-java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: |
+            11
+            17
+          cache: gradle
+      - name: "Build and publish library"
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
+        run: |
+          chmod u+x ./gradlew
+          ./gradlew publishAllPublicationsToStyxRepository
