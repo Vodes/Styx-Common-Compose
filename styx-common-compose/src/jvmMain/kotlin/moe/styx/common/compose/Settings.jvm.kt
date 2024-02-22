@@ -6,7 +6,7 @@ import moe.styx.PreferenceDelegate
 
 private var internalSettings: Settings? = null
 
-val settings: Settings
+actual val settings: Settings
     get() {
         if (internalSettings == null) {
             internalSettings = PreferencesSettings(PreferenceDelegate.delegate)
