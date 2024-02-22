@@ -43,7 +43,6 @@ kotlin {
                 // IO
                 implementation(libs.kstore)
                 implementation(libs.kstore.file)
-                implementation(libs.kstore.storage)
                 api(libs.multiplatform.io)
 
                 // Navigation (Voyager)
