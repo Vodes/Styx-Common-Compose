@@ -1,5 +1,7 @@
 package moe.styx.common.compose.http
 
+import moe.styx.common.compose.appConfig
+
 enum class Endpoints(private val path: String) {
     LOGIN("/login"),
     LOGOUT("/logout"),
@@ -31,9 +33,5 @@ enum class Endpoints(private val path: String) {
     MPV_DOWNLOAD("/mpv/download");
 
     val url: String
-        get() = BASEURL + this.path
-
-    companion object {
-        var BASEURL = ""
-    }
+        get() = appConfig().apiBaseURL + this.path
 }
