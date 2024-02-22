@@ -40,6 +40,12 @@ kotlin {
                 implementation(libs.multiplatform.settings)
                 api(libs.multiplatform.imageloader)
 
+                // IO
+                implementation(libs.kstore)
+                implementation(libs.kstore.file)
+                implementation(libs.kstore.storage)
+                api(libs.multiplatform.io)
+
                 // Navigation (Voyager)
                 api(libs.voyager.nav)
                 api(libs.voyager.transitions)
@@ -50,7 +56,12 @@ kotlin {
         }
         val androidMain by getting
         val iosMain by getting
-        val jvmMain by getting
+        val jvmMain by getting {
+            dependencies {
+                implementation(libs.jvm.mordant)
+                implementation(libs.jvm.oshi)
+            }
+        }
     }
 }
 
