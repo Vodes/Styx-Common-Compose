@@ -11,6 +11,7 @@ import moe.styx.common.compose.http.getObject
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.data.Changes
 import moe.styx.common.extension.currentUnixSeconds
+import okio.FileSystem
 
 /**
  * Object for all the basic data storage operations, e.g. refreshing the data from the API.
@@ -64,6 +65,9 @@ object Storage {
                 )
             )
             loadingProgress.emit("Updating image cache...\nThis may take a minute or two.")
+            ImageCache.checkForNewImages()
         }
     }
 }
+
+expect val SYSTEMFILES: FileSystem

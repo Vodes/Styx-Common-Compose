@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "moe.styx"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.2-SNAPSHOT"
 
 kotlin {
     applyDefaultHierarchyTemplate()
@@ -44,7 +44,6 @@ kotlin {
                 // IO
                 implementation(libs.kstore)
                 implementation(libs.kstore.file)
-                api(libs.multiplatform.io)
 
                 // Navigation (Voyager)
                 api(libs.voyager.nav)
