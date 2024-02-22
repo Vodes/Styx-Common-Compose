@@ -13,6 +13,12 @@ import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.http.httpClient
 import moe.styx.common.json
 
+/**
+ * Function to receive a list of objects from an API endpoint.
+ *
+ * @param endpoint API Endpoint
+ * @return List of objects deserialized with the type defined
+ */
 suspend inline fun <reified T> getList(endpoint: Endpoints): List<T> {
     if (login == null || currentUnixSeconds() > login!!.tokenExpiry) {
         if (!isLoggedIn())
@@ -37,6 +43,13 @@ suspend inline fun <reified T> getList(endpoint: Endpoints): List<T> {
     return emptyList()
 }
 
+/**
+ * Function to send a json encoded object to an API endpoint and receive its response.
+ *
+ * @param endpoint API Endpoint
+ * @param data The object to be sent
+ * @return Generic ApiResponse or null
+ */
 inline fun <reified T> sendObjectWithResponse(endpoint: Endpoints, data: T?): ApiResponse? = runBlocking {
     if (login == null || currentUnixSeconds() > login!!.tokenExpiry) {
         if (!isLoggedIn())
@@ -54,7 +67,8 @@ inline fun <reified T> sendObjectWithResponse(endpoint: Endpoints, data: T?): Ap
     ServerStatus.setLastKnown(request.status)
 
     if (!request.status.isSuccess()) {
-        println("Request Failed for Endpoint `$endpoint`\n${request.bodyAsText()}")
+        val body = request.bodyAsText()
+        Log.e { "Request Failed for Endpoint `$endpoint`\n${body}" }
     }
 
     val response = runCatching {
@@ -64,10 +78,22 @@ inline fun <reified T> sendObjectWithResponse(endpoint: Endpoints, data: T?): Ap
     return@runBlocking response
 }
 
+/**
+ * Function to send a json encoded object to an API endpoint and check whether the response was a success.
+ *
+ * @param endpoint API Endpoint
+ * @param data The object to be sent
+ */
 inline fun <reified T> sendObject(endpoint: Endpoints, data: T?): Boolean = runBlocking {
     return@runBlocking sendObjectWithResponse<T>(endpoint, data) != null
 }
 
+/**
+ * Function to receive a single object from any API endpoint without auth.
+ *
+ * @param endpoint API Endpoint
+ * @return Object deserialized with the type defined
+ */
 inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
     if (login == null || currentUnixSeconds() > login!!.tokenExpiry) {
         if (!isLoggedIn())
