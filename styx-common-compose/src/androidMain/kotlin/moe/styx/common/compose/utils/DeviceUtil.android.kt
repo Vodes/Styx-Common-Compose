@@ -5,15 +5,16 @@ import moe.styx.common.compose.appConfig
 import moe.styx.common.data.DeviceInfo
 
 actual fun fetchDeviceInfo(): DeviceInfo {
-    println(Build())
+    val supportedABIs = Build.SUPPORTED_ABIS.joinToString()
+    val supportSOC = Build.VERSION.SDK_INT >= 31
     return DeviceInfo(
         "Phone",
-        Build.DEVICE,
-        Build.MODEL,
-        Build.SUPPORTED_ABIS.joinToString(),
+        "",
+        "${Build.MANUFACTURER}/${Build.BRAND} ${Build.MODEL}",
+        if (supportSOC) "${Build.SOC_MANUFACTURER} ${Build.SOC_MODEL} ($supportedABIs)" else "Unknown ($supportedABIs)",
         null,
         "Android",
-        null,
+        Build.VERSION.RELEASE,
         null,
         null,
         appConfig().appSecret
