@@ -7,6 +7,7 @@ compose = "1.5.12"
 styx-common = "0.0.1"
 voyager = "1.0.0"
 multiplatform-settings = "1.1.1"
+image-loader = "1.7.6"
 
 
 [libraries]
@@ -17,6 +18,7 @@ voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", vers
 voyager-tabnav = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
 voyager-bottomsheetnav = { module = "cafe.adriel.voyager:voyager-bottom-sheet-navigator", version.ref = "voyager" }
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
+multiplatform-imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "image-loader" }
 
 
 [plugins]

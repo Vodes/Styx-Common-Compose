@@ -35,9 +35,10 @@ kotlin {
                 implementation(compose.materialIconsExtended)
 
                 api(libs.styx.common)
-                
+
                 // Other stuff
                 implementation(libs.multiplatform.settings)
+                api(libs.multiplatform.imageloader)
 
                 // Navigation (Voyager)
                 api(libs.voyager.nav)
