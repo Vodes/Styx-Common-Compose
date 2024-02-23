@@ -39,6 +39,7 @@ kotlin {
 
                 // Other stuff
                 implementation(libs.multiplatform.settings)
+                api(libs.multiplatform.imageloader)
                 api(libs.kamel.image)
 
                 // IO

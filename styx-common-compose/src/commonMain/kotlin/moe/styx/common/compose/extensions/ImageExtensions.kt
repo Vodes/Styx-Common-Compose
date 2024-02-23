@@ -1,7 +1,8 @@
 package moe.styx.common.compose.extensions
 
+import com.seiko.imageloader.ImageLoader
 import io.kamel.core.config.KamelConfig
-import io.kamel.core.config.httpFetcher
+import io.kamel.core.config.httpUrlFetcher
 import io.kamel.core.config.takeFrom
 import io.kamel.image.config.Default
 import io.ktor.client.request.*
@@ -19,13 +20,15 @@ import okio.Path
 
 val kamelConfig by lazy {
     KamelConfig {
-        imageBitmapCacheSize = if (Platform.current == Platform.JVM) 120 else 100
-        svgCacheSize = if (Platform.current == Platform.JVM) 75 else 50
-        imageVectorCacheSize = if (Platform.current == Platform.JVM) 150 else 100
+        imageBitmapCacheSize = if (Platform.current == Platform.JVM) 400 else 300
+        svgCacheSize = if (Platform.current == Platform.JVM) 100 else 75
+        imageVectorCacheSize = if (Platform.current == Platform.JVM) 275 else 200
         takeFrom(KamelConfig.Default)
-        httpFetcher(httpClient)
+        httpUrlFetcher(httpClient)
     }
 }
+
+expect fun getImageLoader(): ImageLoader
 
 /**
  * Extension to get the remote URL for the image.

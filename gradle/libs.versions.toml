@@ -11,6 +11,7 @@ kamel = "1.0.0-beta.1"
 kstore = "0.7.1"
 mordant = "2.3.0"
 oshi = "6.4.11"
+multiplatform-imageloader = "1.7.6"
 
 
 [libraries]
@@ -21,6 +22,7 @@ voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", vers
 voyager-tabnav = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
 voyager-bottomsheetnav = { module = "cafe.adriel.voyager:voyager-bottom-sheet-navigator", version.ref = "voyager" }
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
+multiplatform-imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "multiplatform-imageloader" }
 kamel-image = { module = "media.kamel:kamel-image-default", version.ref = "kamel" }
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
