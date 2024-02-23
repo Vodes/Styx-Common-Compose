@@ -53,7 +53,7 @@ fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
             if (image != null) {
                 CompositionLocalProvider(LocalKamelConfig provides kamelConfig) {
                     val painter = if (image.isCached()) {
-                        asyncPainterResource(image.getPath(), filterQuality = FilterQuality.Low)
+                        asyncPainterResource("file:/${image.getPath()}", filterQuality = FilterQuality.Low)
                     } else asyncPainterResource(Url(image.getURL()), filterQuality = FilterQuality.Low)
                     KamelImage(
                         painter,
