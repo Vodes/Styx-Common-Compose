@@ -7,7 +7,7 @@ compose = "1.5.12"
 styx-common = "0.0.1"
 voyager = "1.0.0"
 multiplatform-settings = "1.1.1"
-image-loader = "1.7.6"
+kamel = "0.9.2"
 kstore = "0.7.1"
 mordant = "2.3.0"
 oshi = "6.4.11"
@@ -21,7 +21,7 @@ voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", vers
 voyager-tabnav = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
 voyager-bottomsheetnav = { module = "cafe.adriel.voyager:voyager-bottom-sheet-navigator", version.ref = "voyager" }
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
-multiplatform-imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "image-loader" }
+kamel-image = { module = "media.kamel:kamel-image", version.ref = "kamel" }
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
 jvm-mordant = { module = "com.github.ajalt.mordant:mordant-jvm", version.ref = "mordant" }
