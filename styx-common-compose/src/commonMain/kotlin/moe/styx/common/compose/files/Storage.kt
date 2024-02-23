@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import moe.styx.common.compose.appConfig
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.getList
 import moe.styx.common.compose.http.getObject
@@ -13,6 +14,7 @@ import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.data.*
 import moe.styx.common.extension.currentUnixSeconds
 import okio.FileSystem
+import okio.Path.Companion.toPath
 
 /**
  * Object for all the basic data storage operations, e.g. refreshing the data from the API.
@@ -30,8 +32,10 @@ object Storage {
         }
 
     val loadingProgress = MutableStateFlow("")
+    val isLoaded = MutableStateFlow(false)
 
     private suspend fun loadData() = coroutineScope {
+        createDirectories()
         loadingProgress.emit("")
         val serverOnline = ServerStatus.lastKnown == ServerStatus.ONLINE
         val lastChanges = (if (serverOnline) getObject<Changes>(Endpoints.CHANGES) else null) ?: Changes(0, 0)
@@ -68,6 +72,12 @@ object Storage {
             loadingProgress.emit("Updating image cache...\nThis may take a minute or two.")
             ImageCache.checkForNewImages()
         }
+        isLoaded.emit(true)
+    }
+
+    private fun createDirectories() {
+        SYSTEMFILES.createDirectories("${appConfig().appStoragePath}/store".toPath())
+        SYSTEMFILES.createDirectories("${appConfig().appStoragePath}/queued".toPath())
     }
 
     val mediaList: List<Media> = runBlocking { stores.mediaStore.getOrEmpty() }
