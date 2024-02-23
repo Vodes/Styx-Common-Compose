@@ -67,48 +67,60 @@ fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
             }
             if (showUnseenBadge) {
                 if (entries.isNotEmpty()) {
-                    ElevatedCard(
-                        Modifier.clip(RoundedCornerShape(40)).size(33.dp).padding(4.dp).align(Alignment.TopEnd).zIndex(3f),
-                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.secondary)
-                    ) {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            val text = entries.size.toString()
-                            Text(
-                                text, softWrap = false,
-                                overflow = TextOverflow.Ellipsis,
-                                style = if (text.length > 2) MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onSecondary,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-                    }
+                    AnimeCardBadge(entries.size, Modifier.align(Alignment.TopEnd).zIndex(3f))
                 }
             }
             if (showName || textAlpha > 0) {
-                Surface(
-                    modifier = Modifier.zIndex(1f).align(Alignment.BottomCenter).padding(0.dp, 0.dp, 0.dp, 5.dp)
-                        .defaultMinSize(0.dp, 25.dp)
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(4.dp))
-                        .onPointerEvent(PointerEventType.Enter) { showName = !showNamesAllTheTime }
-                        .onPointerEvent(PointerEventType.Exit) { showName = showNamesAllTheTime },
-                    color = MaterialTheme.colorScheme.surface.copy(shadowAlpha * 0.85F)
-                ) {
-                    Surface(
-                        modifier = Modifier.zIndex(1f).align(Alignment.Center).padding(1.dp)
-                            .defaultMinSize(0.dp, 25.dp)
-                            .fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.surface.copy(shadowAlpha)
-                    ) {
-                        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(5.dp)) {
-                            Text(
-                                media.name, modifier = Modifier.zIndex(2f).align(Alignment.Center),
-                                color = MaterialTheme.colorScheme.onSurface.copy(textAlpha), softWrap = false,
-                                overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall
-                            )
-                        }
-                    }
-                }
+                AnimeCardName(Modifier.onPointerEvent(PointerEventType.Enter) { showName = !showNamesAllTheTime }
+                    .onPointerEvent(PointerEventType.Exit) { showName = showNamesAllTheTime },
+                    shadowAlpha,
+                    textAlpha,
+                    media.name
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun AnimeCardBadge(num: Int, modifier: Modifier = Modifier) {
+    ElevatedCard(
+        modifier.clip(RoundedCornerShape(40)).size(33.dp).padding(4.dp),
+        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.secondary)
+    ) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                num.toString(), softWrap = false,
+                overflow = TextOverflow.Ellipsis,
+                style = if (num.toString().length > 2) MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSecondary,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+    }
+}
+
+@Composable
+internal fun BoxScope.AnimeCardName(modifier: Modifier = Modifier, shadowAlpha: Float, textAlpha: Float, mediaName: String) {
+    Surface(
+        modifier = modifier.zIndex(1f).align(Alignment.BottomCenter).padding(0.dp, 0.dp, 0.dp, 5.dp)
+            .defaultMinSize(0.dp, 25.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(4.dp)),
+        color = MaterialTheme.colorScheme.surface.copy(shadowAlpha * 0.85F)
+    ) {
+        Surface(
+            modifier = Modifier.zIndex(1f).align(Alignment.Center).padding(1.dp)
+                .defaultMinSize(0.dp, 25.dp)
+                .fillMaxWidth(),
+            color = MaterialTheme.colorScheme.surface.copy(shadowAlpha)
+        ) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(5.dp)) {
+                Text(
+                    mediaName, modifier = Modifier.zIndex(2f).align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.onSurface.copy(textAlpha), softWrap = false,
+                    overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall
+                )
             }
         }
     }
