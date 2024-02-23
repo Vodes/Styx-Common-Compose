@@ -10,8 +10,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -60,8 +58,8 @@ fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
                         contentDescription = media.name,
                         contentScale = ContentScale.FillBounds,
                         modifier = Modifier.padding(2.dp).align(Alignment.Center)
-                            .onPointerEvent(PointerEventType.Enter) { showName = !showNamesAllTheTime }
-                            .onPointerEvent(PointerEventType.Exit) { showName = showNamesAllTheTime }.clip(RoundedCornerShape(8.dp))
+                            .desktopPointerEvent({ showName = !showNamesAllTheTime }, { showName = showNamesAllTheTime })
+                            .clip(RoundedCornerShape(8.dp))
                     )
                 }
             }
@@ -71,8 +69,8 @@ fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
                 }
             }
             if (showName || textAlpha > 0) {
-                AnimeCardName(Modifier.onPointerEvent(PointerEventType.Enter) { showName = !showNamesAllTheTime }
-                    .onPointerEvent(PointerEventType.Exit) { showName = showNamesAllTheTime },
+                AnimeCardName(
+                    Modifier.desktopPointerEvent({ showName = !showNamesAllTheTime }, { showName = showNamesAllTheTime }),
                     shadowAlpha,
                     textAlpha,
                     media.name
