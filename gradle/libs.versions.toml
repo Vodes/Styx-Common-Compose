@@ -21,7 +21,7 @@ voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", vers
 voyager-tabnav = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
 voyager-bottomsheetnav = { module = "cafe.adriel.voyager:voyager-bottom-sheet-navigator", version.ref = "voyager" }
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
-kamel-image = { module = "media.kamel:kamel-image", version.ref = "kamel" }
+kamel-image = { module = "media.kamel:kamel-image-default", version.ref = "kamel" }
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
 jvm-mordant = { module = "com.github.ajalt.mordant:mordant-jvm", version.ref = "mordant" }
