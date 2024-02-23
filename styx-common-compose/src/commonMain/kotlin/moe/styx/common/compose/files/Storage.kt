@@ -1,5 +1,6 @@
 package moe.styx.common.compose.files
 
+import io.github.xxfast.kstore.extensions.getOrEmpty
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.joinAll
@@ -9,7 +10,7 @@ import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.getList
 import moe.styx.common.compose.http.getObject
 import moe.styx.common.compose.utils.ServerStatus
-import moe.styx.common.data.Changes
+import moe.styx.common.data.*
 import moe.styx.common.extension.currentUnixSeconds
 import okio.FileSystem
 
@@ -68,6 +69,15 @@ object Storage {
             ImageCache.checkForNewImages()
         }
     }
+
+    val mediaList: List<Media> = runBlocking { stores.mediaStore.getOrEmpty() }
+    val entryList: List<MediaEntry> = runBlocking { stores.entryStore.getOrEmpty() }
+    val categories: List<Category> = runBlocking { stores.categoryStore.getOrEmpty() }
+    val favourites: List<Favourite> = runBlocking { stores.favouriteStore.getOrEmpty() }
+    val imageList: List<Image> = runBlocking { stores.imageStore.getOrEmpty() }
+    val watchedList: List<MediaWatched> = runBlocking { stores.watchedStore.getOrEmpty() }
+    val schedules: List<MediaSchedule> = runBlocking { stores.scheduleStore.getOrEmpty() }
+    val mediaInfos: List<MediaInfo> = runBlocking { stores.mediainfoStore.getOrEmpty() }
 }
 
 expect val SYSTEMFILES: FileSystem
