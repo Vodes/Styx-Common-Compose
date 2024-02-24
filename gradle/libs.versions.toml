@@ -13,6 +13,7 @@ mordant = "2.3.0"
 oshi = "6.4.11"
 multiplatform-imageloader = "1.7.6"
 multiplatform-lifecycle = "0.0.1"
+islandtime = "0.7.0"
 
 
 [libraries]
@@ -25,6 +26,7 @@ voyager-bottomsheetnav = { module = "cafe.adriel.voyager:voyager-bottom-sheet-na
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
 multiplatform-imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "multiplatform-imageloader" }
 multiplatform-lifecycle = { module = "io.github.kevinnzou:compose-multiplatform-lifecycle-tracker", version.ref = "multiplatform-lifecycle" }
+multiplatform-islandtime = { module = "io.islandtime:core", version.ref = "islandtime" }
 kamel-image = { module = "media.kamel:kamel-image-default", version.ref = "kamel" }
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }

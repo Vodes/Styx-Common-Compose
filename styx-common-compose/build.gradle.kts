@@ -40,6 +40,7 @@ kotlin {
                 // Other stuff
                 implementation(libs.multiplatform.settings)
                 api(libs.multiplatform.imageloader)
+                api(libs.multiplatform.islandtime)
                 api(libs.multiplatform.lifecycle)
                 api(libs.kamel.image)
 

@@ -39,9 +39,7 @@ fun AnimeCard(media: Media, showUnseenBadge: Boolean = false, onClick: () -> Uni
             asyncPainterResource("file:/${image.getPath()}", key = image.GUID, filterQuality = FilterQuality.Low)
         } else asyncPainterResource(Url(image.getURL()), key = image.GUID, filterQuality = FilterQuality.Low)
     }
-    Card(modifier = Modifier.padding(2.dp).aspectRatio(0.71F), onClick = {
-        onClick()
-    }) {
+    Card(modifier = Modifier.padding(2.dp).aspectRatio(0.71F), onClick = onClick) {
         var showName by remember { mutableStateOf(showNamesAllTheTime) }
         val shadowAlpha: Float by animateFloatAsState(if (showName) 0.8f else 0f)
         val textAlpha: Float by animateFloatAsState(if (showName) 1.0f else 0f)

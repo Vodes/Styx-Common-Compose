@@ -1,10 +1,14 @@
 package moe.styx.common.compose.extensions
 
 import io.github.xxfast.kstore.extensions.getOrEmpty
+import io.islandtime.*
+import io.islandtime.clock.now
 import kotlinx.coroutines.runBlocking
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.data.Image
 import moe.styx.common.data.Media
+import moe.styx.common.data.MediaSchedule
+import moe.styx.common.data.ScheduleWeekday
 import moe.styx.common.extension.eqI
 
 fun Media.isFav(): Boolean = runBlocking {
@@ -14,4 +18,23 @@ fun Media.isFav(): Boolean = runBlocking {
 
 fun Media.getThumb(): Image? = runBlocking {
     return@runBlocking Storage.imageList.find { it.GUID eqI (this@getThumb.thumbID ?: "") }
+}
+
+fun ScheduleWeekday.dayOfWeek(): DayOfWeek {
+    return when (this) {
+        ScheduleWeekday.MONDAY -> DayOfWeek.MONDAY
+        ScheduleWeekday.TUESDAY -> DayOfWeek.TUESDAY
+        ScheduleWeekday.WEDNESDAY -> DayOfWeek.WEDNESDAY
+        ScheduleWeekday.THURSDAY -> DayOfWeek.THURSDAY
+        ScheduleWeekday.FRIDAY -> DayOfWeek.FRIDAY
+        ScheduleWeekday.SATURDAY -> DayOfWeek.SATURDAY
+        else -> DayOfWeek.SUNDAY
+    }
+}
+
+fun MediaSchedule.getTargetTime(): ZonedDateTime {
+    val now = DateTime.now().at(TimeZone("Europe/Berlin"))
+    val adjusted = now.copy(hour = this.hour, minute = this.minute)
+    val target = adjusted.next(this.day.dayOfWeek())
+    return target.adjustedTo(TimeZone.systemDefault())
 }
