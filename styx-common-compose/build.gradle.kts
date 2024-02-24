@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "moe.styx"
-version = "0.0.5-SNAPSHOT"
+version = "0.0.6-SNAPSHOT"
 
 kotlin {
     applyDefaultHierarchyTemplate()
@@ -40,6 +40,7 @@ kotlin {
                 // Other stuff
                 implementation(libs.multiplatform.settings)
                 api(libs.multiplatform.imageloader)
+                api(libs.multiplatform.lifecycle)
                 api(libs.kamel.image)
 
                 // IO
