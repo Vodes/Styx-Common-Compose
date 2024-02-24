@@ -2,9 +2,11 @@ package moe.styx.common.compose.threads
 
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import moe.styx.common.Platform
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.http.sendObjectWithResponse
+import moe.styx.common.compose.utils.Log
 import moe.styx.common.data.ActiveUser
 import moe.styx.common.data.ClientHeartbeat
 import moe.styx.common.data.MediaActivity
@@ -42,5 +44,14 @@ object Heartbeats : LifecycleTrackedJob() {
             else
                 delay(3000)
         }
+    }
+
+    fun start() {
+        if (Platform.current != Platform.JVM) {
+            Log.w("Heartbeats::start") { "This function is not designed for use outside of Desktop applications." }
+            return
+        }
+        runJob = true
+        currentJob = createJob()
     }
 }

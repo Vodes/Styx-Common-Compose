@@ -2,6 +2,7 @@ package moe.styx.common.compose.threads
 
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import moe.styx.common.Platform
 import moe.styx.common.compose.files.*
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.isLoggedIn
@@ -53,6 +54,15 @@ object RequestQueue : LifecycleTrackedJob() {
             Storage.stores.queuedWatchedStore.set(QueuedWatchedChanges())
             Log.i { "Synced queued up watch progress" }
         }
+    }
+
+    fun start() {
+        if (Platform.current != Platform.JVM) {
+            Log.w("RequestQueue::start") { "This function is not designed for use outside of Desktop applications." }
+            return
+        }
+        runJob = true
+        currentJob = createJob()
     }
 
     fun addFav(media: Media) {
