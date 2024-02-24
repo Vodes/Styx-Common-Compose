@@ -2,7 +2,6 @@ package moe.styx.common.compose.components.anime
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import io.ktor.http.*
+import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.extensions.getPath
 import moe.styx.common.compose.extensions.getThumb
 import moe.styx.common.compose.extensions.getURL
@@ -37,7 +37,7 @@ fun AnimeListItem(media: Media, onClick: () -> Unit) {
     ) {
         Row(Modifier.height(80.dp)) {
             ElevatedCard(
-                Modifier.clip(RoundedCornerShape(16.dp)).width(67.dp).padding(3.dp),
+                Modifier.clip(AppShapes.large).width(67.dp).padding(3.dp),
             ) {
                 if (image != null && painter != null) {
                     KamelImage(

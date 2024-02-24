@@ -18,6 +18,7 @@ import com.russhwolf.settings.get
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import io.ktor.http.*
+import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.extensions.*
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.getCurrentAndCollectFlow
@@ -51,7 +52,7 @@ fun AnimeCard(media: Media, showUnseenBadge: Boolean = false, onClick: () -> Uni
                     contentScale = ContentScale.FillBounds,
                     modifier = Modifier.padding(2.dp).align(Alignment.Center)
                         .desktopPointerEvent({ showName = !showNamesAllTheTime }, { showName = showNamesAllTheTime })
-                        .clip(RoundedCornerShape(8.dp)),
+                        .clip(AppShapes.medium),
                     animationSpec = tween(),
                     onLoading = { CircularProgressIndicator(it) }
                 )
@@ -97,7 +98,7 @@ internal fun BoxScope.AnimeCardName(modifier: Modifier = Modifier, shadowAlpha: 
         modifier = modifier.zIndex(1f).align(Alignment.BottomCenter).padding(0.dp, 0.dp, 0.dp, 5.dp)
             .defaultMinSize(0.dp, 25.dp)
             .fillMaxWidth()
-            .clip(RoundedCornerShape(4.dp)),
+            .clip(AppShapes.small),
         color = MaterialTheme.colorScheme.surface.copy(shadowAlpha * 0.85F)
     ) {
         Surface(
