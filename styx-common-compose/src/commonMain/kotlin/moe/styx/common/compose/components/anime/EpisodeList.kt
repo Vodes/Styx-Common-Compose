@@ -1,7 +1,10 @@
 package moe.styx.common.compose.components.anime
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
@@ -17,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import com.russhwolf.settings.get
 import moe.styx.common.compose.components.misc.ExpandableText
-import moe.styx.common.compose.extensions.onRightClick
+import moe.styx.common.compose.extensions.dynamicClick
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.getCurrentAndCollectFlow
 import moe.styx.common.compose.http.login
@@ -67,20 +70,15 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
                 val ep = episodes[i]
                 Column(
                     Modifier.padding(10.dp, 5.dp).fillMaxWidth().defaultMinSize(0.dp, 75.dp)
-                        .onRightClick {
-                            showSelection.value = !showSelection.value
-                            if (showSelection.value)
-                                selected[ep.GUID] = !(selected[ep.GUID] ?: false)
-                        }
-                        .combinedClickable(onClick = {
+                        .dynamicClick({
                             if (showSelection.value) {
                                 selected[ep.GUID] = !(selected[ep.GUID] ?: false)
-                                return@combinedClickable
+                                return@dynamicClick
                             }
                             onPlay(ep)
-                        }, onLongClick = {
+                        }) {
                             showSelection.value = !showSelection.value
-                        })
+                        }
                 ) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         val title = if (!ep.nameDE.isNullOrBlank() && preferGerman) ep.nameDE else ep.nameEN

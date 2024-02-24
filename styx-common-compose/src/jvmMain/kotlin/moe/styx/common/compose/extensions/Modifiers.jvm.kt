@@ -2,6 +2,7 @@ package moe.styx.common.compose.extensions
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.PointerMatcher
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.onClick
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -15,6 +16,7 @@ actual fun Modifier.desktopPointerEvent(onEnter: () -> Unit, onLeave: () -> Unit
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-actual fun Modifier.onRightClick(onClick: () -> Unit): Modifier {
-    return this.onClick(true, matcher = PointerMatcher.mouse(PointerButton.Secondary)) { onClick() }
+actual fun Modifier.dynamicClick(regularClick: () -> Unit, otherClick: () -> Unit): Modifier {
+    return this.combinedClickable(onClick = regularClick, onLongClick = otherClick)
+        .onClick(true, matcher = PointerMatcher.mouse(PointerButton.Secondary), onClick = otherClick)
 }

@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.styx.common.compose.extensions.desktopPointerEvent
-import moe.styx.common.compose.extensions.onRightClick
+import moe.styx.common.compose.extensions.dynamicClick
 import moe.styx.common.data.MediaEntry
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
@@ -61,7 +61,7 @@ fun SelectionCheckboxes(showSelection: MutableState<Boolean>, selected: Snapshot
                     Spacer(Modifier.height(2.dp))
                 }
             }
-            Checkbox(checked, modifier = Modifier.onRightClick { timeIn = 85 }, onCheckedChange = {
+            Checkbox(checked, modifier = Modifier.dynamicClick(otherClick = { timeIn = 85 }), onCheckedChange = {
                 checked = !checked
                 selected[episodes[index].GUID] = checked
             })
