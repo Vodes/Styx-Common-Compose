@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "moe.styx"
-version = "0.0.6-SNAPSHOT"
+version = (System.getenv("SHAPSHOT_COMMIT") ?: "").ifBlank { "0.0.6-SNAPSHOT" }
 
 kotlin {
     applyDefaultHierarchyTemplate()
@@ -79,7 +79,7 @@ publishing {
     repositories {
         maven {
             name = "Styx"
-            url = if (version.toString().contains("-SNAPSHOT", true))
+            url = if (version.toString().contains("-SNAPSHOT", true) || !System.getenv("SHAPSHOT_COMMIT").isNullOrBlank())
                 uri("https://repo.styx.moe/snapshots")
             else
                 uri("https://repo.styx.moe/releases")
