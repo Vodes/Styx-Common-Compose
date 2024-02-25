@@ -1,4 +1,4 @@
-name: "Publish macos build to maven repo"
+name: "Auto publish snapshot on push"
 on:
   push:
 
