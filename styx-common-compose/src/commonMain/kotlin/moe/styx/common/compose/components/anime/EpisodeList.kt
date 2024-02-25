@@ -22,6 +22,7 @@ import com.russhwolf.settings.get
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.components.misc.ExpandableText
 import moe.styx.common.compose.extensions.dynamicClick
+import moe.styx.common.compose.extensions.readableSize
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.getCurrentAndCollectFlow
 import moe.styx.common.compose.http.login
@@ -83,42 +84,11 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
                         val title = if (!ep.nameDE.isNullOrBlank() && preferGerman) ep.nameDE else ep.nameEN
                         val watchProgress = watched[ep]
                         SelectionCheckboxes(showSelection, selected, episodes, i)
-
                         Column(Modifier.fillMaxWidth()) {
-                            val interactionSource = remember { MutableInteractionSource() }
-                            val isHover by interactionSource.collectIsHoveredAsState()
-
-                            Column(modifier = Modifier.hoverable(interactionSource = interactionSource)) {
-                                var modifier = Modifier.padding(5.dp)
-                                if (isHover)
-                                    modifier = modifier.basicMarquee(delayMillis = 300)
-                                Text(
-                                    "${ep.entryNumber}${if (!title.isNullOrBlank()) " - $title" else ""}",
-                                    modifier,
-                                    softWrap = false,
-                                    style = MaterialTheme.typography.labelLarge
-                                )
-                                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                    Text(
-                                        ep.timestamp.toDateString(),
-                                        Modifier.padding(5.dp, 0.dp, 0.dp, 4.dp).weight(1f),
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                    Text(
-                                        ep.fileSize.toString(),//.readableSize(),
-                                        Modifier.padding(5.dp).clickable {
-                                            selectedMedia = ep
-                                            showMediaInfoDialog = true
-                                        },
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
-                                }
-                                val summary = if (!ep.synopsisDE.isNullOrBlank() && preferGerman) ep.synopsisDE else ep.synopsisEN
-                                if (!summary.isNullOrBlank() && showSummaries)
-                                    ExpandableText(summary, Modifier.padding(8.dp, 2.dp, 5.dp, 2.dp))
+                            EpisodeDetailComp(ep, title, watchProgress, showSummaries, preferGerman) {
+                                selectedMedia = ep
+                                showMediaInfoDialog = true
                             }
-                            if (watchProgress != null)
-                                WatchedIndicator(watchProgress, Modifier.fillMaxWidth().padding(0.dp, 2.dp, 0.dp, 5.dp))
                         }
                     }
                 }
@@ -127,6 +97,49 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
             }
         }
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun EpisodeDetailComp(
+    ep: MediaEntry,
+    title: String?,
+    watchProgress: MediaWatched?,
+    showSummaries: Boolean,
+    preferGerman: Boolean,
+    onMediaInfoClick: () -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHover by interactionSource.collectIsHoveredAsState()
+
+    Column(modifier = Modifier.hoverable(interactionSource = interactionSource)) {
+        var modifier = Modifier.padding(5.dp)
+        if (isHover)
+            modifier = modifier.basicMarquee(delayMillis = 300)
+        Text(
+            "${ep.entryNumber}${if (!title.isNullOrBlank()) " - $title" else ""}",
+            modifier,
+            softWrap = false,
+            style = MaterialTheme.typography.labelLarge
+        )
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                ep.timestamp.toDateString(),
+                Modifier.padding(5.dp, 0.dp, 0.dp, 4.dp).weight(1f),
+                style = MaterialTheme.typography.labelMedium
+            )
+            Text(
+                ep.fileSize.readableSize(),
+                Modifier.padding(5.dp).clickable { onMediaInfoClick() },
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+        val summary = if (!ep.synopsisDE.isNullOrBlank() && preferGerman) ep.synopsisDE else ep.synopsisEN
+        if (!summary.isNullOrBlank() && showSummaries)
+            ExpandableText(summary, Modifier.padding(8.dp, 2.dp, 5.dp, 2.dp))
+    }
+    if (watchProgress != null)
+        WatchedIndicator(watchProgress, Modifier.fillMaxWidth().padding(0.dp, 2.dp, 0.dp, 5.dp))
 }
 
 @Composable
