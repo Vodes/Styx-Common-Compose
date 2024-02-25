@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import com.russhwolf.settings.get
+import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.components.misc.ExpandableText
 import moe.styx.common.compose.extensions.dynamicClick
 import moe.styx.common.compose.files.Storage
@@ -35,7 +36,7 @@ import moe.styx.common.extension.toDateString
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>, settingsView: Screen?, onPlay: (MediaEntry) -> Unit) {
+fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>, settingsView: Screen?, onPlay: (MediaEntry) -> String) {
     val nav = LocalGlobalNavigator.current
     val watchedList by Storage.stores.watchedStore.getCurrentAndCollectFlow()
     Column(Modifier.fillMaxHeight().fillMaxWidth()) {
@@ -47,14 +48,12 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
             selected.clear()
 
         val watched = episodes.associateWith { ep -> watchedList.find { ep.GUID eqI it.entryID } }
-
         AnimatedVisibility(showSelection.value) { SelectedCard(selected, episodes) { needsRepaint++ } }
 
-        var showFailedDialog by remember { mutableStateOf(false) }
         var failedToPlayMessage by remember { mutableStateOf("") }
-        if (showFailedDialog) {
+        if (failedToPlayMessage.isNotBlank()) {
             FailedDialog(failedToPlayMessage, Modifier.fillMaxWidth(0.6F), Modifier.align(Alignment.CenterHorizontally)) {
-                showFailedDialog = false
+                failedToPlayMessage = ""
                 if (it && settingsView != null) nav.push(settingsView)
             }
         }
@@ -138,14 +137,14 @@ fun SelectedCard(selected: SnapshotStateMap<String, Boolean>, entries: List<Medi
                 if (selected.containsValue(true)) "Selected: ${selected.filter { it.value }.size}" else "Selection",
                 modifier = Modifier.padding(6.dp, 5.dp).weight(1f), style = MaterialTheme.typography.labelMedium
             )
-            IconButton(onClick = {
+            IconButtonWithTooltip(Icons.Default.Visibility, "Set Watched") {
                 val current = selected.filter { it.value }
                 if (current.isEmpty())
-                    return@IconButton
+                    return@IconButtonWithTooltip
                 if (current.size == 1) {
                     val entry = entries.find { selected.entries.first().key eqI it.GUID }
                     if (entry == null)
-                        return@IconButton
+                        return@IconButtonWithTooltip
                     RequestQueue.updateWatched(
                         MediaWatched(entry.GUID, login?.userID ?: "", currentUnixSeconds(), 0, 0F, 100F)
                     )
@@ -155,16 +154,15 @@ fun SelectedCard(selected: SnapshotStateMap<String, Boolean>, entries: List<Medi
                         .filterNotNull())
                 }
                 onUpdate()
-            }) { Icon(Icons.Default.Visibility, "Set Watched") }
-
-            IconButton(onClick = {
+            }
+            IconButtonWithTooltip(Icons.Default.VisibilityOff, "Set Unwatched") {
                 val current = selected.filter { it.value }
                 if (current.isEmpty())
-                    return@IconButton
+                    return@IconButtonWithTooltip
                 if (current.size == 1) {
                     val entry = entries.find { selected.entries.first().key eqI it.GUID }
                     if (entry == null)
-                        return@IconButton
+                        return@IconButtonWithTooltip
                     RequestQueue.removeWatched(entry)
                 } else {
                     RequestQueue.removeMultipleWatched(current
@@ -172,15 +170,10 @@ fun SelectedCard(selected: SnapshotStateMap<String, Boolean>, entries: List<Medi
                         .filterNotNull())
                 }
                 onUpdate()
-            }) { Icon(Icons.Default.VisibilityOff, "Set Unwatched") }
+            }
 
-            IconButton(onClick = {
-                println("Not implemented yet.")
-            }) { Icon(Icons.Default.DownloadForOffline, "Download") }
-
-            IconButton(onClick = {
-                println("Not implemented yet.")
-            }) { Icon(Icons.Default.Delete, "Delete downloaded") }
+            IconButtonWithTooltip(Icons.Default.DownloadForOffline, "Download") {}
+            IconButtonWithTooltip(Icons.Default.Delete, "Delete Downloaded") {}
         }
     }
 }
