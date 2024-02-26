@@ -38,15 +38,15 @@ kotlin {
                 api(libs.styx.common)
 
                 // Other stuff
-                implementation(libs.multiplatform.settings)
+                api(libs.multiplatform.settings)
                 api(libs.multiplatform.imageloader)
                 api(libs.multiplatform.islandtime)
                 api(libs.multiplatform.lifecycle)
                 api(libs.kamel.image)
 
                 // IO
-                implementation(libs.kstore)
-                implementation(libs.kstore.file)
+                api(libs.kstore)
+                api(libs.kstore.file)
 
                 // Navigation (Voyager)
                 api(libs.voyager.nav)
