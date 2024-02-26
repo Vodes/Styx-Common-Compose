@@ -11,6 +11,7 @@ import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.compose.utils.ServerStatus.Companion.setLastKnown
 import moe.styx.common.compose.utils.fetchDeviceInfo
+import moe.styx.common.data.CreationResponse
 import moe.styx.common.data.LoginResponse
 import moe.styx.common.http.httpClient
 import moe.styx.common.json
@@ -39,6 +40,22 @@ fun isLoggedIn(): Boolean {
     }
 
     return false
+}
+
+fun generateCode(): CreationResponse? = runBlocking {
+    val info = json.encodeToString(fetchDeviceInfo())
+    val response: HttpResponse = httpClient.submitForm(
+        Endpoints.DEVICE_CREATE.url,
+        formParameters = Parameters.build {
+            append("info", info)
+        }
+    )
+
+    if (response.status.value !in 200..299) {
+        return@runBlocking null
+    }
+
+    return@runBlocking json.decodeFromString(response.bodyAsText())
 }
 
 fun checkLogin(token: String, first: Boolean = false): LoginResponse? = runBlocking {
