@@ -56,7 +56,11 @@ kotlin {
                 api(libs.voyager.bottomsheetnav)
             }
         }
-        val androidMain by getting
+        val androidMain by getting {
+            dependencies {
+                implementation(libs.android.lifecycle.ktx)
+            }
+        }
         val iosMain by getting
         val jvmMain by getting {
             dependencies {

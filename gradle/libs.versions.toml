@@ -12,8 +12,9 @@ kstore = "0.7.1"
 mordant = "2.3.0"
 oshi = "6.4.11"
 multiplatform-imageloader = "1.7.6"
-multiplatform-lifecycle = "0.0.1"
+multiplatform-lifecycle = "0.0.2"
 islandtime = "0.7.0"
+android-lifecycle = "2.7.0"
 
 
 [libraries]
@@ -32,6 +33,7 @@ kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
 jvm-mordant = { module = "com.github.ajalt.mordant:mordant-jvm", version.ref = "mordant" }
 jvm-oshi = { module = "com.github.oshi:oshi-core", version.ref = "oshi" }
+android-lifecycle-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "android-lifecycle" }
 
 
 [plugins]
