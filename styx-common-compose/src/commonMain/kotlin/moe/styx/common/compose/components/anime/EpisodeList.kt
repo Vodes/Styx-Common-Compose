@@ -37,7 +37,13 @@ import moe.styx.common.extension.toDateString
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>, settingsView: Screen?, onPlay: (MediaEntry) -> String) {
+fun EpisodeList(
+    episodes: List<MediaEntry>,
+    showSelection: MutableState<Boolean>,
+    settingsView: Screen?,
+    onPlay: (MediaEntry) -> String,
+    headerContent: (ColumnScope.() -> Unit)? = null
+) {
     val nav = LocalGlobalNavigator.current
     val watchedList by Storage.stores.watchedStore.getCurrentAndCollectFlow()
     Column(Modifier.fillMaxHeight().fillMaxWidth()) {
@@ -66,6 +72,11 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
         }
 
         LazyColumn {
+            if (headerContent != null) {
+                item("header") {
+                    Column(Modifier.fillMaxWidth()) { headerContent() }
+                }
+            }
             items(episodes.size) { i ->
                 val ep = episodes[i]
                 Column(
