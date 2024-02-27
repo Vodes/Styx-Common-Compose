@@ -6,6 +6,7 @@ import io.github.xxfast.kstore.file.extensions.listStoreOf
 import io.github.xxfast.kstore.file.storeOf
 import kotlinx.coroutines.runBlocking
 import moe.styx.common.compose.appConfig
+import moe.styx.common.compose.utils.SearchState
 import moe.styx.common.data.*
 import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.json
@@ -61,6 +62,18 @@ object Stores {
 
     val queuedWatchedStore: KStore<QueuedWatchedChanges> by lazy {
         storeOf("${appConfig().appStoragePath}/queued/watched-changes.json".toPath(), QueuedWatchedChanges(), json = json)
+    }
+
+    val showSearchState: KStore<SearchState> by lazy {
+        storeOf("${appConfig().appStoragePath}/store/show-search.json".toPath(), SearchState(), json = json)
+    }
+
+    val movieSearchState: KStore<SearchState> by lazy {
+        storeOf("${appConfig().appStoragePath}/store/movie-search.json".toPath(), SearchState(), json = json)
+    }
+
+    val favSearchState: KStore<SearchState> by lazy {
+        storeOf("${appConfig().appStoragePath}/store/fav-search.json".toPath(), SearchState(), json = json)
     }
 
     fun needsRefresh(): Boolean = runBlocking {

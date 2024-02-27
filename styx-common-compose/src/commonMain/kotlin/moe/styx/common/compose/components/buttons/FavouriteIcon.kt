@@ -19,7 +19,7 @@ fun FavouriteIconButton(media: Media, modifier: Modifier = Modifier) {
             RequestQueue.addFav(media)
         else
             RequestQueue.removeFav(media)
-        isFav = media.isFav()
+        isFav = !isFav
     }) {
         if (isFav)
             Icon(Icons.Filled.Star, "Fav")

@@ -1,11 +1,8 @@
 package moe.styx.common.compose.files
 
 import io.github.xxfast.kstore.extensions.getOrEmpty
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import moe.styx.common.compose.appConfig
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.getList
@@ -53,12 +50,12 @@ object Storage {
                 launch { Stores.watchedStore.set(getList(Endpoints.WATCHED)) }
             )
             if (shouldUpdateMedia || shouldUpdateEntries) {
-                jobs.add(launch { Stores.imageStore.set(getList(Endpoints.IMAGES)) })
-                jobs.add(launch { Stores.mediainfoStore.set(getList(Endpoints.MEDIAINFO)) })
+                jobs.add(launch(Dispatchers.IO) { Stores.imageStore.set(getList(Endpoints.IMAGES)) })
+                jobs.add(launch(Dispatchers.IO) { Stores.mediainfoStore.set(getList(Endpoints.MEDIAINFO)) })
                 if (shouldUpdateMedia)
-                    jobs.add(launch { Stores.mediaStore.set(getList(Endpoints.MEDIA)) })
+                    jobs.add(launch(Dispatchers.IO) { Stores.mediaStore.set(getList(Endpoints.MEDIA)) })
                 if (shouldUpdateEntries)
-                    jobs.add(launch { Stores.entryStore.set(getList(Endpoints.MEDIA_ENTRIES)) })
+                    jobs.add(launch(Dispatchers.IO) { Stores.entryStore.set(getList(Endpoints.MEDIA_ENTRIES)) })
             }
             jobs.joinAll()
             val current = currentUnixSeconds()

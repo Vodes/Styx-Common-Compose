@@ -21,3 +21,7 @@ fun Double.roundToDecimals(decimals: Int): Double {
     val roundedValue = (this * dotAt).roundToInt()
     return (roundedValue / dotAt) + (roundedValue % dotAt).toDouble() / dotAt
 }
+
+fun String.removeSomeHTMLTags(): String {
+    return this.replace("<i>", "").replace("</i>", "").replace("<b>", "").replace("</b>", "")
+}
