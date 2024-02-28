@@ -18,6 +18,7 @@ fun MainScaffold(
     title: String,
     addPopButton: Boolean = true,
     actions: @Composable () -> Unit = {},
+    bottomBarContent: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     Scaffold(modifier = modifier, topBar = {
@@ -29,7 +30,7 @@ fun MainScaffold(
                     PopButton()
             }
         )
-    }) {
+    }, bottomBar = { bottomBarContent?.let { it() } }) {
         Box(Modifier.fillMaxSize().padding(it)) {
             content()
         }
