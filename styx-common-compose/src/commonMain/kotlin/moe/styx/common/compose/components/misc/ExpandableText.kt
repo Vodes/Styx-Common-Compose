@@ -12,11 +12,28 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ExpandableText(text: String, modifier: Modifier = Modifier, maxLines: Int = 1, style: TextStyle = MaterialTheme.typography.labelMedium) {
+fun ExpandableText(
+    text: String,
+    modifier: Modifier = Modifier,
+    maxLines: Int = 1,
+    style: TextStyle = MaterialTheme.typography.labelMedium,
+    useCard: Boolean = true
+) {
     var lines by remember { mutableStateOf(maxLines) }
-    ElevatedCard(Modifier.clickable {
-        lines = if (lines != maxLines) maxLines else Int.MAX_VALUE
-    }, elevation = CardDefaults.elevatedCardElevation(2.dp)) {
-        Text(text, modifier, maxLines = lines, overflow = TextOverflow.Ellipsis, style = style)
+    if (useCard) {
+        ElevatedCard(Modifier.clickable {
+            lines = if (lines != maxLines) maxLines else Int.MAX_VALUE
+        }, elevation = CardDefaults.elevatedCardElevation(2.dp)) {
+            Text(text, modifier, maxLines = lines, overflow = TextOverflow.Ellipsis, style = style)
+        }
+    } else {
+        Text(
+            text,
+            modifier.clickable { lines = if (lines != maxLines) maxLines else Int.MAX_VALUE },
+            maxLines = lines,
+            overflow = TextOverflow.Ellipsis,
+            style = style
+        )
     }
+
 }
