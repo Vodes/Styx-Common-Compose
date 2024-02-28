@@ -5,11 +5,9 @@ import io.islandtime.*
 import io.islandtime.clock.now
 import kotlinx.coroutines.runBlocking
 import moe.styx.common.compose.files.Storage
-import moe.styx.common.data.Image
-import moe.styx.common.data.Media
-import moe.styx.common.data.MediaSchedule
-import moe.styx.common.data.ScheduleWeekday
+import moe.styx.common.data.*
 import moe.styx.common.extension.eqI
+import moe.styx.common.extension.toBoolean
 import moe.styx.common.util.isClose
 
 fun Media.isFav(): Boolean = runBlocking {
@@ -42,4 +40,17 @@ fun MediaSchedule.getTargetTime(): ZonedDateTime {
 
 fun Media.find(search: String): Boolean {
     return name.isClose(search.trim()) || nameEN.isClose(search.trim()) || nameJP.isClose(search.trim())
+}
+
+fun List<Media>.getDistinctGenres(): List<String> {
+    return this.flatMap { m ->
+        (m.genres ?: "").split(",").map { it.trim() }
+    }.distinct().filter { it.isNotBlank() }.sorted().toList()
+}
+
+fun List<Media>.getDistinctCategories(allCategories: List<Category>): List<Category> {
+    return this.asSequence().map { (it.categoryID ?: "").trim() }
+        .distinct().filter { it.isNotBlank() }
+        .mapNotNull { allCategories.find { cat -> cat.GUID eqI it } }
+        .filter { it.isVisible.toBoolean() }.sortedBy { it.sort }.toList()
 }
