@@ -13,29 +13,36 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.xxfast.kstore.KStore
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
 import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.utils.SearchState
 import moe.styx.common.compose.utils.SortType
 import moe.styx.common.data.Category
+import moe.styx.common.util.launchThreaded
 
 @Composable
 fun MediaSearchBar(
     searchStore: KStore<SearchState>,
-    searchState: SearchState,
+    initialState: SearchState,
+    receiverStateFlow: MutableStateFlow<SearchState>,
     modifier: Modifier = Modifier,
     availableCategories: List<Category>,
     availableGenres: List<String>,
     favs: Boolean = false,
 ) {
-    val scope = rememberCoroutineScope()
     var showFilters by remember { mutableStateOf(false) }
+    var currentState by mutableStateOf(initialState)
 
-    OutlinedTextField(searchState.search,
+    OutlinedTextField(currentState.search,
         modifier = modifier,
+        singleLine = true,
         onValueChange = {
-            scope.launch { searchStore.set(searchState.copy(search = it)) }
+            launchThreaded {
+                currentState = currentState.copy(search = it)
+                receiverStateFlow.emit(currentState)
+                searchStore.set(currentState)
+            }
         }, shape = AppShapes.medium, label = {
             Text("Search")
         }, leadingIcon = { Icon(Icons.Default.Search, "Search") },
@@ -49,8 +56,12 @@ fun MediaSearchBar(
                 }
                 IconButtonWithTooltip(Icons.Filled.MoreVert, "Sorting") { showSort = true }
             }
-            SortDropdown(showSort, searchState, onDismiss = { showSort = false }) {
-                scope.launch { searchStore.set(searchState.copy(sortType = it.first, sortDescending = it.second)) }
+            SortDropdown(showSort, currentState, onDismiss = { showSort = false }) {
+                launchThreaded {
+                    currentState = currentState.copy(sortType = it.first, sortDescending = it.second)
+                    receiverStateFlow.emit(currentState)
+                    searchStore.set(currentState)
+                }
             }
         }
     )
@@ -60,13 +71,21 @@ fun MediaSearchBar(
             ElevatedCard(Modifier.fillMaxWidth().padding(3.dp)) {
                 Column {
                     Text("Category", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
-                    CategoryFilterBar(searchState, availableCategories) {
-                        scope.launch { searchStore.set(searchState.copy(selectedCategories = it)) }
+                    CategoryFilterBar(currentState, availableCategories) {
+                        launchThreaded {
+                            currentState = currentState.copy(selectedCategories = it)
+                            receiverStateFlow.emit(currentState)
+                            searchStore.set(currentState)
+                        }
                     }
 
                     Text("Genre", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
-                    GenreFilterBar(searchState, availableGenres) {
-                        scope.launch { searchStore.set(searchState.copy(selectedGenres = it)) }
+                    GenreFilterBar(currentState, availableGenres) {
+                        launchThreaded {
+                            currentState = currentState.copy(selectedGenres = it)
+                            receiverStateFlow.emit(currentState)
+                            searchStore.set(currentState)
+                        }
                     }
                 }
             }
