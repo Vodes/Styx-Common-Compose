@@ -1,5 +1,6 @@
 package moe.styx.common.compose.components.misc
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -21,7 +22,7 @@ fun ExpandableText(
 ) {
     var lines by remember { mutableStateOf(maxLines) }
     if (useCard) {
-        ElevatedCard(Modifier.clickable {
+        ElevatedCard(Modifier.animateContentSize().clickable {
             lines = if (lines != maxLines) maxLines else Int.MAX_VALUE
         }, elevation = CardDefaults.elevatedCardElevation(2.dp)) {
             Text(text, modifier, maxLines = lines, overflow = TextOverflow.Ellipsis, style = style)
@@ -29,7 +30,7 @@ fun ExpandableText(
     } else {
         Text(
             text,
-            modifier.clickable { lines = if (lines != maxLines) maxLines else Int.MAX_VALUE },
+            modifier.animateContentSize().clickable { lines = if (lines != maxLines) maxLines else Int.MAX_VALUE },
             maxLines = lines,
             overflow = TextOverflow.Ellipsis,
             style = style
