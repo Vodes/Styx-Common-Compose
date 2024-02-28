@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
 import moe.styx.common.compose.components.misc.PrimarySelectableObject
 import moe.styx.common.compose.components.misc.SecondarySelectableObject
@@ -20,7 +21,8 @@ fun CategoryFilterBar(initialState: SearchState, availableCategories: List<Categ
     }
     FlowRow {
         for (category in availableCategories.sortedByDescending { it.sort }) {
-            PrimarySelectableObject(category.name, mutableStateOf(category in selected)) {
+            val isSelected = remember { mutableStateOf(category in selected) }
+            PrimarySelectableObject(category.name, isSelected) {
                 if (it)
                     selected.add(category)
                 else
@@ -41,7 +43,8 @@ fun GenreFilterBar(initialState: SearchState, availableGenres: List<String>, onC
     }
     FlowRow {
         for (genre in availableGenres.sortedBy { it.lowercase() }) {
-            SecondarySelectableObject(genre, mutableStateOf(genre in selected)) {
+            val isSelected = remember { mutableStateOf(genre in selected) }
+            SecondarySelectableObject(genre, isSelected) {
                 if (it)
                     selected.add(genre)
                 else

@@ -13,7 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.xxfast.kstore.KStore
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.utils.SearchState
@@ -21,70 +24,83 @@ import moe.styx.common.compose.utils.SortType
 import moe.styx.common.data.Category
 import moe.styx.common.util.launchThreaded
 
-@Composable
-fun MediaSearchBar(
-    searchStore: KStore<SearchState>,
-    initialState: SearchState,
-    receiverStateFlow: MutableStateFlow<SearchState>,
-    modifier: Modifier = Modifier,
-    availableCategories: List<Category>,
-    availableGenres: List<String>,
-    favs: Boolean = false,
+class MediaSearch(
+    private val searchStore: KStore<SearchState>,
+    private val initialState: SearchState,
+    private val availableGenres: List<String>,
+    private val availableCategories: List<Category>,
+    private val favs: Boolean = false
 ) {
-    var showFilters by remember { mutableStateOf(false) }
-    var currentState by mutableStateOf(initialState)
+    val stateEmitter = MutableStateFlow(initialState)
 
-    OutlinedTextField(currentState.search,
-        modifier = modifier,
-        singleLine = true,
-        onValueChange = {
-            launchThreaded {
-                currentState = currentState.copy(search = it)
-                receiverStateFlow.emit(currentState)
-                searchStore.set(currentState)
-            }
-        }, shape = AppShapes.medium, label = {
-            Text("Search")
-        }, leadingIcon = { Icon(Icons.Default.Search, "Search") },
-        trailingIcon = {
-            var showSort by remember { mutableStateOf(false) }
-            Row {
-                if (!favs) {
-                    IconButtonWithTooltip(if (showFilters) Icons.Filled.FilterAltOff else Icons.Filled.FilterAlt, "Show filters") {
-                        showFilters = !showFilters
+    @Composable
+    fun Component(modifier: Modifier = Modifier) {
+        var showFilters by remember { mutableStateOf(false) }
+        val scope = rememberCoroutineScope()
+
+        OutlinedTextField(modifier = modifier, singleLine = true, value = initialState.search, shape = AppShapes.medium, label = { Text("Search") },
+            onValueChange = {
+                scope.launch {
+                    stateEmitter.collectLatest { state ->
+                        val new = state.copy(search = it)
+                        stateEmitter.emit(new)
+                        launchThreaded { searchStore.set(new) }
                     }
                 }
-                IconButtonWithTooltip(Icons.Filled.MoreVert, "Sorting") { showSort = true }
-            }
-            SortDropdown(showSort, currentState, onDismiss = { showSort = false }) {
-                launchThreaded {
-                    currentState = currentState.copy(sortType = it.first, sortDescending = it.second)
-                    receiverStateFlow.emit(currentState)
-                    searchStore.set(currentState)
+            },
+            leadingIcon = {
+                Icon(Icons.Default.Search, "Search")
+            },
+            trailingIcon = {
+                var showSort by remember { mutableStateOf(false) }
+                Row {
+                    if (!favs) {
+                        IconButtonWithTooltip(if (showFilters) Icons.Filled.FilterAltOff else Icons.Filled.FilterAlt, "Show filters") {
+                            showFilters = !showFilters
+                        }
+                    }
+                    IconButtonWithTooltip(Icons.Filled.MoreVert, "Sorting") { showSort = true }
                 }
-            }
-        }
-    )
+                SortDropdown(showSort, initialState, onDismiss = { showSort = false }) {
+                    scope.launch {
+                        stateEmitter.collectLatest { state ->
+                            val new = state.copy(sortType = it.first, sortDescending = it.second)
+                            stateEmitter.emit(new)
+                            launchThreaded { searchStore.set(new) }
+                        }
+                    }
+                }
+            })
 
-    AnimatedVisibility(showFilters) {
+        AnimatedVisibility(showFilters) {
+            filterBars(scope)
+        }
+    }
+
+    @Composable
+    private fun filterBars(scope: CoroutineScope) {
         Surface(Modifier.fillMaxWidth().padding(7.dp)) {
             ElevatedCard(Modifier.fillMaxWidth().padding(3.dp)) {
                 Column {
                     Text("Category", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
-                    CategoryFilterBar(currentState, availableCategories) {
-                        launchThreaded {
-                            currentState = currentState.copy(selectedCategories = it)
-                            receiverStateFlow.emit(currentState)
-                            searchStore.set(currentState)
+                    CategoryFilterBar(initialState, availableCategories) {
+                        scope.launch {
+                            stateEmitter.collectLatest { state ->
+                                val new = state.copy(selectedCategories = it)
+                                stateEmitter.emit(new)
+                                launchThreaded { searchStore.set(new) }
+                            }
                         }
                     }
 
                     Text("Genre", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
-                    GenreFilterBar(currentState, availableGenres) {
-                        launchThreaded {
-                            currentState = currentState.copy(selectedGenres = it)
-                            receiverStateFlow.emit(currentState)
-                            searchStore.set(currentState)
+                    GenreFilterBar(initialState, availableGenres) {
+                        scope.launch {
+                            stateEmitter.collectLatest { state ->
+                                val new = state.copy(selectedGenres = it)
+                                stateEmitter.emit(new)
+                                launchThreaded { searchStore.set(new) }
+                            }
                         }
                     }
                 }
