@@ -39,7 +39,7 @@ class MediaSearch(
         val scope = rememberCoroutineScope()
         var internalState by remember { mutableStateOf(initialState) }
 
-        OutlinedTextField(modifier = modifier, singleLine = true, value = initialState.search, shape = AppShapes.medium, label = { Text("Search") },
+        OutlinedTextField(modifier = modifier, singleLine = true, value = internalState.search, shape = AppShapes.medium, label = { Text("Search") },
             onValueChange = {
                 scope.launch {
                     internalState = internalState.copy(search = it)
@@ -60,7 +60,7 @@ class MediaSearch(
                     }
                     IconButtonWithTooltip(Icons.Filled.MoreVert, "Sorting") { showSort = true }
                 }
-                SortDropdown(showSort, initialState, onDismiss = { showSort = false }) {
+                SortDropdown(showSort, internalState, onDismiss = { showSort = false }) {
                     scope.launch {
                         internalState = internalState.copy(sortType = it.first, sortDescending = it.second)
                         _stateEmitter.emit(internalState)
@@ -74,7 +74,7 @@ class MediaSearch(
                 ElevatedCard(Modifier.fillMaxWidth().padding(3.dp)) {
                     Column {
                         Text("Category", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
-                        CategoryFilterBar(initialState, availableCategories) {
+                        CategoryFilterBar(internalState, availableCategories) {
                             scope.launch {
                                 internalState = internalState.copy(selectedCategories = it)
                                 _stateEmitter.emit(internalState)
@@ -83,7 +83,7 @@ class MediaSearch(
                         }
 
                         Text("Genre", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
-                        GenreFilterBar(initialState, availableGenres) {
+                        GenreFilterBar(internalState, availableGenres) {
                             scope.launch {
                                 internalState = internalState.copy(selectedGenres = it)
                                 _stateEmitter.emit(internalState)
