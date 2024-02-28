@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.xxfast.kstore.KStore
 import kotlinx.coroutines.launch
+import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.utils.SearchState
 import moe.styx.common.compose.utils.SortType
@@ -35,7 +36,7 @@ fun MediaSearchBar(
         modifier = modifier,
         onValueChange = {
             scope.launch { searchStore.set(searchState.copy(search = it)) }
-        }, label = {
+        }, shape = AppShapes.medium, label = {
             Text("Search")
         }, leadingIcon = { Icon(Icons.Default.Search, "Search") },
         trailingIcon = {
