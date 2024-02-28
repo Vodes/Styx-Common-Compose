@@ -2,10 +2,13 @@ package moe.styx.common.compose.components.search
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import moe.styx.common.compose.components.misc.PrimarySelectableObject
 import moe.styx.common.compose.components.misc.SecondarySelectableObject
 import moe.styx.common.compose.utils.SearchState
@@ -19,7 +22,7 @@ fun CategoryFilterBar(initialState: SearchState, availableCategories: List<Categ
         if (it !in availableCategories)
             selected.remove(it)
     }
-    FlowRow {
+    FlowRow(Modifier.padding(7.dp, 2.dp, 7.dp, 10.dp)) {
         for (category in availableCategories.sortedByDescending { it.sort }) {
             val isSelected = remember { mutableStateOf(category in selected) }
             PrimarySelectableObject(category.name, isSelected) {
@@ -41,7 +44,7 @@ fun GenreFilterBar(initialState: SearchState, availableGenres: List<String>, onC
         if (it !in availableGenres)
             selected.remove(it)
     }
-    FlowRow {
+    FlowRow(Modifier.padding(7.dp, 2.dp, 7.dp, 10.dp)) {
         for (genre in availableGenres.sortedBy { it.lowercase() }) {
             val isSelected = remember { mutableStateOf(genre in selected) }
             SecondarySelectableObject(genre, isSelected) {
