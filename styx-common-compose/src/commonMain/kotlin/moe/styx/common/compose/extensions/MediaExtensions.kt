@@ -10,6 +10,7 @@ import moe.styx.common.data.Media
 import moe.styx.common.data.MediaSchedule
 import moe.styx.common.data.ScheduleWeekday
 import moe.styx.common.extension.eqI
+import moe.styx.common.util.isClose
 
 fun Media.isFav(): Boolean = runBlocking {
     val favs = Storage.stores.favouriteStore.getOrEmpty()
@@ -37,4 +38,8 @@ fun MediaSchedule.getTargetTime(): ZonedDateTime {
     val adjusted = now.copy(hour = this.hour, minute = this.minute)
     val target = adjusted.next(this.day.dayOfWeek())
     return target.adjustedTo(TimeZone.systemDefault())
+}
+
+fun Media.find(search: String): Boolean {
+    return name.isClose(search.trim()) || nameEN.isClose(search.trim()) || nameJP.isClose(search.trim())
 }
