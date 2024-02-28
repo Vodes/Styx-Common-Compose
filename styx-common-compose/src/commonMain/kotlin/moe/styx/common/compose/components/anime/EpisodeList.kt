@@ -42,7 +42,7 @@ fun EpisodeList(
     showSelection: MutableState<Boolean>,
     settingsView: Screen?,
     onPlay: (MediaEntry) -> String,
-    headerContent: (ColumnScope.() -> Unit)? = null
+    headerContent: (@Composable ColumnScope.() -> Unit)? = null
 ) {
     val nav = LocalGlobalNavigator.current
     val watchedList by Storage.stores.watchedStore.getCurrentAndCollectFlow()
