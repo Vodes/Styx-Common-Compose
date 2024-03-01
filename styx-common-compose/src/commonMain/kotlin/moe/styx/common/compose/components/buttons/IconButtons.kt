@@ -1,5 +1,6 @@
 package moe.styx.common.compose.components.buttons
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
@@ -8,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun ExpandIconButton(
@@ -44,11 +47,12 @@ fun IconButtonWithTooltip(
     colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
     enabled: Boolean = true,
     tint: Color = MaterialTheme.colorScheme.onSurface,
+    size: Dp = 26.0.dp,
     onClick: () -> Unit
 ) {
     ToolTipWrapper(tooltip) {
-        IconButton(onClick, modifier = modifier, enabled = enabled, colors = colors) {
-            Icon(icon, tooltip, tint = tint)
+        IconButton(onClick, modifier = modifier.size(size), enabled = enabled, colors = colors) {
+            Icon(icon, tooltip, Modifier.size(size - 2.dp), tint = tint)
         }
     }
 }
