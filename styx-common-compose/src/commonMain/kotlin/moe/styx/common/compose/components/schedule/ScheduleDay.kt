@@ -14,13 +14,14 @@ import moe.styx.common.compose.extensions.dayOfWeek
 import moe.styx.common.compose.extensions.getTargetTime
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.getCurrentAndCollectFlow
+import moe.styx.common.data.Media
 import moe.styx.common.data.ScheduleWeekday
 import moe.styx.common.extension.capitalize
 import moe.styx.common.extension.eqI
 import moe.styx.common.extension.padString
 
 @Composable
-fun ScheduleDay(day: ScheduleWeekday, onClick: () -> Unit) {
+fun ScheduleDay(day: ScheduleWeekday, onClick: (Media) -> Unit) {
     val mediaList by Storage.stores.mediaStore.getCurrentAndCollectFlow()
     val schedules by Storage.stores.scheduleStore.getCurrentAndCollectFlow()
     val filtered = schedules.filter { it.getTargetTime().dayOfWeek == day.dayOfWeek() }.sortedBy { it.getTargetTime().toInstant().secondOfUnixEpoch }
@@ -40,7 +41,7 @@ fun ScheduleDay(day: ScheduleWeekday, onClick: () -> Unit) {
                 modifier = Modifier.padding(6.dp),
                 style = MaterialTheme.typography.titleMedium
             )
-            Column(Modifier.padding(6.dp, 1.dp)) { AnimeListItem(media, onClick) }
+            Column(Modifier.padding(6.dp, 1.dp)) { AnimeListItem(media) { onClick(media) } }
         }
     }
 }
