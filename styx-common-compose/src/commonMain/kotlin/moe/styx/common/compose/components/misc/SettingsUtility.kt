@@ -1,6 +1,7 @@
 package moe.styx.common.compose.components.misc
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -33,6 +34,18 @@ fun StringChoices(
                     Text(choice, style = MaterialTheme.typography.bodyMedium)
                 }
             }
+        }
+        if (!description.isNullOrBlank())
+            Text(description, Modifier.padding(6.dp, 2.dp), style = MaterialTheme.typography.labelMedium)
+    }
+}
+
+@Composable
+fun MpvCheckbox(title: String, value: Boolean, description: String? = null, enabled: Boolean = true, onUpdate: (Boolean) -> Unit = {}) {
+    Column(Modifier.padding(10.dp, 5.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(checked = value, enabled = enabled, onCheckedChange = { onUpdate(it) })
+            Text(text = title, style = MaterialTheme.typography.bodyLarge)
         }
         if (!description.isNullOrBlank())
             Text(description, Modifier.padding(6.dp, 2.dp), style = MaterialTheme.typography.labelMedium)
