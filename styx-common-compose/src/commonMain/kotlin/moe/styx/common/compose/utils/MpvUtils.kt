@@ -10,15 +10,13 @@ import moe.styx.common.json
 val videoOutputDriverChoices = listOf("gpu-next", "gpu")
 val gpuApiChoices =
     when (Platform.current) {
-        Platform.ANDROID -> listOf("opengl", "vulkan")
-        Platform.IOS -> listOf("opengl", "vulkan")
+        Platform.ANDROID, Platform.IOS -> listOf("opengl", "vulkan")
         else -> listOf("auto", "vulkan", "d3d11", "opengl")
     }
 
 val profileChoices =
     when (Platform.current) {
-        Platform.ANDROID -> listOf("high", "normal", "fast")
-        Platform.IOS -> listOf("high", "normal", "fast")
+        Platform.ANDROID, Platform.IOS -> listOf("high", "normal", "fast")
         else -> listOf("high", "normal", "light", "fast")
     }
 
