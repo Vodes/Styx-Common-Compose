@@ -102,7 +102,7 @@ data class MpvPreferences(
             "jp,jpn,en,eng,de,ger"
     }
 
-    fun getProfile(): String {
+    fun getPlatformProfile(): String {
         return when (Platform.current) {
             Platform.JVM -> "styx${profile.capitalize()}"
             else -> when (profile) {
