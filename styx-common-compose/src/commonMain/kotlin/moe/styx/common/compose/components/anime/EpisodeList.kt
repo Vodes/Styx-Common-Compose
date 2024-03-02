@@ -26,7 +26,7 @@ import moe.styx.common.compose.components.misc.ExpandableText
 import moe.styx.common.compose.extensions.dynamicClick
 import moe.styx.common.compose.extensions.readableSize
 import moe.styx.common.compose.files.Storage
-import moe.styx.common.compose.files.getCurrentAndCollectFlow
+import moe.styx.common.compose.files.collectWithEmptyInitial
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.threads.RequestQueue
@@ -48,7 +48,7 @@ fun EpisodeList(
     headerContent: (@Composable ColumnScope.() -> Unit)? = null
 ) {
     val nav = LocalGlobalNavigator.current
-    val watchedList by Storage.stores.watchedStore.getCurrentAndCollectFlow()
+    val watchedList by Storage.stores.watchedStore.collectWithEmptyInitial()
     Column(Modifier.fillMaxHeight().fillMaxWidth()) {
         val selected = remember { mutableStateMapOf<String, Boolean>() }
         var needsRepaint by remember { mutableStateOf(0) }
