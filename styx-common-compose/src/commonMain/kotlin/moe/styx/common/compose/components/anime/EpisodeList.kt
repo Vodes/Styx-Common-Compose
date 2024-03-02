@@ -9,6 +9,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -41,6 +43,7 @@ fun EpisodeList(
     episodes: List<MediaEntry>,
     showSelection: MutableState<Boolean>,
     settingsView: Screen?,
+    listState: LazyListState? = null,
     onPlay: (MediaEntry) -> String,
     headerContent: (@Composable ColumnScope.() -> Unit)? = null
 ) {
@@ -71,7 +74,9 @@ fun EpisodeList(
             MediaInfoDialog(selectedMedia!!) { showMediaInfoDialog = false }
         }
 
-        LazyColumn {
+        val lazyListState = listState ?: rememberLazyListState()
+
+        LazyColumn(state = lazyListState) {
             if (headerContent != null) {
                 item("header") {
                     Column(Modifier.fillMaxWidth()) { headerContent() }
