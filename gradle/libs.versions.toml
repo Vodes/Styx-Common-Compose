@@ -1,9 +1,9 @@
 [versions]
 android-minSdk = "27"
 android-compileSdk = "34"
-agp = "8.2.2"
+agp = "8.3.0"
 kotlin = "1.9.22"
-compose = "1.5.12"
+compose = "1.6.0"
 styx-common = "0.0.2"
 voyager = "1.0.0"
 multiplatform-settings = "1.1.1"
