@@ -56,6 +56,11 @@ inline fun <T : @Serializable Any> KStore<List<T>>.getCurrentAndCollectFlow(): S
     return this.updatesOrEmpty.collectAsState(current)
 }
 
+@Composable
+inline fun <T : @Serializable Any> KStore<List<T>>.collectWithEmptyInitial(): State<List<T>> {
+    return this.updatesOrEmpty.collectAsState(emptyList())
+}
+
 suspend inline fun <reified T> KStore<List<T>>.updateList(crossinline block: (MutableList<T>) -> Unit) {
     this.update {
         val mutable = it?.toMutableList() ?: mutableListOf()

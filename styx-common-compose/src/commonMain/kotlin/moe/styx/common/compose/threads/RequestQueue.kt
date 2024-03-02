@@ -65,14 +65,14 @@ object RequestQueue : LifecycleTrackedJob() {
         currentJob = createJob()
     }
 
-    fun addFav(media: Media) {
+    fun addFav(media: Media): Job? {
         val favs = Storage.stores.favouriteStore.getBlocking()
         val existing = favs.find { it.mediaID eqI media.GUID }
         if (existing != null)
-            return
+            return null
         val fav = Favourite(media.GUID, login?.userID ?: "", currentUnixSeconds())
 
-        launchThreaded {
+        return launchThreaded {
             Storage.stores.favouriteStore.updateList { it.add(fav) }
             Storage.stores.queuedFavStore.update { changes ->
                 val current = changes ?: QueuedFavChanges()
@@ -90,10 +90,10 @@ object RequestQueue : LifecycleTrackedJob() {
         }
     }
 
-    fun removeFav(media: Media) {
+    fun removeFav(media: Media): Job? {
         val favs = Storage.stores.favouriteStore.getBlocking()
-        val fav = favs.find { it.mediaID eqI media.GUID } ?: return
-        launchThreaded {
+        val fav = favs.find { it.mediaID eqI media.GUID } ?: return null
+        return launchThreaded {
             Storage.stores.favouriteStore.updateList { it.remove(fav) }
             if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(Endpoints.FAVOURITES_DELETE, fav)) {
                 Storage.stores.queuedFavStore.update { changes ->
@@ -105,12 +105,12 @@ object RequestQueue : LifecycleTrackedJob() {
         }
     }
 
-    fun updateWatched(mediaWatched: MediaWatched) {
+    fun updateWatched(mediaWatched: MediaWatched): Job {
         val existingList = Storage.stores.watchedStore.getBlocking()
         val existing = existingList.find { it.entryID eqI mediaWatched.entryID }
         val existingMax = existing?.maxProgress ?: -1F
         val new = if (existingMax > mediaWatched.maxProgress) mediaWatched.copy(maxProgress = existingMax) else mediaWatched
-        launchThreaded {
+        return launchThreaded {
             Storage.stores.watchedStore.updateList { it.replaceIfNotNull(existing, new) }
             Storage.stores.queuedWatchedStore.update { changes ->
                 val current = changes ?: QueuedWatchedChanges()
@@ -123,10 +123,10 @@ object RequestQueue : LifecycleTrackedJob() {
         }
     }
 
-    fun addMultipleWatched(entries: List<MediaEntry>) {
+    fun addMultipleWatched(entries: List<MediaEntry>): Job {
         val existingList = Storage.stores.watchedStore.getBlocking()
         val now = currentUnixSeconds()
-        launchThreaded {
+        return launchThreaded {
             Storage.stores.watchedStore.updateList { watched ->
                 entries.forEach { entry ->
                     val existing = existingList.find { it.entryID eqI entry.GUID }
@@ -138,9 +138,9 @@ object RequestQueue : LifecycleTrackedJob() {
         }
     }
 
-    fun removeMultipleWatched(entries: List<MediaEntry>) {
+    fun removeMultipleWatched(entries: List<MediaEntry>): Job? {
         val existingList = Storage.stores.watchedStore.getBlocking()
-        launchThreaded {
+        return launchThreaded {
             Storage.stores.watchedStore.updateList { watched ->
                 entries.forEach { entry ->
                     val existing = existingList.find { it.entryID eqI entry.GUID } ?: return@forEach
@@ -151,10 +151,10 @@ object RequestQueue : LifecycleTrackedJob() {
         }
     }
 
-    fun removeWatched(entry: MediaEntry) {
+    fun removeWatched(entry: MediaEntry): Job? {
         val existingList = Storage.stores.watchedStore.getBlocking()
-        val existing = existingList.find { it.entryID eqI entry.GUID } ?: return
-        launchThreaded {
+        val existing = existingList.find { it.entryID eqI entry.GUID } ?: return null
+        return launchThreaded {
             Storage.stores.watchedStore.updateList { it.remove(existing) }
             Storage.stores.queuedWatchedStore.update { changes ->
                 val current = changes ?: QueuedWatchedChanges()
