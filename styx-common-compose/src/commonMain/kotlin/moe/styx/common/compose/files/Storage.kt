@@ -32,7 +32,7 @@ object Storage {
     val loadingProgress = MutableStateFlow("")
     val isLoaded = MutableStateFlow(false)
 
-    private fun loadData() = launchGlobal {
+    fun loadData() = launchGlobal {
         createDirectories()
         isLoaded.emit(false)
         loadingProgress.emit("")
