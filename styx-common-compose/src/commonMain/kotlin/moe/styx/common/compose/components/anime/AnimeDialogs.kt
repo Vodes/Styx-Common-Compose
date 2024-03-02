@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.misc.OutlinedText
 import moe.styx.common.compose.components.misc.TextWithCheckBox
@@ -36,7 +37,7 @@ fun FailedDialog(message: String, modifier: Modifier = Modifier, buttonModifier:
 @Composable
 fun MediaInfoDialog(mediaEntry: MediaEntry, onDismiss: () -> Unit) {
     val mediaInfo = Storage.mediaInfos.find { it.entryID eqI mediaEntry.GUID }
-    AlertDialog(onDismiss) {
+    AlertDialog(onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(color = MaterialTheme.colorScheme.surface, shape = AppShapes.medium) {
             Column(Modifier.padding(10.dp)) {
                 if (mediaInfo == null)
