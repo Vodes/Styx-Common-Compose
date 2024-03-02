@@ -24,7 +24,7 @@ object Storage {
     val stores: Stores
         get() {
             if (Stores.needsRefresh()) {
-                runBlocking { loadData().join() }
+                runBlocking { loadData() }
             }
             return Stores
         }
@@ -32,7 +32,7 @@ object Storage {
     val loadingProgress = MutableStateFlow("")
     val isLoaded = MutableStateFlow(false)
 
-    fun loadData() = launchGlobal {
+    suspend fun loadData() = coroutineScope {
         createDirectories()
         isLoaded.emit(false)
         loadingProgress.emit("")
@@ -46,10 +46,10 @@ object Storage {
         if (serverOnline) {
             loadingProgress.emit("Loading media...")
             val jobs = mutableSetOf(
-                launch { Stores.scheduleStore.set(getList(Endpoints.SCHEDULES)) },
-                launch { Stores.categoryStore.set(getList(Endpoints.CATEGORIES)) },
-                launch { Stores.favouriteStore.set(getList(Endpoints.FAVOURITES)) },
-                launch { Stores.watchedStore.set(getList(Endpoints.WATCHED)) }
+                launchGlobal { Stores.scheduleStore.set(getList(Endpoints.SCHEDULES)) },
+                launchGlobal { Stores.categoryStore.set(getList(Endpoints.CATEGORIES)) },
+                launchGlobal { Stores.favouriteStore.set(getList(Endpoints.FAVOURITES)) },
+                launchGlobal { Stores.watchedStore.set(getList(Endpoints.WATCHED)) }
             )
             if (shouldUpdateMedia || shouldUpdateEntries) {
                 jobs.add(launch(Dispatchers.IO) { Stores.imageStore.set(getList(Endpoints.IMAGES)) })
