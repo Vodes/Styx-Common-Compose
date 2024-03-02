@@ -4,18 +4,11 @@ import android.util.Log as AndroidLog
 
 actual object Log : ALog() {
     override fun printMsg(message: String, prefix: String, source: String?, exception: Throwable?, printStack: Boolean) {
-        val fallback = if (message.isBlank() && exception != null) "Exception: ${exception.message}" else message
-        var msg = "${getFormattedTime()} - [$prefix] - $fallback"
-        if (!source.isNullOrBlank())
-            msg += "\n  at: $source"
-        if (exception != null && message.isBlank())
-            msg += "\n  Exception: ${exception.message}"
-
         when (prefix) {
-            "I" -> AndroidLog.i(source, message, exception)
-            "D" -> AndroidLog.d(source, message, exception)
-            "W" -> AndroidLog.w(source, message, exception)
-            else -> AndroidLog.e(source, message, exception)
+            "I" -> AndroidLog.i(source ?: "Styx", message, exception)
+            "D" -> AndroidLog.d(source ?: "Styx", message, exception)
+            "W" -> AndroidLog.w(source ?: "Styx", message, exception)
+            else -> AndroidLog.e(source ?: "Styx", message, exception)
         }
 
         if (printStack)
