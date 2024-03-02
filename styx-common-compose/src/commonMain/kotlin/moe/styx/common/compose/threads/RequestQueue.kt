@@ -106,30 +106,34 @@ object RequestQueue : LifecycleTrackedJob() {
     }
 
     fun updateWatched(mediaWatched: MediaWatched): Job {
-        val existingList = Storage.stores.watchedStore.getBlocking()
-        val existing = existingList.find { it.entryID eqI mediaWatched.entryID }
-        val existingMax = existing?.maxProgress ?: -1F
-        val new = if (existingMax > mediaWatched.maxProgress) mediaWatched.copy(maxProgress = existingMax) else mediaWatched
         return launchThreaded {
-            Storage.stores.watchedStore.updateList { it.replaceIfNotNull(existing, new) }
-            Storage.stores.queuedWatchedStore.update { changes ->
-                val current = changes ?: QueuedWatchedChanges()
-                current.toUpdate.removeAll { it.entryID eqI mediaWatched.entryID }
-                current.toRemove.removeAll { it.entryID eqI mediaWatched.entryID }
-                return@update current
+            var new: MediaWatched? = null
+            Storage.stores.watchedStore.updateList {
+                val existing = it.find { w -> w.entryID eqI mediaWatched.entryID }
+                val existingMax = existing?.maxProgress ?: -1F
+                new = if (existingMax > mediaWatched.maxProgress) mediaWatched.copy(maxProgress = existingMax) else mediaWatched
+                it.replaceIfNotNull(existing, new!!)
             }
-            if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(Endpoints.WATCHED_ADD, new))
-                Storage.stores.queuedWatchedStore.addWatched(new)
+
+            new?.let { new ->
+                Storage.stores.queuedWatchedStore.update { changes ->
+                    val current = changes ?: QueuedWatchedChanges()
+                    current.toUpdate.removeAll { it.entryID eqI mediaWatched.entryID }
+                    current.toRemove.removeAll { it.entryID eqI mediaWatched.entryID }
+                    return@update current
+                }
+                if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(Endpoints.WATCHED_ADD, new))
+                    Storage.stores.queuedWatchedStore.addWatched(new)
+            }
         }
     }
 
     fun addMultipleWatched(entries: List<MediaEntry>): Job {
-        val existingList = Storage.stores.watchedStore.getBlocking()
         val now = currentUnixSeconds()
         return launchThreaded {
             Storage.stores.watchedStore.updateList { watched ->
                 entries.forEach { entry ->
-                    val existing = existingList.find { it.entryID eqI entry.GUID }
+                    val existing = watched.find { it.entryID eqI entry.GUID }
                     val new = MediaWatched(entry.GUID, login?.userID ?: "", now, 0, 0F, 100F)
                     watched.replaceIfNotNull(existing, new)
                     Storage.stores.queuedWatchedStore.addWatched(new)
@@ -138,12 +142,11 @@ object RequestQueue : LifecycleTrackedJob() {
         }
     }
 
-    fun removeMultipleWatched(entries: List<MediaEntry>): Job? {
-        val existingList = Storage.stores.watchedStore.getBlocking()
+    fun removeMultipleWatched(entries: List<MediaEntry>): Job {
         return launchThreaded {
             Storage.stores.watchedStore.updateList { watched ->
                 entries.forEach { entry ->
-                    val existing = existingList.find { it.entryID eqI entry.GUID } ?: return@forEach
+                    val existing = watched.find { it.entryID eqI entry.GUID } ?: return@forEach
                     watched.remove(existing)
                     Storage.stores.queuedWatchedStore.removeWatched(existing)
                 }
@@ -151,19 +154,23 @@ object RequestQueue : LifecycleTrackedJob() {
         }
     }
 
-    fun removeWatched(entry: MediaEntry): Job? {
-        val existingList = Storage.stores.watchedStore.getBlocking()
-        val existing = existingList.find { it.entryID eqI entry.GUID } ?: return null
+    fun removeWatched(entry: MediaEntry): Job {
         return launchThreaded {
-            Storage.stores.watchedStore.updateList { it.remove(existing) }
-            Storage.stores.queuedWatchedStore.update { changes ->
-                val current = changes ?: QueuedWatchedChanges()
-                current.toUpdate.removeAll { it.entryID eqI entry.GUID }
-                current.toRemove.removeAll { it.entryID eqI entry.GUID }
-                return@update current
+            var existing: MediaWatched? = null
+            Storage.stores.watchedStore.updateList { list ->
+                existing = list.find { it.entryID eqI entry.GUID }
+                existing?.let { list.remove(it) }
             }
-            if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(Endpoints.WATCHED_DELETE, existing))
-                Storage.stores.queuedWatchedStore.removeWatched(existing)
+            existing?.let { existing ->
+                Storage.stores.queuedWatchedStore.update { changes ->
+                    val current = changes ?: QueuedWatchedChanges()
+                    current.toUpdate.removeAll { it.entryID eqI entry.GUID }
+                    current.toRemove.removeAll { it.entryID eqI entry.GUID }
+                    return@update current
+                }
+                if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(Endpoints.WATCHED_DELETE, existing))
+                    Storage.stores.queuedWatchedStore.removeWatched(existing)
+            }
         }
     }
 }
