@@ -10,6 +10,7 @@ import moe.styx.common.compose.http.getObject
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.data.*
 import moe.styx.common.extension.currentUnixSeconds
+import moe.styx.common.util.launchGlobal
 import okio.FileSystem
 import okio.Path.Companion.toPath
 
@@ -23,7 +24,7 @@ object Storage {
     val stores: Stores
         get() {
             if (Stores.needsRefresh()) {
-                runBlocking { loadData() }
+                runBlocking { loadData().join() }
             }
             return Stores
         }
@@ -31,8 +32,9 @@ object Storage {
     val loadingProgress = MutableStateFlow("")
     val isLoaded = MutableStateFlow(false)
 
-    private suspend fun loadData() = coroutineScope {
+    private fun loadData() = launchGlobal {
         createDirectories()
+        isLoaded.emit(false)
         loadingProgress.emit("")
         val serverOnline = ServerStatus.lastKnown == ServerStatus.ONLINE
         val lastChanges = (if (serverOnline) getObject<Changes>(Endpoints.CHANGES) else null) ?: Changes(0, 0)
