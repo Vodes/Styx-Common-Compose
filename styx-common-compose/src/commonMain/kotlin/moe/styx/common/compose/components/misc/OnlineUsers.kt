@@ -24,7 +24,7 @@ fun OnlineUsersIcon(onClickMedia: (Media) -> Unit) {
     val users by Heartbeats.currentUserState.collectAsState()
     val mediaList by Storage.stores.mediaStore.getCurrentAndCollectFlow()
     val entryList by Storage.stores.entryStore.getCurrentAndCollectFlow()
-    val numUsers = users.size
+    val numUsers = users.distinctBy { it.user.GUID }.size
 
     UsersIconWithNum(numUsers) {
         showUserDropDown = if (showUserDropDown) false
