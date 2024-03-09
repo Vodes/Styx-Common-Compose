@@ -48,9 +48,9 @@ fun MediaInfoDialog(mediaEntry: MediaEntry, onDismiss: () -> Unit) {
                     }
                     Text("Other Tracks", Modifier.padding(3.dp, 10.dp, 0.dp, 5.dp), style = MaterialTheme.typography.titleLarge)
                     FlowRow(Modifier.padding(6.dp, 2.dp), verticalArrangement = Arrangement.Center, horizontalArrangement = Arrangement.Start) {
-                        TextWithCheckBox("Has english dub", mediaInfo.hasEnglishDub.toBoolean(), enabled = false)
-                        TextWithCheckBox("Has german dub", mediaInfo.hasGermanDub.toBoolean(), enabled = false)
-                        TextWithCheckBox("Has german sub", mediaInfo.hasGermanSub.toBoolean(), enabled = false)
+                        Row { TextWithCheckBox("Has english dub", mediaInfo.hasEnglishDub.toBoolean(), enabled = false) }
+                        Row { TextWithCheckBox("Has german dub", mediaInfo.hasGermanDub.toBoolean(), enabled = false) }
+                        Row { TextWithCheckBox("Has german sub", mediaInfo.hasGermanSub.toBoolean(), enabled = false) }
                     }
                 }
             }
