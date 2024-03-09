@@ -1,8 +1,6 @@
 package moe.styx.common.compose.components.anime
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,11 +31,11 @@ fun FailedDialog(message: String, modifier: Modifier = Modifier, buttonModifier:
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MediaInfoDialog(mediaEntry: MediaEntry, onDismiss: () -> Unit) {
     val mediaInfo = Storage.mediaInfos.find { it.entryID eqI mediaEntry.GUID }
-    AlertDialog(onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    BasicAlertDialog(onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(color = MaterialTheme.colorScheme.surface, shape = AppShapes.medium) {
             Column(Modifier.padding(10.dp)) {
                 if (mediaInfo == null)
@@ -49,7 +47,7 @@ fun MediaInfoDialog(mediaEntry: MediaEntry, onDismiss: () -> Unit) {
                         OutlinedText(mediaInfo.videoRes.split("x").getOrNull(1)?.let { "${it}p" } ?: mediaInfo.videoRes)
                     }
                     Text("Other Tracks", Modifier.padding(3.dp, 10.dp, 0.dp, 5.dp), style = MaterialTheme.typography.titleLarge)
-                    Row(Modifier.padding(6.dp, 2.dp), verticalAlignment = Alignment.CenterVertically) {
+                    FlowRow(Modifier.padding(6.dp, 2.dp), verticalArrangement = Arrangement.Center, horizontalArrangement = Arrangement.Start) {
                         TextWithCheckBox("Has english dub", mediaInfo.hasEnglishDub.toBoolean(), enabled = false)
                         TextWithCheckBox("Has german dub", mediaInfo.hasGermanDub.toBoolean(), enabled = false)
                         TextWithCheckBox("Has german sub", mediaInfo.hasGermanSub.toBoolean(), enabled = false)
