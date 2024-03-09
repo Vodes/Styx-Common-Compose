@@ -32,16 +32,15 @@ fun OnlineUsersIcon(onClickMedia: (Media) -> Unit) {
     }
     DropdownMenu(showUserDropDown, { showUserDropDown = false }, Modifier.defaultMinSize(260.dp, 0.dp)) {
         Text("Online Users", Modifier.padding(7.dp, 10.dp), style = MaterialTheme.typography.titleLarge)
-        Divider(Modifier.fillMaxWidth().padding(10.dp, 0.dp, 10.dp, 8.dp), thickness = 3.dp)
+        HorizontalDivider(Modifier.fillMaxWidth().padding(10.dp, 0.dp, 10.dp, 8.dp), thickness = 3.dp)
         UserListComponent(users, mediaList, entryList, onClickMedia)
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UsersIconWithNum(num: Int, onClick: () -> Unit) {
     BadgedBox(badge = {
-        Badge(Modifier.size(20.dp).offset((-10).dp, 12.dp), MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.onSecondary) {
+        Badge(Modifier.size(20.dp).offset((-10).dp, 6.dp), MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.onSecondary) {
             Text("$num")
         }
     }) {
@@ -53,7 +52,7 @@ fun UsersIconWithNum(num: Int, onClick: () -> Unit) {
 fun UserListComponent(userList: List<ActiveUser>, mediaList: List<Media>, entryList: List<MediaEntry>, onClickMedia: (Media) -> Unit) {
     userList.forEachIndexed { index, user ->
         if (index != 0)
-            Divider(Modifier.fillMaxWidth().padding(10.dp, 10.dp), thickness = 1.dp)
+            HorizontalDivider(Modifier.fillMaxWidth().padding(10.dp, 10.dp), thickness = 1.dp)
 
         Row(Modifier.padding(10.dp, if (index != 0) 0.dp else 5.dp, 0.dp, 5.dp), verticalAlignment = Alignment.CenterVertically) {
             when (user.deviceType) {
