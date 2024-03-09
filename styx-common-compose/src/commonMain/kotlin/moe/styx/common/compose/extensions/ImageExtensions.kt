@@ -1,6 +1,9 @@
 package moe.styx.common.compose.extensions
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.painter.Painter
 import com.seiko.imageloader.ImageLoader
+import io.kamel.core.Resource
 import io.kamel.core.config.KamelConfig
 import io.kamel.core.config.httpUrlFetcher
 import io.kamel.core.config.takeFrom
@@ -56,6 +59,9 @@ fun Image.getPath(): Path {
     else
         ImageCache.cacheDir / "$GUID.png"
 }
+
+@Composable
+expect fun Image.getPainter(): Resource<Painter>
 
 
 /**

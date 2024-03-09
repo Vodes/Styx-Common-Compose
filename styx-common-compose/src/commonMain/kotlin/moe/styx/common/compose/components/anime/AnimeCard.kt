@@ -9,17 +9,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.russhwolf.settings.get
 import io.kamel.image.KamelImage
-import io.kamel.image.asyncPainterResource
-import io.ktor.http.*
 import moe.styx.common.compose.components.AppShapes
-import moe.styx.common.compose.extensions.*
+import moe.styx.common.compose.extensions.desktopPointerEvent
+import moe.styx.common.compose.extensions.getPainter
+import moe.styx.common.compose.extensions.getThumb
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.getCurrentAndCollectFlow
 import moe.styx.common.compose.settings
@@ -35,11 +34,7 @@ fun AnimeCard(media: Media, showUnseenBadge: Boolean = false, onClick: () -> Uni
         Storage.entryList.filter { it.mediaID == media.GUID }
             .associateWith { m -> watched.find { it.entryID == m.GUID } }.filter { (it.value?.maxProgress ?: 0F) < 85F }
     } else emptyMap()
-    val painter = image?.let {
-        if (image.isCached()) {
-            asyncPainterResource("file:/${image.getPath()}", key = image.GUID, filterQuality = FilterQuality.Low)
-        } else asyncPainterResource(Url(image.getURL()), key = image.GUID, filterQuality = FilterQuality.Low)
-    }
+    val painter = image?.getPainter()
     Card(modifier = Modifier.padding(2.dp).aspectRatio(0.71F), onClick = onClick) {
         var showName by remember { mutableStateOf(showNamesAllTheTime) }
         val shadowAlpha: Float by animateFloatAsState(if (showName) 0.8f else 0f)

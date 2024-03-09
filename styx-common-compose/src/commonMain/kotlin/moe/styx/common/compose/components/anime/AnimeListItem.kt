@@ -7,29 +7,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.kamel.image.KamelImage
-import io.kamel.image.asyncPainterResource
-import io.ktor.http.*
 import moe.styx.common.compose.components.AppShapes
-import moe.styx.common.compose.extensions.getPath
+import moe.styx.common.compose.extensions.getPainter
 import moe.styx.common.compose.extensions.getThumb
-import moe.styx.common.compose.extensions.getURL
-import moe.styx.common.compose.extensions.isCached
 import moe.styx.common.data.Media
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimeListItem(media: Media, onClick: () -> Unit) {
     val image = media.getThumb()
-    val painter = image?.let {
-        if (image.isCached()) {
-            asyncPainterResource("file:/${image.getPath()}", key = image.GUID, filterQuality = FilterQuality.Low)
-        } else asyncPainterResource(Url(image.getURL()), key = image.GUID, filterQuality = FilterQuality.Low)
-    }
+    val painter = image?.getPainter()
     ElevatedCard(
         modifier = Modifier.padding(5.dp, 2.dp).fillMaxWidth(),
         elevation = CardDefaults.elevatedCardElevation(3.dp),
