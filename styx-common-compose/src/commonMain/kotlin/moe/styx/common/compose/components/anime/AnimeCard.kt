@@ -31,8 +31,10 @@ fun AnimeCard(media: Media, showUnseenBadge: Boolean = false, onClick: () -> Uni
     val showNamesAllTheTime by remember { mutableStateOf(settings["display-names", false]) }
     val entries = if (showUnseenBadge) {
         val watched by Storage.stores.watchedStore.getCurrentAndCollectFlow()
-        Storage.entryList.filter { it.mediaID == media.GUID }
-            .associateWith { m -> watched.find { it.entryID == m.GUID } }.filter { (it.value?.maxProgress ?: 0F) < 85F }
+        val entries by Storage.stores.entryStore.getCurrentAndCollectFlow()
+        entries.filter { it.mediaID == media.GUID }
+            .associateWith { m -> watched.find { it.entryID == m.GUID } }
+            .filter { (it.value?.maxProgress ?: 0F) < 85F }
     } else emptyMap()
     val painter = image?.getPainter()
     Card(modifier = Modifier.padding(2.dp).aspectRatio(0.71F), onClick = onClick) {
