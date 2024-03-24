@@ -72,9 +72,9 @@ fun AnimeListItem(media: Media, targetEpisodeNum: Int = 0, onClick: () -> Unit) 
                 }
             }
             if (targetEpisodeNum != 0) {
-                SuggestionChip({}, {
+                SuggestionChip(onClick, {
                     Text("$targetEpisodeNum episodes")
-                })
+                }, modifier = Modifier.padding(8.dp, 1.dp))
             }
         }
     }
