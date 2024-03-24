@@ -54,8 +54,10 @@ fun AnimeCard(media: Media, showUnseenBadge: Boolean = false, onClick: () -> Uni
                 )
             }
             if (showUnseenBadge) {
-                if (entries.isNotEmpty()) {
-                    AnimeCardBadge(entries.size, Modifier.align(Alignment.TopEnd).zIndex(3f))
+                androidx.compose.animation.AnimatedVisibility(entries.isNotEmpty()) {
+                    if (entries.isNotEmpty()) {
+                        AnimeCardBadge(entries.size, Modifier.align(Alignment.TopEnd).zIndex(3f))
+                    }
                 }
             }
             if (showName || textAlpha > 0) {
