@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import moe.styx.common.compose.components.buttons.PopButton
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -23,7 +24,7 @@ fun MainScaffold(
 ) {
     Scaffold(modifier = modifier, topBar = {
         TopAppBar(
-            title = { Text(title) },
+            title = { Text(title, overflow = TextOverflow.Ellipsis, maxLines = 2) },
             actions = {
                 actions()
                 if (addPopButton)
