@@ -154,8 +154,11 @@ fun EpisodeDetailComp(
         if (!summary.isNullOrBlank() && showSummaries)
             ExpandableText(summary, Modifier.padding(8.dp, 2.dp, 5.dp, 2.dp))
     }
-    if (watchProgress != null)
-        WatchedIndicator(watchProgress, Modifier.fillMaxWidth().padding(0.dp, 2.dp, 0.dp, 5.dp))
+    AnimatedVisibility(watchProgress != null) {
+        if (watchProgress != null) {
+            WatchedIndicator(watchProgress, Modifier.fillMaxWidth().padding(0.dp, 2.dp, 0.dp, 5.dp))
+        }
+    }
 }
 
 @Composable
