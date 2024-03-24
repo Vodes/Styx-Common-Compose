@@ -2,6 +2,8 @@ package moe.styx.common.compose.components.anime
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -54,9 +56,14 @@ fun AnimeCard(media: Media, showUnseenBadge: Boolean = false, onClick: () -> Uni
                 )
             }
             if (showUnseenBadge) {
-                androidx.compose.animation.AnimatedVisibility(entries.isNotEmpty()) {
+                androidx.compose.animation.AnimatedVisibility(
+                    entries.isNotEmpty(),
+                    Modifier.align(Alignment.TopEnd).zIndex(3f),
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
                     if (entries.isNotEmpty()) {
-                        AnimeCardBadge(entries.size, Modifier.align(Alignment.TopEnd).zIndex(3f))
+                        AnimeCardBadge(entries.size)
                     }
                 }
             }
