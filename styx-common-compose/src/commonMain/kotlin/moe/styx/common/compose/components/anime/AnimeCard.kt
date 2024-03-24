@@ -21,22 +21,27 @@ import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.extensions.desktopPointerEvent
 import moe.styx.common.compose.extensions.getPainter
 import moe.styx.common.compose.extensions.getThumb
-import moe.styx.common.compose.files.Storage
-import moe.styx.common.compose.files.collectWithEmptyInitial
 import moe.styx.common.compose.settings
 import moe.styx.common.data.Media
+import moe.styx.common.data.MediaEntry
+import moe.styx.common.data.MediaWatched
 
 @Composable
-fun AnimeCard(media: Media, showUnseenBadge: Boolean = false, onClick: () -> Unit) {
+fun AnimeCard(
+    media: Media,
+    showUnseenBadge: Boolean = false,
+    watchedEntries: List<MediaWatched> = emptyList(),
+    entryList: List<MediaEntry> = emptyList(),
+    onClick: () -> Unit
+) {
     val image = media.getThumb()
     val showNamesAllTheTime by remember { mutableStateOf(settings["display-names", false]) }
     val entries = if (showUnseenBadge) {
-        val watched by Storage.stores.watchedStore.collectWithEmptyInitial()
-        val entries by Storage.stores.entryStore.collectWithEmptyInitial()
-        entries.filter { it.mediaID == media.GUID }
-            .associateWith { m -> watched.find { it.entryID == m.GUID } }
+        entryList.filter { it.mediaID == media.GUID }
+            .associateWith { m -> watchedEntries.find { it.entryID == m.GUID } }
             .filter { (it.value?.maxProgress ?: 0F) < 85F }
-    } else emptyMap()
+    } else
+        emptyMap()
     val painter = image?.getPainter()
     Card(modifier = Modifier.padding(2.dp).aspectRatio(0.71F), onClick = onClick) {
         var showName by remember { mutableStateOf(showNamesAllTheTime) }
