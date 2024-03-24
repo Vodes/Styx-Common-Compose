@@ -1,5 +1,6 @@
 package moe.styx.common.compose.components.anime
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -41,36 +42,39 @@ fun MediaInfoDialog(mediaEntry: MediaEntry, onDismiss: () -> Unit) {
     BasicAlertDialog(onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(color = MaterialTheme.colorScheme.surface, shape = AppShapes.medium) {
             Column(Modifier.padding(10.dp)) {
-                if (mediaInfo == null)
+                AnimatedVisibility(mediaInfo == null) {
                     Text("Could not find details on this file.")
-                else {
-                    Text("Video Information", Modifier.padding(3.dp, 10.dp), style = MaterialTheme.typography.titleLarge)
-                    Row(Modifier.padding(6.dp, 2.dp), verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedText("${mediaInfo.videoCodec} ${mediaInfo.videoBitdepth}-bit")
-                        OutlinedText(mediaInfo.videoRes.split("x").getOrNull(1)?.let { "${it}p" } ?: mediaInfo.videoRes)
-                    }
-                    Text("Other Tracks", Modifier.padding(3.dp, 10.dp, 0.dp, 5.dp), style = MaterialTheme.typography.titleLarge)
-                    FlowRow(Modifier.padding(6.dp, 2.dp), verticalArrangement = Arrangement.Center, horizontalArrangement = Arrangement.Start) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            TextWithCheckBox(
-                                "Has english dub",
-                                mediaInfo.hasEnglishDub.toBoolean(),
-                                enabled = false
-                            )
+                }
+                AnimatedVisibility(mediaInfo != null) {
+                    if (mediaInfo != null) {
+                        Text("Video Information", Modifier.padding(3.dp, 10.dp), style = MaterialTheme.typography.titleLarge)
+                        Row(Modifier.padding(6.dp, 2.dp), verticalAlignment = Alignment.CenterVertically) {
+                            OutlinedText("${mediaInfo.videoCodec} ${mediaInfo.videoBitdepth}-bit")
+                            OutlinedText(mediaInfo.videoRes.split("x").getOrNull(1)?.let { "${it}p" } ?: mediaInfo.videoRes)
                         }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            TextWithCheckBox(
-                                "Has german dub",
-                                mediaInfo.hasGermanDub.toBoolean(),
-                                enabled = false
-                            )
-                        }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            TextWithCheckBox(
-                                "Has german sub",
-                                mediaInfo.hasGermanSub.toBoolean(),
-                                enabled = false
-                            )
+                        Text("Other Tracks", Modifier.padding(3.dp, 10.dp, 0.dp, 5.dp), style = MaterialTheme.typography.titleLarge)
+                        FlowRow(Modifier.padding(6.dp, 2.dp), verticalArrangement = Arrangement.Center, horizontalArrangement = Arrangement.Start) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                TextWithCheckBox(
+                                    "Has english dub",
+                                    mediaInfo.hasEnglishDub.toBoolean(),
+                                    enabled = false
+                                )
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                TextWithCheckBox(
+                                    "Has german dub",
+                                    mediaInfo.hasGermanDub.toBoolean(),
+                                    enabled = false
+                                )
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                TextWithCheckBox(
+                                    "Has german sub",
+                                    mediaInfo.hasGermanSub.toBoolean(),
+                                    enabled = false
+                                )
+                            }
                         }
                     }
                 }
