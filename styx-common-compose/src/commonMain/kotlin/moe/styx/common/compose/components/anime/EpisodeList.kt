@@ -1,6 +1,8 @@
 package moe.styx.common.compose.components.anime
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
@@ -154,7 +156,7 @@ fun EpisodeDetailComp(
         if (!summary.isNullOrBlank() && showSummaries)
             ExpandableText(summary, Modifier.padding(8.dp, 2.dp, 5.dp, 2.dp))
     }
-    AnimatedVisibility(watchProgress != null) {
+    AnimatedVisibility(watchProgress != null, enter = fadeIn(), exit = fadeOut()) {
         if (watchProgress != null) {
             WatchedIndicator(watchProgress, Modifier.fillMaxWidth().padding(0.dp, 2.dp, 0.dp, 5.dp))
         }
