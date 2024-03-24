@@ -3,6 +3,7 @@ package moe.styx.common.compose.components.anime
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -11,6 +12,7 @@ import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.misc.OutlinedText
 import moe.styx.common.compose.components.misc.TextWithCheckBox
 import moe.styx.common.compose.files.Storage
+import moe.styx.common.compose.files.collectWithEmptyInitial
 import moe.styx.common.data.MediaEntry
 import moe.styx.common.extension.eqI
 import moe.styx.common.extension.toBoolean
@@ -34,7 +36,8 @@ fun FailedDialog(message: String, modifier: Modifier = Modifier, buttonModifier:
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MediaInfoDialog(mediaEntry: MediaEntry, onDismiss: () -> Unit) {
-    val mediaInfo = Storage.mediaInfos.find { it.entryID eqI mediaEntry.GUID }
+    val mediaInfos by Storage.stores.mediainfoStore.collectWithEmptyInitial()
+    val mediaInfo = mediaInfos.find { it.entryID eqI mediaEntry.GUID }
     BasicAlertDialog(onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(color = MaterialTheme.colorScheme.surface, shape = AppShapes.medium) {
             Column(Modifier.padding(10.dp)) {
