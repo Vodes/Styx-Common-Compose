@@ -109,7 +109,7 @@ fun EpisodeList(
                     }
                 }
                 if (i < (episodes.size - 1))
-                    Divider(Modifier.fillMaxWidth(), thickness = 1.dp)
+                    HorizontalDivider(Modifier.fillMaxWidth(), thickness = 1.dp)
             }
         }
     }
@@ -210,7 +210,10 @@ fun SelectedCard(selected: SnapshotStateMap<String, Boolean>, entries: List<Medi
 @Composable
 fun WatchedIndicator(mediaWatched: MediaWatched, modifier: Modifier = Modifier) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
-        LinearProgressIndicator(mediaWatched.progressPercent / 100, Modifier.fillMaxWidth().weight(1f).padding(7.dp, 2.dp))
+        LinearProgressIndicator(
+            progress = { mediaWatched.progressPercent / 100 },
+            modifier = Modifier.fillMaxWidth().weight(1f).padding(7.dp, 2.dp),
+        )
         if (mediaWatched.maxProgress > 85)
             Icon(
                 Icons.Default.CheckCircle,

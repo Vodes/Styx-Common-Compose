@@ -37,7 +37,7 @@ fun AnimeListItem(media: Media, onClick: () -> Unit) {
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.padding(1.dp),
                         animationSpec = tween(),
-                        onLoading = { CircularProgressIndicator(it) }
+                        onLoading = { CircularProgressIndicator(progress = { it }) }
                     )
                 }
             }

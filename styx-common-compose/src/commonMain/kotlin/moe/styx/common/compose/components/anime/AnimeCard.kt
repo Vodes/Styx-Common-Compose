@@ -24,7 +24,6 @@ import moe.styx.common.compose.files.getCurrentAndCollectFlow
 import moe.styx.common.compose.settings
 import moe.styx.common.data.Media
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimeCard(media: Media, showUnseenBadge: Boolean = false, onClick: () -> Unit) {
     val image = media.getThumb()
@@ -51,7 +50,7 @@ fun AnimeCard(media: Media, showUnseenBadge: Boolean = false, onClick: () -> Uni
                         .desktopPointerEvent({ showName = !showNamesAllTheTime }, { showName = showNamesAllTheTime })
                         .clip(AppShapes.medium),
                     animationSpec = tween(),
-                    onLoading = { CircularProgressIndicator(it) }
+                    onLoading = { CircularProgressIndicator(progress = { it }) }
                 )
             }
             if (showUnseenBadge) {
