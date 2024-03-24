@@ -41,11 +41,13 @@ fun MediaInfoDialog(mediaEntry: MediaEntry, onDismiss: () -> Unit) {
     val mediaInfo = mediaInfos.find { it.entryID eqI mediaEntry.GUID }
     BasicAlertDialog(onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(color = MaterialTheme.colorScheme.surface, shape = AppShapes.medium) {
-            Column(Modifier.padding(10.dp)) {
-                AnimatedVisibility(mediaInfo == null) {
+            AnimatedVisibility(mediaInfo == null) {
+                Column(Modifier.padding(10.dp)) {
                     Text("Could not find details on this file.")
                 }
-                AnimatedVisibility(mediaInfo != null) {
+            }
+            AnimatedVisibility(mediaInfo != null) {
+                Column(Modifier.padding(10.dp)) {
                     if (mediaInfo != null) {
                         Text("Video Information", Modifier.padding(3.dp, 10.dp), style = MaterialTheme.typography.titleLarge)
                         Row(Modifier.padding(6.dp, 2.dp), verticalAlignment = Alignment.CenterVertically) {
