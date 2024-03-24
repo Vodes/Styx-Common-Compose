@@ -41,7 +41,7 @@ fun ScheduleDay(day: ScheduleWeekday, onClick: (Media) -> Unit) {
                 modifier = Modifier.padding(6.dp),
                 style = MaterialTheme.typography.titleMedium
             )
-            Column(Modifier.padding(6.dp, 1.dp)) { AnimeListItem(media) { onClick(media) } }
+            Column(Modifier.padding(6.dp, 1.dp)) { AnimeListItem(media, schedule.finalEpisodeCount) { onClick(media) } }
         }
     }
 }

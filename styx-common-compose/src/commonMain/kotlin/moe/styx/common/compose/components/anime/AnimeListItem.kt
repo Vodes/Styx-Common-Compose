@@ -18,7 +18,7 @@ import moe.styx.common.data.Media
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AnimeListItem(media: Media, onClick: () -> Unit) {
+fun AnimeListItem(media: Media, targetEpisodeNum: Int = 0, onClick: () -> Unit) {
     val image = media.getThumb()
     val painter = image?.getPainter()
     ElevatedCard(
@@ -41,7 +41,7 @@ fun AnimeListItem(media: Media, onClick: () -> Unit) {
                     )
                 }
             }
-            Column {
+            Column(Modifier.weight(1f)) {
                 Text(
                     media.name,
                     overflow = TextOverflow.Ellipsis,
@@ -70,6 +70,11 @@ fun AnimeListItem(media: Media, onClick: () -> Unit) {
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
+            }
+            if (targetEpisodeNum != 0) {
+                SuggestionChip({}, {
+                    Text("$targetEpisodeNum episodes")
+                })
             }
         }
     }
