@@ -20,7 +20,7 @@ import moe.styx.common.compose.extensions.desktopPointerEvent
 import moe.styx.common.compose.extensions.getPainter
 import moe.styx.common.compose.extensions.getThumb
 import moe.styx.common.compose.files.Storage
-import moe.styx.common.compose.files.getCurrentAndCollectFlow
+import moe.styx.common.compose.files.collectWithEmptyInitial
 import moe.styx.common.compose.settings
 import moe.styx.common.data.Media
 
@@ -29,8 +29,8 @@ fun AnimeCard(media: Media, showUnseenBadge: Boolean = false, onClick: () -> Uni
     val image = media.getThumb()
     val showNamesAllTheTime by remember { mutableStateOf(settings["display-names", false]) }
     val entries = if (showUnseenBadge) {
-        val watched by Storage.stores.watchedStore.getCurrentAndCollectFlow()
-        val entries by Storage.stores.entryStore.getCurrentAndCollectFlow()
+        val watched by Storage.stores.watchedStore.collectWithEmptyInitial()
+        val entries by Storage.stores.entryStore.collectWithEmptyInitial()
         entries.filter { it.mediaID == media.GUID }
             .associateWith { m -> watched.find { it.entryID == m.GUID } }
             .filter { (it.value?.maxProgress ?: 0F) < 85F }
