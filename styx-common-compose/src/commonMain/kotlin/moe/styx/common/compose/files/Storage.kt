@@ -10,8 +10,8 @@ import moe.styx.common.compose.http.getObject
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.data.*
 import moe.styx.common.extension.currentUnixSeconds
+import moe.styx.common.util.SYSTEMFILES
 import moe.styx.common.util.launchGlobal
-import okio.FileSystem
 import okio.Path.Companion.toPath
 
 /**
@@ -88,5 +88,3 @@ object Storage {
     val schedules: List<MediaSchedule> = runBlocking { stores.scheduleStore.getOrEmpty() }
     val mediaInfos: List<MediaInfo> = runBlocking { stores.mediainfoStore.getOrEmpty() }
 }
-
-expect val SYSTEMFILES: FileSystem

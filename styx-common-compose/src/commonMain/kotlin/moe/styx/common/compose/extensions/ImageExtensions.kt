@@ -15,10 +15,10 @@ import io.ktor.utils.io.core.*
 import moe.styx.common.Platform
 import moe.styx.common.compose.appConfig
 import moe.styx.common.compose.files.ImageCache
-import moe.styx.common.compose.files.SYSTEMFILES
 import moe.styx.common.data.Image
 import moe.styx.common.extension.toBoolean
 import moe.styx.common.http.httpClient
+import moe.styx.common.util.SYSTEMFILES
 import okio.Path
 
 val kamelConfig by lazy {
