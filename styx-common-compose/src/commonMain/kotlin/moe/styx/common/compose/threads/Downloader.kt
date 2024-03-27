@@ -6,6 +6,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.Serializable
+import moe.styx.common.Platform
 import moe.styx.common.compose.appConfig
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.updateList
@@ -48,6 +49,15 @@ object DownloadQueue : LifecycleTrackedJob(false) {
             }
             delay(2000)
         }
+    }
+
+    fun start() {
+        if (Platform.current != Platform.JVM) {
+            Log.w("RequestQueue::start") { "This function is not designed for use outside of Desktop applications." }
+            return
+        }
+        runJob = true
+        currentJob = createJob()
     }
 
     fun addToQueue(mediaEntry: MediaEntry) = launchGlobal {

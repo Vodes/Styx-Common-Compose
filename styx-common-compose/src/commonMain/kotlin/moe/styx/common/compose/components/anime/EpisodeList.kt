@@ -30,6 +30,7 @@ import moe.styx.common.compose.extensions.dynamicClick
 import moe.styx.common.compose.extensions.readableSize
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.collectWithEmptyInitial
+import moe.styx.common.compose.files.updateList
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.threads.DownloadProgress
@@ -173,22 +174,34 @@ fun EpisodeDetailComp(
                     Modifier.padding(5.dp).clickable { onMediaInfoClick() },
                     style = MaterialTheme.typography.labelSmall
                 )
+                if (downloaded != null) {
+                    Icon(
+                        Icons.Default.DownloadForOffline,
+                        "Downloaded",
+                        modifier = Modifier.padding(4.dp, 0.dp, 6.dp, 0.dp).size(16.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
             val summary = if (!ep.synopsisDE.isNullOrBlank() && preferGerman) ep.synopsisDE else ep.synopsisEN
             if (!summary.isNullOrBlank() && showSummaries)
                 ExpandableText(summary, Modifier.padding(8.dp, 2.dp, 5.dp, 2.dp))
         }
-        if (isQueued || downloaded != null || progress != null) {
-            Column {
+        if (isQueued || progress != null) {
+            Row(Modifier.padding(4.dp).fillMaxHeight(), verticalAlignment = Alignment.CenterVertically) {
                 if (isQueued) {
                     Icon(Icons.Default.Downloading, "Queued", modifier = Modifier.size(20.dp))
                 } else if (progress != null) {
                     Box {
-                        Icon(Icons.Default.Download, "Downloading", modifier = Modifier.size(17.dp).zIndex(1F))
-                        CircularProgressIndicator({ progress.progressPercent.toFloat() / 100 }, modifier = Modifier.size(20.dp).zIndex(2F))
+                        Icon(Icons.Default.Download, "Downloading", modifier = Modifier.size(14.dp).zIndex(1F).align(Alignment.Center))
+                        CircularProgressIndicator(
+                            { progress.progressPercent.toFloat() / 100 },
+                            modifier = Modifier.size(23.dp).zIndex(2F).align(Alignment.Center),
+                            trackColor = MaterialTheme.colorScheme.onSurface.copy(0.4F),
+                            color = MaterialTheme.colorScheme.primary,
+                            strokeWidth = 3.dp
+                        )
                     }
-                } else {
-                    Icon(Icons.Default.DownloadForOffline, "Downloaded", modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
                 }
             }
         }
@@ -274,6 +287,11 @@ fun SelectedCard(selected: SnapshotStateMap<String, Boolean>, entries: List<Medi
                     if (downloadedEntry != null) {
                         SYSTEMFILES.delete(downloadedEntry.okioPath)
                     }
+                    launchThreaded {
+                        Storage.stores.downloadedStore.updateList { list ->
+                            list.removeAll { it.entryID eqI entry.GUID }
+                        }
+                    }
                 }
             }
         }
@@ -291,7 +309,7 @@ fun WatchedIndicator(mediaWatched: MediaWatched, modifier: Modifier = Modifier) 
             Icon(
                 Icons.Default.CheckCircle,
                 "Has been watched",
-                Modifier.size(20.dp).padding(0.dp, 0.dp, 6.dp, 0.dp),
+                Modifier.padding(0.dp, 0.dp, 6.dp, 0.dp).size(16.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
     }
