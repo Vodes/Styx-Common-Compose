@@ -64,7 +64,6 @@ kotlin {
         val iosMain by getting
         val jvmMain by getting {
             dependencies {
-                implementation(libs.jvm.mordant)
                 implementation(libs.jvm.oshi)
             }
         }
