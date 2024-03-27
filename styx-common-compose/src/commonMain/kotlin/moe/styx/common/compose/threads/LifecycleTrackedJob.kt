@@ -3,7 +3,7 @@ package moe.styx.common.compose.threads
 import com.multiplatform.lifecycle.LifecycleEvent
 import kotlinx.coroutines.Job
 
-abstract class LifecycleTrackedJob {
+abstract class LifecycleTrackedJob(val shouldBeStopped: Boolean = true) {
     internal var runJob: Boolean = true
     internal var currentJob: Job? = null
 
@@ -19,8 +19,10 @@ abstract class LifecycleTrackedJob {
             }
 
             in arrayOf(LifecycleEvent.OnStopEvent, LifecycleEvent.OnDestroyEvent) -> {
-                runJob = false
-                currentJob = null
+                if (shouldBeStopped) {
+                    runJob = false
+                    currentJob = null
+                }
             }
 
             else -> {}

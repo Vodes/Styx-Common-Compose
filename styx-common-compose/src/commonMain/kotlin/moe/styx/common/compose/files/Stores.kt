@@ -6,6 +6,7 @@ import io.github.xxfast.kstore.file.extensions.listStoreOf
 import io.github.xxfast.kstore.file.storeOf
 import kotlinx.coroutines.runBlocking
 import moe.styx.common.compose.appConfig
+import moe.styx.common.compose.threads.DownloadedEntry
 import moe.styx.common.compose.utils.SearchState
 import moe.styx.common.data.*
 import moe.styx.common.extension.currentUnixSeconds
@@ -62,6 +63,10 @@ object Stores {
 
     val queuedWatchedStore: KStore<QueuedWatchedChanges> by lazy {
         storeOf("${appConfig().appStoragePath}/queued/watched-changes.json".toPath(), QueuedWatchedChanges(), json = json)
+    }
+
+    val downloadedStore: KStore<List<DownloadedEntry>> by lazy {
+        listStoreOf("${appConfig().appStoragePath}/store/downloaded.json".toPath(), json = json)
     }
 
     val showSearchState: KStore<SearchState> by lazy {
