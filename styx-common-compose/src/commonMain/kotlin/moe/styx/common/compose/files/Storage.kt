@@ -7,11 +7,14 @@ import moe.styx.common.compose.appConfig
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.getList
 import moe.styx.common.compose.http.getObject
+import moe.styx.common.compose.threads.DownloadQueue
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.data.*
 import moe.styx.common.extension.currentUnixSeconds
+import moe.styx.common.extension.eqI
 import moe.styx.common.util.SYSTEMFILES
 import moe.styx.common.util.launchGlobal
+import moe.styx.common.util.launchThreaded
 import okio.Path.Companion.toPath
 
 /**
@@ -70,8 +73,21 @@ object Storage {
             )
             loadingProgress.emit("Updating image cache...\nThis may take a minute or two.")
             ImageCache.checkForNewImages()
+            deleteFilesForDeletedEntries()
         }
         isLoaded.emit(true)
+    }
+
+    private fun deleteFilesForDeletedEntries() = launchThreaded {
+        val entries = stores.entryStore.getOrEmpty()
+        if (SYSTEMFILES.exists(DownloadQueue.downloadedDir)) {
+            for (file in SYSTEMFILES.listRecursively(DownloadQueue.downloadedDir)) {
+                val nameWithoutExt = file.name.substringBeforeLast(".")
+                val correspondingEntry = entries.find { it.GUID eqI nameWithoutExt }
+                if (correspondingEntry == null)
+                    SYSTEMFILES.delete(file)
+            }
+        }
     }
 
     private fun createDirectories() {

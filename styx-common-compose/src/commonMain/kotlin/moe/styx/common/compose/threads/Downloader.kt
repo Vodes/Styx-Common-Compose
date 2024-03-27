@@ -15,6 +15,7 @@ import moe.styx.common.compose.http.isLoggedIn
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.data.MediaEntry
+import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.extension.eqI
 import moe.styx.common.http.DownloadResult
 import moe.styx.common.http.downloadFileStream
@@ -24,6 +25,8 @@ import moe.styx.common.util.launchGlobal
 import moe.styx.common.util.launchThreaded
 import okio.Path
 import okio.Path.Companion.toPath
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 object DownloadQueue : LifecycleTrackedJob(false) {
     val currentDownload: MutableStateFlow<DownloadProgress?> = MutableStateFlow(null)
@@ -37,6 +40,17 @@ object DownloadQueue : LifecycleTrackedJob(false) {
     }
 
     override fun createJob(): Job = launchGlobal {
+        if (SYSTEMFILES.exists(tempDir)) {
+            val now = currentUnixSeconds() * 1000
+            val oneMinMillis = 1.toDuration(DurationUnit.MINUTES).toLong(DurationUnit.MILLISECONDS)
+            val files = SYSTEMFILES.listRecursively(tempDir)
+            for (file in files) {
+                val metadata = SYSTEMFILES.metadataOrNull(file) ?: continue
+                if ((metadata.lastModifiedAtMillis ?: 0) < (now - oneMinMillis))
+                    SYSTEMFILES.delete(file)
+            }
+        }
+        delay(5000)
         while (true) {
             if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn()) {
                 delay(10000)
