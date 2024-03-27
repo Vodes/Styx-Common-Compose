@@ -21,6 +21,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import cafe.adriel.voyager.core.screen.Screen
 import com.russhwolf.settings.get
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
@@ -31,6 +32,9 @@ import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.collectWithEmptyInitial
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.settings
+import moe.styx.common.compose.threads.DownloadProgress
+import moe.styx.common.compose.threads.DownloadQueue
+import moe.styx.common.compose.threads.DownloadedEntry
 import moe.styx.common.compose.threads.RequestQueue
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.data.MediaEntry
@@ -51,6 +55,9 @@ fun EpisodeList(
 ) {
     val nav = LocalGlobalNavigator.current
     val watchedList by Storage.stores.watchedStore.collectWithEmptyInitial()
+    val downloaded by Storage.stores.downloadedStore.collectWithEmptyInitial()
+    val downloadQueue by DownloadQueue.queuedEntries.collectAsState()
+    val currentlyDownloading by DownloadQueue.currentDownload.collectAsState()
     Column(Modifier.fillMaxHeight().fillMaxWidth()) {
         val selected = remember { mutableStateMapOf<String, Boolean>() }
         var needsRepaint by remember { mutableStateOf(0) }
@@ -103,7 +110,16 @@ fun EpisodeList(
                         val watchProgress = watched[ep]
                         SelectionCheckboxes(showSelection, selected, episodes, i)
                         Column(Modifier.fillMaxWidth()) {
-                            EpisodeDetailComp(ep, title, watchProgress, showSummaries, preferGerman) {
+                            EpisodeDetailComp(
+                                ep,
+                                title,
+                                watchProgress,
+                                showSummaries,
+                                preferGerman,
+                                downloadQueue.contains(ep.GUID),
+                                downloaded.find { it.entryID eqI ep.GUID },
+                                currentlyDownloading?.let { if (it.entryID eqI ep.GUID) it else null }
+                            ) {
                                 selectedMedia = ep
                                 showMediaInfoDialog = true
                             }
@@ -125,36 +141,55 @@ fun EpisodeDetailComp(
     watchProgress: MediaWatched?,
     showSummaries: Boolean,
     preferGerman: Boolean,
+    isQueued: Boolean,
+    downloaded: DownloadedEntry? = null,
+    progress: DownloadProgress? = null,
     onMediaInfoClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHover by interactionSource.collectIsHoveredAsState()
 
-    Column(modifier = Modifier.hoverable(interactionSource = interactionSource)) {
-        var modifier = Modifier.padding(5.dp)
-        if (isHover)
-            modifier = modifier.basicMarquee(delayMillis = 300)
-        Text(
-            "${ep.entryNumber}${if (!title.isNullOrBlank()) " - $title" else ""}",
-            modifier,
-            softWrap = false,
-            style = MaterialTheme.typography.labelLarge
-        )
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    Row {
+        Column(modifier = Modifier.hoverable(interactionSource = interactionSource).weight(1f)) {
+            var modifier = Modifier.padding(5.dp)
+            if (isHover)
+                modifier = modifier.basicMarquee(delayMillis = 300)
             Text(
-                ep.timestamp.toDateString(),
-                Modifier.padding(5.dp, 0.dp, 0.dp, 4.dp).weight(1f),
-                style = MaterialTheme.typography.labelMedium
+                "${ep.entryNumber}${if (!title.isNullOrBlank()) " - $title" else ""}",
+                modifier,
+                softWrap = false,
+                style = MaterialTheme.typography.labelLarge
             )
-            Text(
-                ep.fileSize.readableSize(),
-                Modifier.padding(5.dp).clickable { onMediaInfoClick() },
-                style = MaterialTheme.typography.labelSmall
-            )
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    ep.timestamp.toDateString(),
+                    Modifier.padding(5.dp, 0.dp, 0.dp, 4.dp).weight(1f),
+                    style = MaterialTheme.typography.labelMedium
+                )
+                Text(
+                    ep.fileSize.readableSize(),
+                    Modifier.padding(5.dp).clickable { onMediaInfoClick() },
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+            val summary = if (!ep.synopsisDE.isNullOrBlank() && preferGerman) ep.synopsisDE else ep.synopsisEN
+            if (!summary.isNullOrBlank() && showSummaries)
+                ExpandableText(summary, Modifier.padding(8.dp, 2.dp, 5.dp, 2.dp))
         }
-        val summary = if (!ep.synopsisDE.isNullOrBlank() && preferGerman) ep.synopsisDE else ep.synopsisEN
-        if (!summary.isNullOrBlank() && showSummaries)
-            ExpandableText(summary, Modifier.padding(8.dp, 2.dp, 5.dp, 2.dp))
+        if (isQueued || downloaded != null || progress != null) {
+            Column {
+                if (isQueued) {
+                    Icon(Icons.Default.Downloading, "Queued", modifier = Modifier.size(20.dp))
+                } else if (progress != null) {
+                    Box {
+                        Icon(Icons.Default.Download, "Downloading", modifier = Modifier.size(17.dp).zIndex(1F))
+                        CircularProgressIndicator({ progress.progressPercent.toFloat() / 100 }, modifier = Modifier.size(20.dp).zIndex(2F))
+                    }
+                } else {
+                    Icon(Icons.Default.DownloadForOffline, "Downloaded", modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
+                }
+            }
+        }
     }
     AnimatedVisibility(watchProgress != null, enter = fadeIn(), exit = fadeOut()) {
         if (watchProgress != null) {
