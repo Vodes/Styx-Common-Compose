@@ -42,6 +42,8 @@ import moe.styx.common.data.MediaWatched
 import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.extension.eqI
 import moe.styx.common.extension.toDateString
+import moe.styx.common.util.SYSTEMFILES
+import moe.styx.common.util.launchThreaded
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -200,6 +202,8 @@ fun EpisodeDetailComp(
 
 @Composable
 fun SelectedCard(selected: SnapshotStateMap<String, Boolean>, entries: List<MediaEntry>, onUpdate: () -> Unit) {
+    val downloaded by Storage.stores.downloadedStore.collectWithEmptyInitial()
+    val queued by DownloadQueue.queuedEntries.collectAsState()
     ElevatedCard(Modifier.padding(4.dp).fillMaxWidth().height(30.dp)) {
         Row {
             Text(
@@ -241,8 +245,37 @@ fun SelectedCard(selected: SnapshotStateMap<String, Boolean>, entries: List<Medi
                 onUpdate()
             }
 
-            IconButtonWithTooltip(Icons.Default.DownloadForOffline, "Download") {}
-            IconButtonWithTooltip(Icons.Default.Delete, "Delete Downloaded") {}
+            IconButtonWithTooltip(Icons.Default.DownloadForOffline, "Download") {
+                val current = selected.filter { it.value }
+                if (current.isEmpty())
+                    return@IconButtonWithTooltip
+                if (current.size == 1) {
+                    val entry = entries.find { selected.entries.first().key eqI it.GUID }
+                    if (entry == null)
+                        return@IconButtonWithTooltip
+                    DownloadQueue.addToQueue(entry)
+                } else {
+                    DownloadQueue.addToQueue(current
+                        .map { pair -> entries.find { pair.key eqI it.GUID } }
+                        .filterNotNull())
+                }
+            }
+            IconButtonWithTooltip(Icons.Default.Delete, "Delete Downloaded") {
+                val current = selected.filter { it.value }
+                if (current.isEmpty())
+                    return@IconButtonWithTooltip
+
+                val currentSelected = current.map { pair -> entries.find { pair.key eqI it.GUID } }.filterNotNull()
+                currentSelected.forEach { entry ->
+                    if (queued.contains(entry.GUID)) {
+                        launchThreaded { DownloadQueue.queuedEntries.emit(queued.toMutableList().filterNot { it eqI entry.GUID }.toList()) }
+                    }
+                    val downloadedEntry = downloaded.find { it.entryID eqI entry.GUID }
+                    if (downloadedEntry != null) {
+                        SYSTEMFILES.delete(downloadedEntry.okioPath)
+                    }
+                }
+            }
         }
     }
 }
