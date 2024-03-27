@@ -6,12 +6,12 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
-import moe.styx.common.compose.utils.Log
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.data.ApiResponse
 import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.http.httpClient
 import moe.styx.common.json
+import moe.styx.common.util.Log
 
 /**
  * Function to receive a list of objects from an API endpoint.

@@ -8,12 +8,12 @@ import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.isLoggedIn
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.http.sendObject
-import moe.styx.common.compose.utils.Log
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.data.*
 import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.extension.eqI
 import moe.styx.common.extension.replaceIfNotNull
+import moe.styx.common.util.Log
 import moe.styx.common.util.launchGlobal
 import moe.styx.common.util.launchThreaded
 

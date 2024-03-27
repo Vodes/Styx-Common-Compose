@@ -6,8 +6,8 @@ import moe.styx.common.compose.appConfig
 import moe.styx.common.compose.extensions.downloadFile
 import moe.styx.common.compose.extensions.getPath
 import moe.styx.common.compose.extensions.isCached
-import moe.styx.common.compose.utils.Log
 import moe.styx.common.extension.eqI
+import moe.styx.common.util.Log
 import moe.styx.common.util.SYSTEMFILES
 import moe.styx.common.util.launchGlobal
 import okio.Path

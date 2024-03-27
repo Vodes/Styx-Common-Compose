@@ -7,12 +7,12 @@ import moe.styx.common.Platform
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.http.sendObjectWithResponse
-import moe.styx.common.compose.utils.Log
 import moe.styx.common.data.ActiveUser
 import moe.styx.common.data.ClientHeartbeat
 import moe.styx.common.data.MediaActivity
 import moe.styx.common.extension.eqI
 import moe.styx.common.json
+import moe.styx.common.util.Log
 import moe.styx.common.util.launchGlobal
 
 object Heartbeats : LifecycleTrackedJob() {
