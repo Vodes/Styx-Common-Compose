@@ -35,10 +35,14 @@ object MpvDesc {
         Leave on if at all possible and not causing issues.
     """.trimIndent()
 
-    val deband = """
+    val deband = if (Platform.current == Platform.JVM) """
         Removes colorbanding from the video.
         Keep this on if you don't have any performance issues.
         Can also be toggled with h in the player.
+    """.trimIndent()
+    else """
+        Removes colorbanding from the video.
+        This might be quite heavy for mobile devices but worth it for WEB releases if your device is strong enough.
     """.trimIndent()
 
     val oversample = """
@@ -68,6 +72,12 @@ object MpvDesc {
         Forces dithering to 10bit because MPV's auto detection is broken.
         Only use if you know that your display is 10bit.
     """.trimIndent()
+
+    val blendSubs = """
+        Render subtitles in the same colorspace as your video.
+        This makes the colored stuff in subtitles more accurate but may be a little taxing on the performance.
+        Keep this on if you don't have any performance issues.
+    """.trimIndent()
 }
 
 @Serializable
@@ -82,6 +92,7 @@ data class MpvPreferences(
     val oversampleInterpol: Boolean = false,
     val dither10bit: Boolean = false,
     val customDownmix: Boolean = false,
+    val blendSubs: Boolean = true,
     val preferGerman: Boolean = false,
     val preferEnDub: Boolean = false,
     val preferDeDub: Boolean = false,
