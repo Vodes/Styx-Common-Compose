@@ -1,19 +1,19 @@
 [versions]
 android-minSdk = "27"
 android-compileSdk = "34"
-agp = "8.3.0"
+agp = "8.2.0"
 kotlin = "1.9.23"
-compose = "1.6.1"
-styx-common = "0.1.0"
+compose = "1.6.11"
+styx-common = "0.1.1"
 voyager = "1.0.0"
 multiplatform-settings = "1.1.1"
 kamel = "1.0.0-beta.2"
-kstore = "0.7.1"
+kstore = "0.8.0"
 oshi = "6.4.11"
 multiplatform-imageloader = "1.7.6"
 multiplatform-lifecycle = "0.0.2"
 islandtime = "0.7.0"
-android-lifecycle = "2.7.0"
+android-lifecycle = "2.8.3"
 
 
 [libraries]
