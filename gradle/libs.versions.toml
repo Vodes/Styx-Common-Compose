@@ -1,10 +1,9 @@
 [versions]
 android-minSdk = "27"
-android-compileSdk = "34"
-agp = "8.2.0"
-kotlin = "1.9.23"
-compose = "1.6.11"
-styx-common = "0.1.1"
+android-compileSdk = "35"
+agp = "8.2.2"
+kotlin = "2.0.10-RC2"
+styx-common = "0.2.0-SNAPSHOT3"
 voyager = "1.0.0"
 multiplatform-settings = "1.1.1"
 kamel = "1.0.0-beta.2"
@@ -14,6 +13,7 @@ multiplatform-imageloader = "1.7.6"
 multiplatform-lifecycle = "0.0.2"
 islandtime = "0.7.0"
 android-lifecycle = "2.8.3"
+compose = "1.6.11"
 
 
 [libraries]
@@ -39,3 +39,4 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

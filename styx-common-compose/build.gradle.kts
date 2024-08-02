@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.compose)
+    alias(libs.plugins.compose.compiler)
     `maven-publish`
 }
 
@@ -11,18 +12,9 @@ version = (System.getenv("SNAPSHOT_COMMIT") ?: "").ifBlank { "0.0.5" }
 
 kotlin {
     applyDefaultHierarchyTemplate()
-    jvm {
-        jvmToolchain(17)
-        withSourcesJar()
-    }
-    androidTarget {
-        publishLibraryVariants("release")
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
+    jvmToolchain(17)
+    jvm { withSourcesJar() }
+    androidTarget { publishLibraryVariants("release") }
     iosX64()
     iosArm64()
     iosSimulatorArm64()

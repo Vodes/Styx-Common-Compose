@@ -17,13 +17,11 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: |
-            11
-            17
+          java-version: 17
           cache: gradle
       - name: "Build and publish library"
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
         run: |
           chmod u+x ./gradlew
-          ./gradlew publishAllPublicationsToStyxRepository
+          ./gradlew publishAllPublicationsToStyxRepository -Dorg.gradle.parallel=false --stacktrace --no-configuration-cache

@@ -17,9 +17,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: |
-            11
-            17
+          java-version: 17
           cache: gradle
       - name: Set commit env variable
         run: echo "SNAPSHOT_COMMIT=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
@@ -28,4 +26,4 @@ jobs:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
         run: |
           chmod u+x ./gradlew
-          ./gradlew publishAllPublicationsToStyxRepository
+          ./gradlew publishAllPublicationsToStyxRepository -Dorg.gradle.parallel=false --stacktrace --no-configuration-cache

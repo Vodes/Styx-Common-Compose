@@ -11,6 +11,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven("https://repo.styx.moe/releases")
+        maven("https://repo.styx.moe/snapshots")
     }
 }
 
