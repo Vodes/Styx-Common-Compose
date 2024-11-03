@@ -11,7 +11,9 @@ import io.kamel.image.config.Default
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
+import kotlinx.io.readByteArray
 import moe.styx.common.Platform
 import moe.styx.common.compose.appConfig
 import moe.styx.common.compose.files.ImageCache
@@ -77,7 +79,7 @@ fun Image.isCached(): Boolean {
 suspend fun Image.downloadFile() {
     val response = httpClient.get(this.getURL())
     if (response.status.isSuccess()) {
-        val bytes = response.bodyAsChannel().readRemaining().readBytes()
+        val bytes = response.bodyAsChannel().readRemaining().readByteArray()
         SYSTEMFILES.write(this.getPath()) {
             write(bytes)
         }

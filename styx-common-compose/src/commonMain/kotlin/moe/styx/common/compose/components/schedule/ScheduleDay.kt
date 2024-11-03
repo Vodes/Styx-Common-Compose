@@ -13,7 +13,7 @@ import moe.styx.common.compose.components.anime.AnimeListItem
 import moe.styx.common.compose.extensions.dayOfWeek
 import moe.styx.common.compose.extensions.getTargetTime
 import moe.styx.common.compose.files.Storage
-import moe.styx.common.compose.files.getCurrentAndCollectFlow
+import moe.styx.common.compose.files.collectWithEmptyInitial
 import moe.styx.common.data.Media
 import moe.styx.common.data.ScheduleWeekday
 import moe.styx.common.extension.capitalize
@@ -22,8 +22,9 @@ import moe.styx.common.extension.padString
 
 @Composable
 fun ScheduleDay(day: ScheduleWeekday, onClick: (Media) -> Unit) {
-    val mediaList by Storage.stores.mediaStore.getCurrentAndCollectFlow()
-    val schedules by Storage.stores.scheduleStore.getCurrentAndCollectFlow()
+    val mediaList by Storage.stores.mediaStore.collectWithEmptyInitial()
+    val imageList by Storage.stores.imageStore.collectWithEmptyInitial()
+    val schedules by Storage.stores.scheduleStore.collectWithEmptyInitial()
     val filtered = schedules.filter { it.getTargetTime().dayOfWeek == day.dayOfWeek() }.sortedBy { it.getTargetTime().toInstant().secondOfUnixEpoch }
     if (filtered.isEmpty())
         return
@@ -35,13 +36,14 @@ fun ScheduleDay(day: ScheduleWeekday, onClick: (Media) -> Unit) {
         )
         for (schedule in filtered) {
             val media = mediaList.find { it.GUID eqI schedule.mediaID } ?: continue
+            val image = imageList.find { it.GUID eqI media.thumbID } ?: continue
             val target = schedule.getTargetTime()
             Text(
                 "${target.hour.padString(2)}:${target.minute.padString(2)}",
                 modifier = Modifier.padding(6.dp),
                 style = MaterialTheme.typography.titleMedium
             )
-            Column(Modifier.padding(6.dp, 1.dp)) { AnimeListItem(media, schedule.finalEpisodeCount) { onClick(media) } }
+            Column(Modifier.padding(6.dp, 1.dp)) { AnimeListItem(media to image, schedule.finalEpisodeCount) { onClick(media) } }
         }
     }
 }

@@ -8,6 +8,8 @@ import io.github.xxfast.kstore.extensions.getOrEmpty
 import io.github.xxfast.kstore.extensions.updatesOrEmpty
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
+import moe.styx.common.compose.http.Endpoints
+import moe.styx.common.compose.http.getList
 import moe.styx.common.data.Changes
 import moe.styx.common.data.MediaWatched
 import moe.styx.common.data.QueuedFavChanges
@@ -54,6 +56,12 @@ fun <T : @Serializable Any> KStore<List<T>>.getBlocking(): List<T> = runBlocking
 inline fun <T : @Serializable Any> KStore<List<T>>.getCurrentAndCollectFlow(): State<List<T>> {
     val current = runBlocking { this@getCurrentAndCollectFlow.getOrEmpty() }
     return this.updatesOrEmpty.collectAsState(current)
+}
+
+suspend inline fun <reified T : @Serializable Any> KStore<List<T>>.updateFromEndpoint(endpoint: Endpoints) {
+    val result = getList<T>(endpoint)
+    if (result.httpCode > 0)
+        this.set(result.result.getOrNull())
 }
 
 @Composable

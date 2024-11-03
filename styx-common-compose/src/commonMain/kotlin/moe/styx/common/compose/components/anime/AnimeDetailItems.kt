@@ -12,6 +12,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import moe.styx.common.compose.components.buttons.ExpandIconButton
 import moe.styx.common.compose.components.misc.OutlinedText
+import moe.styx.common.data.Image
 import moe.styx.common.data.Media
 
 @Composable
@@ -66,21 +67,21 @@ fun MediaGenreListing(media: Media) {
 }
 
 @Composable
-fun MediaRelations(media: Media, list: List<Media>, onClick: (Media) -> Unit) {
+fun MediaRelations(media: Media, list: List<Media>, images: List<Image>, onClick: (Media) -> Unit) {
     Text("Relations", Modifier.padding(6.dp, 4.dp), style = MaterialTheme.typography.titleLarge)
     Column(Modifier.padding(5.dp, 2.dp)) {
         val pre = list.find { a -> a.GUID == media.prequel }
         if (pre != null) {
             Column(Modifier.align(Alignment.Start)) {
                 Text("Prequel", Modifier.padding(4.dp, 5.dp, 4.dp, 6.dp), style = MaterialTheme.typography.bodyMedium)
-                AnimeListItem(pre) { onClick(pre) }
+                AnimeListItem(pre to images.find { it.GUID == pre.thumbID }) { onClick(pre) }
             }
         }
         val seq = list.find { a -> a.GUID == media.sequel }
         if (seq != null) {
             Column(Modifier.align(Alignment.Start)) {
                 Text("Sequel", Modifier.padding(4.dp, 5.dp, 4.dp, 6.dp), style = MaterialTheme.typography.bodyMedium)
-                AnimeListItem(seq) { onClick(seq) }
+                AnimeListItem(seq to images.find { it.GUID == seq.thumbID }) { onClick(seq) }
             }
         }
     }

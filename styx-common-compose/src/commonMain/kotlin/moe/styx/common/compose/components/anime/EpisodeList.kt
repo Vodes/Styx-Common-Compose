@@ -156,7 +156,7 @@ fun EpisodeDetailComp(
         Column(modifier = Modifier.hoverable(interactionSource = interactionSource).weight(1f)) {
             var modifier = Modifier.padding(5.dp)
             if (isHover)
-                modifier = modifier.basicMarquee(delayMillis = 300)
+                modifier = modifier.basicMarquee(repeatDelayMillis = 300)
             Text(
                 "${ep.entryNumber}${if (!title.isNullOrBlank()) " - $title" else ""}",
                 modifier,

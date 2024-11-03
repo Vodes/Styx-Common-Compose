@@ -16,19 +16,25 @@ import moe.styx.common.util.SYSTEMFILES
 import moe.styx.common.util.launchGlobal
 import moe.styx.common.util.launchThreaded
 import okio.Path.Companion.toPath
+import kotlin.math.abs
 
 /**
  * Object for all the basic data storage operations, e.g. refreshing the data from the API.
  */
 object Storage {
+    private var refreshDataJob: Job? = null
+
     /**
      * This property getter ensures presence of data in the stores.
      */
     val stores: Stores
         get() {
-            if (Stores.needsRefresh()) {
-                runBlocking { loadData() }
-            }
+            if (refreshDataJob == null || refreshDataJob!!.isCompleted)
+                refreshDataJob = launchGlobal {
+                    if (Stores.needsRefresh()) {
+                        runBlocking { loadData() }
+                    }
+                }
             return Stores
         }
 
@@ -36,6 +42,15 @@ object Storage {
     val isLoaded = MutableStateFlow(false)
 
     suspend fun loadData() = coroutineScope {
+        // This is a bad workaround to avoid insane amounts of reads and requests
+        if (abs(Stores.lastLoaded - currentUnixSeconds()) < 2)
+            if (Stores.loadBuffer > 1)
+                return@coroutineScope
+            else
+                Stores.loadBuffer++
+        else
+            Stores.loadBuffer = 0
+
         createDirectories()
         isLoaded.emit(false)
         loadingProgress.emit("")
@@ -48,32 +63,48 @@ object Storage {
 
         if (serverOnline) {
             loadingProgress.emit("Loading media...")
+            var (mediaFailed, entriesFailed) = false to false
             val jobs = mutableSetOf(
-                launchGlobal { Stores.scheduleStore.set(getList(Endpoints.SCHEDULES)) },
-                launchGlobal { Stores.categoryStore.set(getList(Endpoints.CATEGORIES)) },
-                launchGlobal { Stores.favouriteStore.set(getList(Endpoints.FAVOURITES)) },
-                launchGlobal { Stores.watchedStore.set(getList(Endpoints.WATCHED)) }
+                launchGlobal { Stores.scheduleStore.updateFromEndpoint(Endpoints.SCHEDULES) },
+                launchGlobal { Stores.categoryStore.updateFromEndpoint(Endpoints.CATEGORIES) },
+                launchGlobal { Stores.favouriteStore.updateFromEndpoint(Endpoints.FAVOURITES) },
+                launchGlobal { Stores.watchedStore.updateFromEndpoint(Endpoints.WATCHED) }
             )
             if (shouldUpdateMedia || shouldUpdateEntries) {
-                jobs.add(launch(Dispatchers.IO) { Stores.imageStore.set(getList(Endpoints.IMAGES)) })
-                jobs.add(launch(Dispatchers.IO) { Stores.mediainfoStore.set(getList(Endpoints.MEDIAINFO)) })
+                jobs.add(launch(Dispatchers.IO) { Stores.imageStore.updateFromEndpoint(Endpoints.IMAGES) })
+                jobs.add(launch(Dispatchers.IO) { Stores.mediainfoStore.updateFromEndpoint(Endpoints.MEDIAINFO) })
                 if (shouldUpdateMedia)
-                    jobs.add(launch(Dispatchers.IO) { Stores.mediaStore.set(getList(Endpoints.MEDIA)) })
+                    jobs.add(launch(Dispatchers.IO) {
+                        val mediaResult = getList<Media>(Endpoints.MEDIA)
+                        if (mediaResult.httpCode !in 200..203 || mediaResult.result.isFailure)
+                            mediaFailed = true
+                        else
+                            runCatching { Stores.mediaStore.set(mediaResult.result.getOrNull()!!) }.onFailure { mediaFailed = true }
+                    })
                 if (shouldUpdateEntries)
-                    jobs.add(launch(Dispatchers.IO) { Stores.entryStore.set(getList(Endpoints.MEDIA_ENTRIES)) })
+                    jobs.add(launch(Dispatchers.IO) {
+                        val entryResult = getList<MediaEntry>(Endpoints.MEDIA_ENTRIES)
+                        if (entryResult.httpCode !in 200..203 || entryResult.result.isFailure)
+                            entriesFailed = true
+                        else
+                            runCatching { Stores.entryStore.set(entryResult.result.getOrNull()!!) }.onFailure { entriesFailed = true }
+                    })
             }
             jobs.joinAll()
             val current = currentUnixSeconds()
             Stores.lastLoaded = current
             Stores.changesStore.set(
                 localChange.copy(
-                    if (shouldUpdateMedia) current else localChange.media,
-                    if (shouldUpdateEntries) current else localChange.entry
+                    if (mediaFailed) 0 else (if (shouldUpdateMedia) current else localChange.media),
+                    if (entriesFailed) 0 else (if (shouldUpdateEntries) current else localChange.entry)
                 )
             )
             loadingProgress.emit("Updating image cache...\nThis may take a minute or two.")
-            ImageCache.checkForNewImages()
-            deleteFilesForDeletedEntries()
+            if (!Stores.mediaStore.get().isNullOrEmpty()) {
+                ImageCache.checkForNewImages()
+                if (!Stores.entryStore.get().isNullOrEmpty())
+                    deleteFilesForDeletedEntries()
+            }
         }
         isLoaded.emit(true)
     }

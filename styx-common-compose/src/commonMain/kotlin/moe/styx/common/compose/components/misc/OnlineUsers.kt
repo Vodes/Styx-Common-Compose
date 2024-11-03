@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import moe.styx.common.compose.files.Storage
-import moe.styx.common.compose.files.getCurrentAndCollectFlow
+import moe.styx.common.compose.files.collectWithEmptyInitial
 import moe.styx.common.compose.threads.Heartbeats
 import moe.styx.common.data.ActiveUser
 import moe.styx.common.data.Media
@@ -22,8 +22,8 @@ import moe.styx.common.extension.toBoolean
 fun OnlineUsersIcon(onClickMedia: (Media) -> Unit) {
     var showUserDropDown by remember { mutableStateOf(false) }
     val users by Heartbeats.currentUserState.collectAsState()
-    val mediaList by Storage.stores.mediaStore.getCurrentAndCollectFlow()
-    val entryList by Storage.stores.entryStore.getCurrentAndCollectFlow()
+    val mediaList by Storage.stores.mediaStore.collectWithEmptyInitial()
+    val entryList by Storage.stores.entryStore.collectWithEmptyInitial()
     val numUsers = users.distinctBy { it.user.GUID }.size
 
     UsersIconWithNum(numUsers) {
