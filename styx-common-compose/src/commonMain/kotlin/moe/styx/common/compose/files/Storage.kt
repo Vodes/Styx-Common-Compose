@@ -9,7 +9,9 @@ import moe.styx.common.compose.http.getList
 import moe.styx.common.compose.http.getObject
 import moe.styx.common.compose.threads.DownloadQueue
 import moe.styx.common.compose.utils.ServerStatus
-import moe.styx.common.data.*
+import moe.styx.common.data.Changes
+import moe.styx.common.data.Media
+import moe.styx.common.data.MediaEntry
 import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.extension.eqI
 import moe.styx.common.util.SYSTEMFILES
@@ -22,7 +24,7 @@ import kotlin.math.abs
  * Object for all the basic data storage operations, e.g. refreshing the data from the API.
  */
 object Storage {
-    private var refreshDataJob: Job? = null
+    var refreshDataJob: Job? = null
 
     /**
      * This property getter ensures presence of data in the stores.
@@ -61,33 +63,39 @@ object Storage {
         val shouldUpdateMedia = lastChanges.media > localChange.media
         val shouldUpdateEntries = lastChanges.entry > localChange.entry
 
+        val dataLoaderDispatcher = Dispatchers.IO.limitedParallelism(100, "Storage DataLoader")
+
         if (serverOnline) {
             loadingProgress.emit("Loading media...")
             var (mediaFailed, entriesFailed) = false to false
             val jobs = mutableSetOf(
-                launchGlobal { Stores.scheduleStore.updateFromEndpoint(Endpoints.SCHEDULES) },
-                launchGlobal { Stores.categoryStore.updateFromEndpoint(Endpoints.CATEGORIES) },
-                launchGlobal { Stores.favouriteStore.updateFromEndpoint(Endpoints.FAVOURITES) },
-                launchGlobal { Stores.watchedStore.updateFromEndpoint(Endpoints.WATCHED) }
+                launch(dataLoaderDispatcher) { Stores.scheduleStore.updateFromEndpoint(Endpoints.SCHEDULES) },
+                launch(dataLoaderDispatcher) { Stores.categoryStore.updateFromEndpoint(Endpoints.CATEGORIES) },
+                launch(dataLoaderDispatcher) { Stores.favouriteStore.updateFromEndpoint(Endpoints.FAVOURITES) },
+                launch(dataLoaderDispatcher) { Stores.watchedStore.updateFromEndpoint(Endpoints.WATCHED) }
             )
             if (shouldUpdateMedia || shouldUpdateEntries) {
-                jobs.add(launch(Dispatchers.IO) { Stores.imageStore.updateFromEndpoint(Endpoints.IMAGES) })
-                jobs.add(launch(Dispatchers.IO) { Stores.mediainfoStore.updateFromEndpoint(Endpoints.MEDIAINFO) })
+                jobs.add(launch(dataLoaderDispatcher) { Stores.imageStore.updateFromEndpoint(Endpoints.IMAGES) })
+                jobs.add(launch(dataLoaderDispatcher) { Stores.mediainfoStore.updateFromEndpoint(Endpoints.MEDIAINFO) })
                 if (shouldUpdateMedia)
-                    jobs.add(launch(Dispatchers.IO) {
+                    jobs.add(launch(dataLoaderDispatcher) {
                         val mediaResult = getList<Media>(Endpoints.MEDIA)
                         if (mediaResult.httpCode !in 200..203 || mediaResult.result.isFailure)
                             mediaFailed = true
                         else
-                            runCatching { Stores.mediaStore.set(mediaResult.result.getOrNull()!!) }.onFailure { mediaFailed = true }
+                            runCatching { Stores.mediaStore.set(mediaResult.result.getOrNull()!!) }.onFailure {
+                                mediaFailed = true
+                            }
                     })
                 if (shouldUpdateEntries)
-                    jobs.add(launch(Dispatchers.IO) {
+                    jobs.add(launch(dataLoaderDispatcher) {
                         val entryResult = getList<MediaEntry>(Endpoints.MEDIA_ENTRIES)
                         if (entryResult.httpCode !in 200..203 || entryResult.result.isFailure)
                             entriesFailed = true
                         else
-                            runCatching { Stores.entryStore.set(entryResult.result.getOrNull()!!) }.onFailure { entriesFailed = true }
+                            runCatching { Stores.entryStore.set(entryResult.result.getOrNull()!!) }.onFailure {
+                                entriesFailed = true
+                            }
                     })
             }
             jobs.joinAll()
@@ -125,13 +133,4 @@ object Storage {
         SYSTEMFILES.createDirectories("${appConfig().appStoragePath}/store".toPath())
         SYSTEMFILES.createDirectories("${appConfig().appStoragePath}/queued".toPath())
     }
-
-    val mediaList: List<Media> = runBlocking { stores.mediaStore.getOrEmpty() }
-    val entryList: List<MediaEntry> = runBlocking { stores.entryStore.getOrEmpty() }
-    val categories: List<Category> = runBlocking { stores.categoryStore.getOrEmpty() }
-    val favourites: List<Favourite> = runBlocking { stores.favouriteStore.getOrEmpty() }
-    val imageList: List<Image> = runBlocking { stores.imageStore.getOrEmpty() }
-    val watchedList: List<MediaWatched> = runBlocking { stores.watchedStore.getOrEmpty() }
-    val schedules: List<MediaSchedule> = runBlocking { stores.scheduleStore.getOrEmpty() }
-    val mediaInfos: List<MediaInfo> = runBlocking { stores.mediainfoStore.getOrEmpty() }
 }

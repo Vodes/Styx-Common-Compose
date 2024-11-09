@@ -26,11 +26,11 @@ object RequestQueue : LifecycleTrackedJob() {
                 delay(30000L)
                 continue
             }
-            val favStore = Storage.stores.queuedFavStore.getOrDefault()
+            val favStore = Stores.queuedFavStore.getOrDefault()
             if (favStore.toAdd.isNotEmpty() || favStore.toRemove.isNotEmpty()) {
                 syncFavs(favStore)
             }
-            val watchedStore = Storage.stores.queuedWatchedStore.getOrDefault()
+            val watchedStore = Stores.queuedWatchedStore.getOrDefault()
             if (watchedStore.toUpdate.isNotEmpty() || watchedStore.toRemove.isNotEmpty()) {
                 syncWatched(watchedStore)
             }
@@ -51,7 +51,7 @@ object RequestQueue : LifecycleTrackedJob() {
         if (ServerStatus.lastKnown != ServerStatus.UNKNOWN && isLoggedIn()
             && sendObject(Endpoints.WATCHED_SYNC, watched)
         ) {
-            Storage.stores.queuedWatchedStore.set(QueuedWatchedChanges())
+            Stores.queuedWatchedStore.set(QueuedWatchedChanges())
             Log.i { "Synced queued up watch progress" }
         }
     }
@@ -80,7 +80,11 @@ object RequestQueue : LifecycleTrackedJob() {
                 current.toRemove.removeAll { it.mediaID eqI media.GUID }
                 return@update current
             }
-            if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(Endpoints.FAVOURITES_ADD, fav)) {
+            if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(
+                    Endpoints.FAVOURITES_ADD,
+                    fav
+                )
+            ) {
                 Storage.stores.queuedFavStore.update { changes ->
                     val current = changes ?: QueuedFavChanges()
                     current.toAdd.add(fav)
@@ -95,7 +99,11 @@ object RequestQueue : LifecycleTrackedJob() {
         val fav = favs.find { it.mediaID eqI media.GUID } ?: return null
         return launchThreaded {
             Storage.stores.favouriteStore.updateList { it.remove(fav) }
-            if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(Endpoints.FAVOURITES_DELETE, fav)) {
+            if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(
+                    Endpoints.FAVOURITES_DELETE,
+                    fav
+                )
+            ) {
                 Storage.stores.queuedFavStore.update { changes ->
                     val current = changes ?: QueuedFavChanges()
                     current.toRemove.add(fav)
@@ -111,7 +119,8 @@ object RequestQueue : LifecycleTrackedJob() {
             Storage.stores.watchedStore.updateList {
                 val existing = it.find { w -> w.entryID eqI mediaWatched.entryID }
                 val existingMax = existing?.maxProgress ?: -1F
-                new = if (existingMax > mediaWatched.maxProgress) mediaWatched.copy(maxProgress = existingMax) else mediaWatched
+                new =
+                    if (existingMax > mediaWatched.maxProgress) mediaWatched.copy(maxProgress = existingMax) else mediaWatched
                 it.replaceIfNotNull(existing, new!!)
             }
 
@@ -122,7 +131,11 @@ object RequestQueue : LifecycleTrackedJob() {
                     current.toRemove.removeAll { it.entryID eqI mediaWatched.entryID }
                     return@update current
                 }
-                if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(Endpoints.WATCHED_ADD, new))
+                if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(
+                        Endpoints.WATCHED_ADD,
+                        new
+                    )
+                )
                     Storage.stores.queuedWatchedStore.addWatched(new)
             }
         }
@@ -168,7 +181,11 @@ object RequestQueue : LifecycleTrackedJob() {
                     current.toRemove.removeAll { it.entryID eqI entry.GUID }
                     return@update current
                 }
-                if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(Endpoints.WATCHED_DELETE, existing))
+                if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(
+                        Endpoints.WATCHED_DELETE,
+                        existing
+                    )
+                )
                     Storage.stores.queuedWatchedStore.removeWatched(existing)
             }
         }
