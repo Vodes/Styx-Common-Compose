@@ -17,11 +17,10 @@ import moe.styx.common.data.Image
 import moe.styx.common.data.Media
 
 @Composable
-fun AnimeListItem(mediaImagePair: Pair<Media, Image?>, targetEpisodeNum: Int = 0, onClick: () -> Unit) {
-    val (media, image) = mediaImagePair
+fun AnimeListItem(media: Media, image: Image?, targetEpisodeNum: Int = 0, modifier: Modifier = Modifier.padding(5.dp, 2.dp), onClick: () -> Unit) {
     val painter = image?.getPainter()
     ElevatedCard(
-        modifier = Modifier.padding(5.dp, 2.dp).fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.elevatedCardElevation(3.dp),
         onClick = onClick
     ) {

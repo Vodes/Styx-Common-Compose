@@ -43,7 +43,7 @@ object Storage {
     val loadingProgress = MutableStateFlow("")
     val isLoaded = MutableStateFlow(false)
 
-    suspend fun loadData() = coroutineScope {
+    suspend fun loadData(runPreImages: () -> Unit = {}) = coroutineScope {
         // This is a bad workaround to avoid insane amounts of reads and requests
         if (abs(Stores.lastLoaded - currentUnixSeconds()) < 2)
             if (Stores.loadBuffer > 1)
@@ -107,6 +107,7 @@ object Storage {
                     if (entriesFailed) 0 else (if (shouldUpdateEntries) current else localChange.entry)
                 )
             )
+            runPreImages()
             loadingProgress.emit("Updating image cache...\nThis may take a minute or two.")
             if (!Stores.mediaStore.get().isNullOrEmpty()) {
                 ImageCache.checkForNewImages()

@@ -12,7 +12,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import moe.styx.common.compose.components.buttons.ExpandIconButton
 import moe.styx.common.compose.components.misc.OutlinedText
-import moe.styx.common.data.Image
+import moe.styx.common.compose.viewmodels.MediaStorage
 import moe.styx.common.data.Media
 
 @Composable
@@ -48,7 +48,7 @@ fun MediaGenreListing(media: Media) {
     if (!media.genres.isNullOrBlank()) {
         FlowRow(Modifier.padding(5.dp), horizontalArrangement = Arrangement.Start, verticalArrangement = Arrangement.Center) {
             for (genre in media.genres!!.split(",")) {
-                OutlinedText(genre, MaterialTheme.colorScheme.primary)
+                OutlinedText(genre.trim(), MaterialTheme.colorScheme.primary)
             }
             if (!media.tags.isNullOrBlank()) {
                 ExpandIconButton(tooltip = "Show tags", tooltipExpanded = "Hide tags", isExpanded = isExpanded) { isExpanded = !isExpanded }
@@ -58,7 +58,7 @@ fun MediaGenreListing(media: Media) {
             AnimatedVisibility(isExpanded) {
                 FlowRow(Modifier.padding(5.dp)) {
                     media.tags!!.split(",").forEach { tag ->
-                        OutlinedText(tag, MaterialTheme.colorScheme.secondary)
+                        OutlinedText(tag.trim(), MaterialTheme.colorScheme.secondary)
                     }
                 }
             }
@@ -67,21 +67,19 @@ fun MediaGenreListing(media: Media) {
 }
 
 @Composable
-fun MediaRelations(media: Media, list: List<Media>, images: List<Image>, onClick: (Media) -> Unit) {
+fun MediaRelations(mediaStorage: MediaStorage, onClick: (Media) -> Unit) {
     Text("Relations", Modifier.padding(6.dp, 4.dp), style = MaterialTheme.typography.titleLarge)
     Column(Modifier.padding(5.dp, 2.dp)) {
-        val pre = list.find { a -> a.GUID == media.prequel }
-        if (pre != null) {
+        if (mediaStorage.hasPrequel()) {
             Column(Modifier.align(Alignment.Start)) {
                 Text("Prequel", Modifier.padding(4.dp, 5.dp, 4.dp, 6.dp), style = MaterialTheme.typography.bodyMedium)
-                AnimeListItem(pre to images.find { it.GUID == pre.thumbID }) { onClick(pre) }
+                AnimeListItem(mediaStorage.prequel!!, mediaStorage.prequelImage) { onClick(mediaStorage.prequel!!) }
             }
         }
-        val seq = list.find { a -> a.GUID == media.sequel }
-        if (seq != null) {
+        if (mediaStorage.hasSequel()) {
             Column(Modifier.align(Alignment.Start)) {
                 Text("Sequel", Modifier.padding(4.dp, 5.dp, 4.dp, 6.dp), style = MaterialTheme.typography.bodyMedium)
-                AnimeListItem(seq to images.find { it.GUID == seq.thumbID }) { onClick(seq) }
+                AnimeListItem(mediaStorage.sequel!!, mediaStorage.sequelImage) { onClick(mediaStorage.sequel!!) }
             }
         }
     }
