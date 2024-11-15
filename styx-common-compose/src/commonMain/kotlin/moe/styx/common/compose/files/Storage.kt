@@ -42,6 +42,7 @@ object Storage {
 
     val loadingProgress = MutableStateFlow("")
     val isLoaded = MutableStateFlow(false)
+    val dataLoaderDispatcher = Dispatchers.IO.limitedParallelism(100, "Storage DataLoader")
 
     suspend fun loadData(runPreImages: () -> Unit = {}) = coroutineScope {
         // This is a bad workaround to avoid insane amounts of reads and requests
@@ -62,8 +63,6 @@ object Storage {
         val localChange = Stores.changesStore.getOrDefault()
         val shouldUpdateMedia = lastChanges.media > localChange.media
         val shouldUpdateEntries = lastChanges.entry > localChange.entry
-
-        val dataLoaderDispatcher = Dispatchers.IO.limitedParallelism(100, "Storage DataLoader")
 
         if (serverOnline) {
             loadingProgress.emit("Loading media...")
