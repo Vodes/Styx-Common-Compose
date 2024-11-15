@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.russhwolf.settings.get
 import moe.styx.common.compose.components.misc.ExpandableText
@@ -46,7 +47,13 @@ fun LazyItemScope.EpisodeListItem(
             var textModifier = Modifier.padding(3.dp, 1.dp)
             if (isHover)
                 textModifier = textModifier.basicMarquee(repeatDelayMillis = 300)
-            Text(item.entryNumber + if (title.isNullOrBlank()) "" else " - $title", textModifier, maxLines = 1)
+            Text(
+                item.entryNumber + if (title.isNullOrBlank()) "" else " - $title",
+                textModifier,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.titleMedium
+            )
         },
         supportingContent = {
             Column(Modifier.fillMaxWidth()) {
