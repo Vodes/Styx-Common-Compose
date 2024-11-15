@@ -40,10 +40,11 @@ fun ScheduleViewComponent(
     val days = ScheduleWeekday.entries.toTypedArray()
     val mapped = remember {
         days.map { day ->
-            day to storage.scheduleList.filter { it.getTargetTime().dayOfWeek == day.dayOfWeek() }.mapNotNull {
-                val res = storage.mediaList.find { m -> m.GUID eqI it.mediaID }
-                res?.let { m -> it to m }
-            }
+            day to storage.scheduleList.filter { it.getTargetTime().dayOfWeek == day.dayOfWeek() }
+                .mapNotNull {
+                    val res = storage.mediaList.find { m -> m.GUID eqI it.mediaID }
+                    res?.let { m -> it to m }
+                }.sortedWith(compareBy({ it.first.hour }, { it.first.minute }, { it.second.name }))
         }.filter { it.second.isNotEmpty() }
     }
     val images = remember {
