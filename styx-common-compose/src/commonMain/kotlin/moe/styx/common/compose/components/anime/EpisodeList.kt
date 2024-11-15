@@ -46,7 +46,9 @@ fun EpisodeList(
     headerContent: (@Composable ColumnScope.() -> Unit)? = null
 ) {
     val nav = LocalGlobalNavigator.current
-    val associatedEntries = remember { mediaStorage.entries.map { ent -> ent to storage.watchedList.find { it.entryID eqI ent.GUID } } }
+    val associatedEntries = remember(storage) {
+        mediaStorage.entries.map { ent -> ent to storage.watchedList.find { it.entryID eqI ent.GUID } }
+    }
 
     val downloaded by Storage.stores.downloadedStore.collectWithEmptyInitial()
     val downloadQueue by DownloadQueue.queuedEntries.collectAsState()

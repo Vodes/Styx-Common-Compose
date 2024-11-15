@@ -56,8 +56,8 @@ fun UserListComponent(userList: List<ActiveUser>, mediaList: List<Media>, entryL
 
         Row(Modifier.padding(10.dp, if (index != 0) 0.dp else 5.dp, 0.dp, 5.dp), verticalAlignment = Alignment.CenterVertically) {
             when (user.deviceType) {
-                "PC" -> Icon(Icons.Filled.Computer, "PC")
-                "Laptop" -> Icon(Icons.Filled.LaptopWindows, "Laptop")
+                "PC" -> Icon(Icons.Filled.DesktopWindows, "PC")
+                "Laptop" -> Icon(Icons.Filled.LaptopChromebook, "Laptop")
                 "Phone" -> Icon(Icons.Filled.PhoneAndroid, "Phone")
                 "Tablet" -> Icon(Icons.Filled.Tablet, "Tablet")
                 else -> Icon(Icons.Filled.DeviceUnknown, "Unknown")
