@@ -3,7 +3,10 @@ package moe.styx.common.compose.components.misc
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -56,11 +59,11 @@ fun UserListComponent(userList: List<ActiveUser>, mediaList: List<Media>, entryL
 
         Row(Modifier.padding(10.dp, if (index != 0) 0.dp else 5.dp, 0.dp, 5.dp), verticalAlignment = Alignment.CenterVertically) {
             when (user.deviceType) {
-                "PC" -> Icon(Icons.Filled.DesktopWindows, "PC")
-                "Laptop" -> Icon(Icons.Filled.LaptopChromebook, "Laptop")
-                "Phone" -> Icon(Icons.Filled.PhoneAndroid, "Phone")
-                "Tablet" -> Icon(Icons.Filled.Tablet, "Tablet")
-                else -> Icon(Icons.Filled.DeviceUnknown, "Unknown")
+                "PC" -> Icon(Icons.Outlined.DesktopWindows, "PC")
+                "Laptop" -> Icon(Icons.Outlined.LaptopChromebook, "Laptop")
+                "Phone" -> Icon(Icons.Outlined.PhoneAndroid, "Phone")
+                "Tablet" -> Icon(Icons.Outlined.Tablet, "Tablet")
+                else -> Icon(Icons.Outlined.DeviceUnknown, "Unknown")
             }
             Column(Modifier.padding(10.dp, 0.dp)) {
                 Text(user.user.name, Modifier.padding(3.dp, 0.dp, 0.dp, 0.dp), style = MaterialTheme.typography.titleMedium)

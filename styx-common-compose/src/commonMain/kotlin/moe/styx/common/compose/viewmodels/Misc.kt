@@ -11,6 +11,11 @@ import moe.styx.common.compose.http.login
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.util.Log
 
+class ListPosViewModel : ScreenModel {
+    var scrollIndex: Int by mutableStateOf(0)
+    var scrollOffset: Int by mutableStateOf(0)
+}
+
 abstract class OverviewViewModel : ScreenModel {
     var isLoggedIn by mutableStateOf<Boolean?>(null)
         private set
