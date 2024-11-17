@@ -6,7 +6,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
-import moe.styx.common.compose.appConfig
+import moe.styx.common.compose.AppContextImpl.appConfig
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.compose.utils.ServerStatus.Companion.setLastKnown

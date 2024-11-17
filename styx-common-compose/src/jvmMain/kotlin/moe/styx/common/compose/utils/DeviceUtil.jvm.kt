@@ -1,6 +1,6 @@
 package moe.styx.common.compose.utils
 
-import moe.styx.common.compose.appConfig
+import moe.styx.common.compose.AppContextImpl.appConfig
 import moe.styx.common.data.DeviceInfo
 import oshi.SystemInfo
 

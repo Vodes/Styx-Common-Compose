@@ -1,6 +1,6 @@
 package moe.styx.common.compose.http
 
-import moe.styx.common.compose.appConfig
+import moe.styx.common.compose.AppContextImpl.appConfig
 
 enum class Endpoints(private val path: String) {
     LOGIN("/login"),

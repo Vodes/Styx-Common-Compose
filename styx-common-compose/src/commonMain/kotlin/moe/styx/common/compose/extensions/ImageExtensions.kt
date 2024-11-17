@@ -12,10 +12,9 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.*
-import io.ktor.utils.io.core.*
 import kotlinx.io.readByteArray
 import moe.styx.common.Platform
-import moe.styx.common.compose.appConfig
+import moe.styx.common.compose.AppContextImpl.appConfig
 import moe.styx.common.compose.files.ImageCache
 import moe.styx.common.data.Image
 import moe.styx.common.extension.toBoolean

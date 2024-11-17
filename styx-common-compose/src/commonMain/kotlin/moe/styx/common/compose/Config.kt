@@ -25,9 +25,10 @@ data class AppConfig(
     val appStoragePath: String = ""
 )
 
-/**
- * Change the function in this variable in your app.
- */
-var appConfig: () -> AppConfig = {
-    AppConfig("")
+abstract class AppContext {
+    var appConfig: () -> AppConfig = {
+        AppConfig("")
+    }
 }
+
+expect object AppContextImpl : AppContext

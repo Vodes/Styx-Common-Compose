@@ -3,7 +3,7 @@ package moe.styx.common.compose.files
 import io.github.xxfast.kstore.extensions.getOrEmpty
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import moe.styx.common.compose.appConfig
+import moe.styx.common.compose.AppContextImpl.appConfig
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.getList
 import moe.styx.common.compose.http.getObject

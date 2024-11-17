@@ -5,7 +5,7 @@ import io.github.xxfast.kstore.extensions.getOrEmpty
 import io.github.xxfast.kstore.file.extensions.listStoreOf
 import io.github.xxfast.kstore.file.storeOf
 import kotlinx.io.files.Path
-import moe.styx.common.compose.appConfig
+import moe.styx.common.compose.AppContextImpl.appConfig
 import moe.styx.common.compose.threads.DownloadedEntry
 import moe.styx.common.compose.utils.SearchState
 import moe.styx.common.data.*

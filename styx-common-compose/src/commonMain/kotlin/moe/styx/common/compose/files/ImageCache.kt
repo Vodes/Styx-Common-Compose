@@ -2,7 +2,7 @@ package moe.styx.common.compose.files
 
 import io.github.xxfast.kstore.extensions.getOrEmpty
 import kotlinx.coroutines.*
-import moe.styx.common.compose.appConfig
+import moe.styx.common.compose.AppContextImpl.appConfig
 import moe.styx.common.compose.extensions.downloadFile
 import moe.styx.common.compose.extensions.getPath
 import moe.styx.common.compose.extensions.isCached
