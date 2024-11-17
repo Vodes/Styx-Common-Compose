@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.material3.*
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -34,7 +36,6 @@ fun LazyItemScope.EpisodeListItem(
     item: MediaEntry,
     watched: MediaWatched?,
     modifier: Modifier = Modifier,
-    showDivider: Boolean = false,
     onMediaInfoClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -66,12 +67,6 @@ fun LazyItemScope.EpisodeListItem(
                         WatchedIndicator(watched, Modifier.fillMaxWidth().padding(2.dp, 5.dp))
                     }
                 }
-                if (showDivider)
-                    HorizontalDivider(
-                        Modifier.fillMaxWidth().padding(0.dp, 9.dp, 0.dp, 0.dp),
-                        thickness = 2.dp,
-                        color = MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp)
-                    )
             }
         },
         overlineContent = { EpisodeListItemOverline(item, onMediaInfoClick = onMediaInfoClick) },

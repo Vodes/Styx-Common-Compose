@@ -87,15 +87,24 @@ fun EpisodeList(
                 }
             }
             itemsIndexed(associatedEntries, key = { _, item -> item.first.GUID }) { idx, item ->
-                EpisodeListItem(
-                    item.first, item.second, Modifier.defaultMinSize(0.dp, 75.dp)
-                        .dynamicClick(regularClick = {
-                            onPlay(item.first)
-                        }),
-                    idx != associatedEntries.size - 1
-                ) {
-                    showMediaInfoDialog = true
-                    selectedMedia = item.first
+                Column(Modifier.fillMaxWidth()) {
+                    EpisodeListItem(
+                        item.first, item.second,
+                        Modifier.defaultMinSize(0.dp, 75.dp)
+                            .dynamicClick(regularClick = {
+                                onPlay(item.first)
+                            })
+                    ) {
+                        showMediaInfoDialog = true
+                        selectedMedia = item.first
+                    }
+                    if (idx != associatedEntries.size - 1) {
+                        HorizontalDivider(
+                            Modifier.fillMaxWidth().padding(0.dp, 5.dp, 0.dp, 0.dp),
+                            thickness = 2.dp,
+                            color = MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp)
+                        )
+                    }
                 }
             }
         }
