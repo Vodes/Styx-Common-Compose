@@ -11,7 +11,7 @@ import moe.styx.common.data.MediaEntry
 import moe.styx.common.extension.eqI
 import moe.styx.common.util.launchThreaded
 
-val downloadManager by lazy {
+val downloadManager: DownloadManager by lazy {
     AppContextImpl.get().getSystemService(DownloadManager::class.java)
 }
 
