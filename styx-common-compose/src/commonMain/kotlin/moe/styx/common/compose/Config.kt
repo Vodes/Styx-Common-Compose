@@ -14,6 +14,8 @@ expect val settings: Settings
  * @param debugToken A refreshToken to be used when ran in debug.
  * @param appCachePath Cache path for (for now just) images.
  * @param appStoragePath Storage path for all the data.
+ * @param versionCheckURL URL to check the available versions from.
+ *                        Ideally a GitHub tags api link. e.g. `https://api.github.com/repos/<user>/<repo>/tags`
  */
 data class AppConfig(
     val appSecret: String,
@@ -22,7 +24,8 @@ data class AppConfig(
     val imageBaseURL: String = "",
     val debugToken: String? = null,
     val appCachePath: String = "",
-    val appStoragePath: String = ""
+    val appStoragePath: String = "",
+    val versionCheckURL: String = ""
 )
 
 abstract class AppContext {

@@ -34,6 +34,7 @@ kotlin {
                 api(libs.multiplatform.imageloader)
                 api(libs.multiplatform.islandtime)
                 api(libs.multiplatform.lifecycle)
+                api(libs.multiplatform.semver)
                 api(libs.kamel.image)
 
                 // IO
