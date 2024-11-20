@@ -15,6 +15,7 @@ multiplatform-lifecycle = "0.0.2"
 islandtime = "0.7.0"
 android-lifecycle = "2.8.7"
 semver = "2.0.0"
+sonner = "0.3.8"
 
 
 [libraries]
@@ -29,6 +30,7 @@ multiplatform-imageloader = { module = "io.github.qdsfdhvh:image-loader", versio
 multiplatform-lifecycle = { module = "io.github.kevinnzou:compose-multiplatform-lifecycle-tracker", version.ref = "multiplatform-lifecycle" }
 multiplatform-islandtime = { module = "io.islandtime:core", version.ref = "islandtime" }
 multiplatform-semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
+sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }
 kamel-image = { module = "media.kamel:kamel-image-default", version.ref = "kamel" }
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }

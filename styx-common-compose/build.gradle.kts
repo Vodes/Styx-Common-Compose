@@ -30,12 +30,13 @@ kotlin {
                 api(libs.styx.common)
 
                 // Other stuff
-                api(libs.multiplatform.settings)
                 api(libs.multiplatform.imageloader)
                 api(libs.multiplatform.islandtime)
                 api(libs.multiplatform.lifecycle)
+                api(libs.multiplatform.settings)
                 api(libs.multiplatform.semver)
                 api(libs.kamel.image)
+                api(libs.sonner)
 
                 // IO
                 api(libs.kstore)

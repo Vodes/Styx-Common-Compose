@@ -100,7 +100,7 @@ fun EpisodeList(
                     }
                     if (idx != associatedEntries.size - 1) {
                         HorizontalDivider(
-                            Modifier.fillMaxWidth().padding(0.dp, 5.dp, 0.dp, 0.dp),
+                            Modifier.fillMaxWidth().padding(0.dp, 3.dp, 0.dp, 3.dp),
                             thickness = 2.dp,
                             color = MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp)
                         )
