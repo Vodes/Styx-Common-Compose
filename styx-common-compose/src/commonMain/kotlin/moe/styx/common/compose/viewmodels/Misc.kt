@@ -32,13 +32,18 @@ abstract class OverviewViewModel : ScreenModel {
         private set
 
     var availablePreRelease by mutableStateOf<String?>(null)
-        private set
 
     init {
-        screenModelScope.launch { runLogin() }
+        Log.d { "Initializing overview model" }
+        runLoginAndChecks()
     }
 
-    private fun runLogin() {
+    fun runLoginAndChecks() = screenModelScope.launch {
+        runLogin()
+        runChecks()
+    }
+
+    private suspend fun runLogin() {
         Log.d { "Checking login..." }
         if (isLoggedIn == null) {
             isLoggedIn = isLoggedIn()
@@ -48,7 +53,7 @@ abstract class OverviewViewModel : ScreenModel {
 
     open fun checkPlayerVersion() {}
 
-    fun runChecks() {
+    private fun runChecks() {
         screenModelScope.launch {
             launch versionCheck@{
                 val versionCheckURL = AppContextImpl.appConfig().versionCheckURL
@@ -73,7 +78,8 @@ abstract class OverviewViewModel : ScreenModel {
                     }
                 }
             }
-            isOffline = ServerStatus.lastKnown in arrayOf(ServerStatus.OFFLINE, ServerStatus.UNKNOWN, ServerStatus.TIMEOUT)
+            isOffline =
+                ServerStatus.lastKnown in arrayOf(ServerStatus.OFFLINE, ServerStatus.UNKNOWN, ServerStatus.TIMEOUT)
             checkPlayerVersion()
         }
     }

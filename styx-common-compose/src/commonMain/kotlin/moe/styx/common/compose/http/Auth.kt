@@ -18,7 +18,7 @@ import moe.styx.common.json
 
 var login: LoginResponse? = null
 
-fun isLoggedIn(): Boolean {
+suspend fun isLoggedIn(): Boolean {
     val token = if (!appConfig().debugToken.isNullOrBlank()) {
         appConfig().debugToken!!
     } else {
@@ -58,16 +58,21 @@ fun generateCode(): CreationResponse? = runBlocking {
     return@runBlocking json.decodeFromString(response.bodyAsText())
 }
 
-fun checkLogin(token: String, first: Boolean = false): LoginResponse? = runBlocking {
+suspend fun checkLogin(token: String, first: Boolean = false): LoginResponse? {
     val response = runCatching {
         httpClient.submitForm(
             (if (first) Endpoints.DEVICE_FIRST_AUTH else Endpoints.LOGIN).url,
             formParameters = Parameters.build {
                 append("token", token)
-                append("content", runCatching { json.encodeToString(fetchDeviceInfo()) }.onFailure { it.printStackTrace() }.getOrNull() ?: "")
+                append(
+                    "content",
+                    runCatching { json.encodeToString(fetchDeviceInfo()) }.onFailure { it.printStackTrace() }
+                        .getOrNull() ?: ""
+                )
             }
         )
-    }.onFailure { it.printStackTrace().also { ServerStatus.lastKnown = ServerStatus.UNKNOWN } }.getOrNull() ?: return@runBlocking null
+    }.onFailure { it.printStackTrace().also { ServerStatus.lastKnown = ServerStatus.UNKNOWN } }.getOrNull()
+        ?: return null
 
     setLastKnown(response.status)
 
@@ -76,9 +81,9 @@ fun checkLogin(token: String, first: Boolean = false): LoginResponse? = runBlock
         login = log
         if (first && log.refreshToken != null)
             settings.putString("refreshToken", log.refreshToken!!)
-        return@runBlocking login
+        return login
     } else {
         println(response.bodyAsText())
     }
-    return@runBlocking null
+    return null
 }
