@@ -1,5 +1,6 @@
 package moe.styx.common.compose.components.misc
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -12,6 +13,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import moe.styx.common.compose.components.AppShapes
+import moe.styx.common.compose.components.buttons.ExpandIconButton
+import moe.styx.common.compose.components.misc.Toggles.settingsContainer
 import moe.styx.common.extension.eqI
 
 object Toggles {
@@ -93,6 +96,43 @@ object Toggles {
                             })
                             Text(choice, style = MaterialTheme.typography.bodyMedium)
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ExpandableSettings(
+    title: String,
+    isExpanded: Boolean,
+    onExpandClick: () -> Unit,
+    withContainer: Boolean = true,
+    content: (@Composable ColumnScope.() -> Unit)
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    Surface(
+        Modifier.padding(5.dp).clickable(interactionSource, null) {
+            onExpandClick()
+        },
+        shape = AppShapes.medium,
+        color = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
+        shadowElevation = 1.dp
+    ) {
+        Column {
+            Row(Modifier.fillMaxWidth().padding(3.dp)) {
+                Text(title, modifier = Modifier.padding(5.dp).weight(1f), style = MaterialTheme.typography.headlineSmall)
+                ExpandIconButton(isExpanded = isExpanded, onClick = onExpandClick)
+            }
+            AnimatedVisibility(isExpanded) {
+                if (withContainer) {
+                    Column(Modifier.settingsContainer()) {
+                        content()
+                    }
+                } else {
+                    Column(Modifier.fillMaxWidth()) {
+                        content()
                     }
                 }
             }

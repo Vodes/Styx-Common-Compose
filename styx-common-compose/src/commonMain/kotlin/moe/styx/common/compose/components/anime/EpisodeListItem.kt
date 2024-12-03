@@ -13,13 +13,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,6 +34,8 @@ import moe.styx.common.extension.toDateString
 fun LazyItemScope.EpisodeListItem(
     item: MediaEntry,
     watched: MediaWatched?,
+    showCheckboxes: Boolean,
+    selectedIDs: SnapshotStateList<String>,
     modifier: Modifier = Modifier,
     onMediaInfoClick: () -> Unit
 ) {
@@ -68,6 +68,16 @@ fun LazyItemScope.EpisodeListItem(
                         WatchedIndicator(watched, Modifier.fillMaxWidth().padding(2.dp, 5.dp))
                     }
                 }
+            }
+        },
+        leadingContent = {
+            AnimatedVisibility(showCheckboxes) {
+                Checkbox(selectedIDs.contains(item.GUID), {
+                    if (selectedIDs.contains(item.GUID))
+                        selectedIDs.remove(item.GUID)
+                    else
+                        selectedIDs.add(item.GUID)
+                }, modifier = Modifier.padding(0.dp, 6.dp, 0.dp, 0.dp))
             }
         },
         overlineContent = { EpisodeListItemOverline(item, onMediaInfoClick = onMediaInfoClick) },

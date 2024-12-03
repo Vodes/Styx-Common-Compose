@@ -11,7 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateMap
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -54,11 +54,10 @@ fun EpisodeList(
     val downloadQueue by DownloadQueue.queuedEntries.collectAsState()
     val currentlyDownloading by DownloadQueue.currentDownload.collectAsState()
     Column(Modifier.fillMaxHeight().fillMaxWidth()) {
-        val selected = remember { mutableStateMapOf<String, Boolean>() }
-        var needsRepaint by remember { mutableStateOf(0) }
+        val selected = remember { mutableStateListOf<String>() }
         if (!showSelection.value)
             selected.clear()
-        AnimatedVisibility(showSelection.value) { SelectedCard(selected, mediaStorage.entries) { needsRepaint++ } }
+        AnimatedVisibility(showSelection.value) { SelectedCard(selected, mediaStorage.entries) }
 
         var failedToPlayMessage by remember { mutableStateOf("") }
         if (failedToPlayMessage.isNotBlank()) {
@@ -90,10 +89,19 @@ fun EpisodeList(
                 Column(Modifier.fillMaxWidth()) {
                     EpisodeListItem(
                         item.first, item.second,
+                        showSelection.value, selected,
                         Modifier.defaultMinSize(0.dp, 75.dp)
                             .dynamicClick(regularClick = {
-                                onPlay(item.first)
-                            })
+                                if (!showSelection.value)
+                                    onPlay(item.first)
+                                else
+                                    if (selected.contains(item.first.GUID))
+                                        selected.remove(item.first.GUID)
+                                    else
+                                        selected.add(item.first.GUID)
+                            }) {
+                                showSelection.value = !showSelection.value
+                            }
                     ) {
                         showMediaInfoDialog = true
                         selectedMedia = item.first
@@ -112,74 +120,61 @@ fun EpisodeList(
 }
 
 @Composable
-fun SelectedCard(selected: SnapshotStateMap<String, Boolean>, entries: List<MediaEntry>, onUpdate: () -> Unit) {
+fun SelectedCard(selected: SnapshotStateList<String>, entries: List<MediaEntry>, onUpdate: () -> Unit = {}) {
     val downloaded by Storage.stores.downloadedStore.collectWithEmptyInitial()
     val queued by DownloadQueue.queuedEntries.collectAsState()
     ElevatedCard(Modifier.padding(4.dp).fillMaxWidth().height(30.dp)) {
         Row {
             Text(
-                if (selected.containsValue(true)) "Selected: ${selected.filter { it.value }.size}" else "Selection",
+                if (selected.isNotEmpty()) "Selected: ${selected.size}" else "Selection",
                 modifier = Modifier.padding(6.dp, 5.dp).weight(1f), style = MaterialTheme.typography.labelMedium
             )
             IconButtonWithTooltip(Icons.Default.Visibility, "Set Watched") {
-                val current = selected.filter { it.value }
-                if (current.isEmpty())
+                if (selected.isEmpty())
                     return@IconButtonWithTooltip
-                if (current.size == 1) {
-                    val entry = entries.find { selected.entries.first().key eqI it.GUID }
+                if (selected.size == 1) {
+                    val entry = entries.find { selected.first() eqI it.GUID }
                     if (entry == null)
                         return@IconButtonWithTooltip
                     RequestQueue.updateWatched(
                         MediaWatched(entry.GUID, login?.userID ?: "", currentUnixSeconds(), 0, 0F, 100F)
                     )
                 } else {
-                    RequestQueue.addMultipleWatched(
-                        current
-                            .map { pair -> entries.find { pair.key eqI it.GUID } }
-                            .filterNotNull())
+                    RequestQueue.addMultipleWatched(selected.mapNotNull { id -> entries.find { id eqI it.GUID } })
                 }
                 onUpdate()
             }
             IconButtonWithTooltip(Icons.Default.VisibilityOff, "Set Unwatched") {
-                val current = selected.filter { it.value }
-                if (current.isEmpty())
+                if (selected.isEmpty())
                     return@IconButtonWithTooltip
-                if (current.size == 1) {
-                    val entry = entries.find { selected.entries.first().key eqI it.GUID }
+                if (selected.size == 1) {
+                    val entry = entries.find { selected.first() eqI it.GUID }
                     if (entry == null)
                         return@IconButtonWithTooltip
                     RequestQueue.removeWatched(entry)
                 } else {
-                    RequestQueue.removeMultipleWatched(
-                        current
-                            .map { pair -> entries.find { pair.key eqI it.GUID } }
-                            .filterNotNull())
+                    RequestQueue.removeMultipleWatched(selected.mapNotNull { id -> entries.find { id eqI it.GUID } })
                 }
                 onUpdate()
             }
 
             IconButtonWithTooltip(Icons.Default.DownloadForOffline, "Download") {
-                val current = selected.filter { it.value }
-                if (current.isEmpty())
+                if (selected.isEmpty())
                     return@IconButtonWithTooltip
-                if (current.size == 1) {
-                    val entry = entries.find { selected.entries.first().key eqI it.GUID }
+                if (selected.size == 1) {
+                    val entry = entries.find { selected.first() eqI it.GUID }
                     if (entry == null)
                         return@IconButtonWithTooltip
                     DownloadQueue.addToQueue(entry)
                 } else {
-                    DownloadQueue.addToQueue(
-                        current
-                            .map { pair -> entries.find { pair.key eqI it.GUID } }
-                            .filterNotNull())
+                    DownloadQueue.addToQueue(selected.mapNotNull { id -> entries.find { id eqI it.GUID } })
                 }
             }
             IconButtonWithTooltip(Icons.Default.Delete, "Delete Downloaded") {
-                val current = selected.filter { it.value }
-                if (current.isEmpty())
+                if (selected.isEmpty())
                     return@IconButtonWithTooltip
 
-                val currentSelected = current.map { pair -> entries.find { pair.key eqI it.GUID } }.filterNotNull()
+                val currentSelected = selected.mapNotNull { id -> entries.find { id eqI it.GUID } }
                 currentSelected.forEach { entry ->
                     if (queued.contains(entry.GUID)) {
                         launchThreaded {
