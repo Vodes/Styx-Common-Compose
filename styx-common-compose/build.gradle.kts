@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "moe.styx"
-version = (System.getenv("SNAPSHOT_COMMIT") ?: "").ifBlank { "0.0.5" }
+version = (System.getenv("SNAPSHOT_COMMIT") ?: "").ifBlank { "0.1.0" }
 
 kotlin {
     applyDefaultHierarchyTemplate()
@@ -30,11 +30,13 @@ kotlin {
                 api(libs.styx.common)
 
                 // Other stuff
-                api(libs.multiplatform.settings)
                 api(libs.multiplatform.imageloader)
                 api(libs.multiplatform.islandtime)
                 api(libs.multiplatform.lifecycle)
+                api(libs.multiplatform.settings)
+                api(libs.multiplatform.semver)
                 api(libs.kamel.image)
+                api(libs.sonner)
 
                 // IO
                 api(libs.kstore)
@@ -74,10 +76,11 @@ publishing {
     repositories {
         maven {
             name = "Styx"
-            url = if (version.toString().contains("-SNAPSHOT", true) || !System.getenv("SNAPSHOT_COMMIT").isNullOrBlank())
-                uri("https://repo.styx.moe/snapshots")
-            else
-                uri("https://repo.styx.moe/releases")
+            url =
+                if (version.toString().contains("-SNAPSHOT", true) || !System.getenv("SNAPSHOT_COMMIT").isNullOrBlank())
+                    uri("https://repo.styx.moe/snapshots")
+                else
+                    uri("https://repo.styx.moe/releases")
             credentials {
                 username = System.getenv("STYX_REPO_TOKEN")
                 password = System.getenv("STYX_REPO_SECRET")

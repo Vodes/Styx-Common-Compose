@@ -2,18 +2,20 @@
 android-minSdk = "27"
 android-compileSdk = "35"
 agp = "8.2.2"
-kotlin = "2.0.20"
-styx-common = "0.2.0"
-voyager = "1.0.0"
+kotlin = "2.0.21"
+styx-common = "0.4.3"
+voyager = "1.1.0-beta03"
+kamel = "1.0.1"
+compose = "1.7.1"
 multiplatform-settings = "1.2.0"
-kamel = "1.0.0-beta.2"
-kstore = "0.8.0"
-oshi = "6.6.3"
+kstore = "0.9.0"
+oshi = "6.6.5"
 multiplatform-imageloader = "1.7.6"
 multiplatform-lifecycle = "0.0.2"
 islandtime = "0.7.0"
-android-lifecycle = "2.8.3"
-compose = "1.6.11"
+android-lifecycle = "2.8.7"
+semver = "2.0.0"
+sonner = "0.3.8"
 
 
 [libraries]
@@ -27,6 +29,8 @@ multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg
 multiplatform-imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "multiplatform-imageloader" }
 multiplatform-lifecycle = { module = "io.github.kevinnzou:compose-multiplatform-lifecycle-tracker", version.ref = "multiplatform-lifecycle" }
 multiplatform-islandtime = { module = "io.islandtime:core", version.ref = "islandtime" }
+multiplatform-semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
+sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }
 kamel-image = { module = "media.kamel:kamel-image-default", version.ref = "kamel" }
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }

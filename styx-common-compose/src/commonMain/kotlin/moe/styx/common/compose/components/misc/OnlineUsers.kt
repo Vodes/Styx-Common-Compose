@@ -3,14 +3,17 @@ package moe.styx.common.compose.components.misc
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import moe.styx.common.compose.files.Storage
-import moe.styx.common.compose.files.getCurrentAndCollectFlow
+import moe.styx.common.compose.files.collectWithEmptyInitial
 import moe.styx.common.compose.threads.Heartbeats
 import moe.styx.common.data.ActiveUser
 import moe.styx.common.data.Media
@@ -22,8 +25,8 @@ import moe.styx.common.extension.toBoolean
 fun OnlineUsersIcon(onClickMedia: (Media) -> Unit) {
     var showUserDropDown by remember { mutableStateOf(false) }
     val users by Heartbeats.currentUserState.collectAsState()
-    val mediaList by Storage.stores.mediaStore.getCurrentAndCollectFlow()
-    val entryList by Storage.stores.entryStore.getCurrentAndCollectFlow()
+    val mediaList by Storage.stores.mediaStore.collectWithEmptyInitial()
+    val entryList by Storage.stores.entryStore.collectWithEmptyInitial()
     val numUsers = users.distinctBy { it.user.GUID }.size
 
     UsersIconWithNum(numUsers) {
@@ -40,7 +43,7 @@ fun OnlineUsersIcon(onClickMedia: (Media) -> Unit) {
 @Composable
 fun UsersIconWithNum(num: Int, onClick: () -> Unit) {
     BadgedBox(badge = {
-        Badge(Modifier.size(20.dp).offset((-10).dp, 6.dp), MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.onSecondary) {
+        Badge(Modifier.size(22.dp).offset((-8).dp, 4.dp), MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.onSecondary) {
             Text("$num")
         }
     }) {
@@ -56,11 +59,11 @@ fun UserListComponent(userList: List<ActiveUser>, mediaList: List<Media>, entryL
 
         Row(Modifier.padding(10.dp, if (index != 0) 0.dp else 5.dp, 0.dp, 5.dp), verticalAlignment = Alignment.CenterVertically) {
             when (user.deviceType) {
-                "PC" -> Icon(Icons.Filled.Computer, "PC")
-                "Laptop" -> Icon(Icons.Filled.LaptopWindows, "Laptop")
-                "Phone" -> Icon(Icons.Filled.PhoneAndroid, "Phone")
-                "Tablet" -> Icon(Icons.Filled.Tablet, "Tablet")
-                else -> Icon(Icons.Filled.DeviceUnknown, "Unknown")
+                "PC" -> Icon(Icons.Outlined.DesktopWindows, "PC")
+                "Laptop" -> Icon(Icons.Outlined.LaptopChromebook, "Laptop")
+                "Phone" -> Icon(Icons.Outlined.PhoneAndroid, "Phone")
+                "Tablet" -> Icon(Icons.Outlined.Tablet, "Tablet")
+                else -> Icon(Icons.Outlined.DeviceUnknown, "Unknown")
             }
             Column(Modifier.padding(10.dp, 0.dp)) {
                 Text(user.user.name, Modifier.padding(3.dp, 0.dp, 0.dp, 0.dp), style = MaterialTheme.typography.titleMedium)

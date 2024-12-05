@@ -1,7 +1,6 @@
 package moe.styx.common.compose.threads
 
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import moe.styx.common.Platform
 import moe.styx.common.compose.files.*
 import moe.styx.common.compose.http.Endpoints
@@ -21,16 +20,18 @@ object RequestQueue : LifecycleTrackedJob() {
 
     override fun createJob(): Job = launchGlobal {
         delay(3000)
-        while (runJob) {
+        while (isActive) {
             if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn()) {
                 delay(30000L)
+                ensureActive()
                 continue
             }
-            val favStore = Storage.stores.queuedFavStore.getOrDefault()
+            ensureActive()
+            val favStore = Stores.queuedFavStore.getOrDefault()
             if (favStore.toAdd.isNotEmpty() || favStore.toRemove.isNotEmpty()) {
                 syncFavs(favStore)
             }
-            val watchedStore = Storage.stores.queuedWatchedStore.getOrDefault()
+            val watchedStore = Stores.queuedWatchedStore.getOrDefault()
             if (watchedStore.toUpdate.isNotEmpty() || watchedStore.toRemove.isNotEmpty()) {
                 syncWatched(watchedStore)
             }
@@ -51,7 +52,7 @@ object RequestQueue : LifecycleTrackedJob() {
         if (ServerStatus.lastKnown != ServerStatus.UNKNOWN && isLoggedIn()
             && sendObject(Endpoints.WATCHED_SYNC, watched)
         ) {
-            Storage.stores.queuedWatchedStore.set(QueuedWatchedChanges())
+            Stores.queuedWatchedStore.set(QueuedWatchedChanges())
             Log.i { "Synced queued up watch progress" }
         }
     }
@@ -65,14 +66,14 @@ object RequestQueue : LifecycleTrackedJob() {
         currentJob = createJob()
     }
 
-    fun addFav(media: Media): Job? {
+    fun addFav(media: Media): Pair<Job, Job>? {
         val favs = Storage.stores.favouriteStore.getBlocking()
         val existing = favs.find { it.mediaID eqI media.GUID }
         if (existing != null)
             return null
         val fav = Favourite(media.GUID, login?.userID ?: "", currentUnixSeconds())
 
-        return launchThreaded {
+        val storageUpdateJob = CoroutineScope(Storage.dataLoaderDispatcher).launch {
             Storage.stores.favouriteStore.updateList { it.add(fav) }
             Storage.stores.queuedFavStore.update { changes ->
                 val current = changes ?: QueuedFavChanges()
@@ -80,7 +81,15 @@ object RequestQueue : LifecycleTrackedJob() {
                 current.toRemove.removeAll { it.mediaID eqI media.GUID }
                 return@update current
             }
-            if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(Endpoints.FAVOURITES_ADD, fav)) {
+        }
+
+        return storageUpdateJob to launchThreaded {
+            storageUpdateJob.join()
+            if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(
+                    Endpoints.FAVOURITES_ADD,
+                    fav
+                )
+            ) {
                 Storage.stores.queuedFavStore.update { changes ->
                     val current = changes ?: QueuedFavChanges()
                     current.toAdd.add(fav)
@@ -90,12 +99,19 @@ object RequestQueue : LifecycleTrackedJob() {
         }
     }
 
-    fun removeFav(media: Media): Job? {
+    fun removeFav(media: Media): Pair<Job, Job>? {
         val favs = Storage.stores.favouriteStore.getBlocking()
         val fav = favs.find { it.mediaID eqI media.GUID } ?: return null
-        return launchThreaded {
+        val storageUpdateJob = CoroutineScope(Storage.dataLoaderDispatcher).launch {
             Storage.stores.favouriteStore.updateList { it.remove(fav) }
-            if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(Endpoints.FAVOURITES_DELETE, fav)) {
+        }
+        return storageUpdateJob to launchThreaded {
+            storageUpdateJob.join()
+            if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(
+                    Endpoints.FAVOURITES_DELETE,
+                    fav
+                )
+            ) {
                 Storage.stores.queuedFavStore.update { changes ->
                     val current = changes ?: QueuedFavChanges()
                     current.toRemove.add(fav)
@@ -105,16 +121,19 @@ object RequestQueue : LifecycleTrackedJob() {
         }
     }
 
-    fun updateWatched(mediaWatched: MediaWatched): Job {
-        return launchThreaded {
-            var new: MediaWatched? = null
+    fun updateWatched(mediaWatched: MediaWatched): Pair<Job, Job> {
+        var new: MediaWatched? = null
+        val storageUpdateJob = CoroutineScope(Storage.dataLoaderDispatcher).launch {
             Storage.stores.watchedStore.updateList {
                 val existing = it.find { w -> w.entryID eqI mediaWatched.entryID }
                 val existingMax = existing?.maxProgress ?: -1F
-                new = if (existingMax > mediaWatched.maxProgress) mediaWatched.copy(maxProgress = existingMax) else mediaWatched
+                new =
+                    if (existingMax > mediaWatched.maxProgress) mediaWatched.copy(maxProgress = existingMax) else mediaWatched
                 it.replaceIfNotNull(existing, new!!)
             }
-
+        }
+        return storageUpdateJob to launchThreaded {
+            storageUpdateJob.join()
             new?.let { new ->
                 Storage.stores.queuedWatchedStore.update { changes ->
                     val current = changes ?: QueuedWatchedChanges()
@@ -122,7 +141,11 @@ object RequestQueue : LifecycleTrackedJob() {
                     current.toRemove.removeAll { it.entryID eqI mediaWatched.entryID }
                     return@update current
                 }
-                if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(Endpoints.WATCHED_ADD, new))
+                if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(
+                        Endpoints.WATCHED_ADD,
+                        new
+                    )
+                )
                     Storage.stores.queuedWatchedStore.addWatched(new)
             }
         }
@@ -154,13 +177,16 @@ object RequestQueue : LifecycleTrackedJob() {
         }
     }
 
-    fun removeWatched(entry: MediaEntry): Job {
-        return launchThreaded {
-            var existing: MediaWatched? = null
+    fun removeWatched(entry: MediaEntry): Pair<Job, Job> {
+        var existing: MediaWatched? = null
+        val storageUpdateJob = CoroutineScope(Storage.dataLoaderDispatcher).launch {
             Storage.stores.watchedStore.updateList { list ->
                 existing = list.find { it.entryID eqI entry.GUID }
                 existing?.let { list.remove(it) }
             }
+        }
+        return storageUpdateJob to launchThreaded {
+            storageUpdateJob.join()
             existing?.let { existing ->
                 Storage.stores.queuedWatchedStore.update { changes ->
                     val current = changes ?: QueuedWatchedChanges()
@@ -168,7 +194,11 @@ object RequestQueue : LifecycleTrackedJob() {
                     current.toRemove.removeAll { it.entryID eqI entry.GUID }
                     return@update current
                 }
-                if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(Endpoints.WATCHED_DELETE, existing))
+                if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(
+                        Endpoints.WATCHED_DELETE,
+                        existing
+                    )
+                )
                     Storage.stores.queuedWatchedStore.removeWatched(existing)
             }
         }

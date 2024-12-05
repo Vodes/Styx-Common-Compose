@@ -5,7 +5,10 @@ import io.islandtime.*
 import io.islandtime.clock.now
 import kotlinx.coroutines.runBlocking
 import moe.styx.common.compose.files.Storage
-import moe.styx.common.data.*
+import moe.styx.common.data.Category
+import moe.styx.common.data.Media
+import moe.styx.common.data.MediaSchedule
+import moe.styx.common.data.ScheduleWeekday
 import moe.styx.common.extension.eqI
 import moe.styx.common.extension.toBoolean
 import moe.styx.common.util.isClose
@@ -13,10 +16,6 @@ import moe.styx.common.util.isClose
 fun Media.isFav(): Boolean = runBlocking {
     val favs = Storage.stores.favouriteStore.getOrEmpty()
     return@runBlocking favs.find { it.mediaID eqI this@isFav.GUID } != null
-}
-
-fun Media.getThumb(): Image? = runBlocking {
-    return@runBlocking Storage.imageList.find { it.GUID eqI (this@getThumb.thumbID ?: "") }
 }
 
 fun ScheduleWeekday.dayOfWeek(): DayOfWeek {

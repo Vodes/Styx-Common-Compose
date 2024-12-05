@@ -13,17 +13,14 @@ import androidx.compose.ui.unit.dp
 import io.kamel.image.KamelImage
 import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.extensions.getPainter
-import moe.styx.common.compose.extensions.getThumb
+import moe.styx.common.data.Image
 import moe.styx.common.data.Media
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AnimeListItem(media: Media, targetEpisodeNum: Int = 0, onClick: () -> Unit) {
-    val image = media.getThumb()
+fun AnimeListItem(media: Media, image: Image?, targetEpisodeNum: Int = 0, modifier: Modifier = Modifier.padding(5.dp, 2.dp), onClick: () -> Unit) {
     val painter = image?.getPainter()
     ElevatedCard(
-        modifier = Modifier.padding(5.dp, 2.dp).fillMaxWidth(),
-        elevation = CardDefaults.elevatedCardElevation(3.dp),
+        modifier = modifier.fillMaxWidth(),
         onClick = onClick
     ) {
         Row(Modifier.height(80.dp)) {
@@ -32,7 +29,7 @@ fun AnimeListItem(media: Media, targetEpisodeNum: Int = 0, onClick: () -> Unit) 
             ) {
                 if (image != null && painter != null) {
                     KamelImage(
-                        painter,
+                        { painter },
                         contentDescription = media.name,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.padding(1.dp),

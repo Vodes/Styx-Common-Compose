@@ -32,5 +32,13 @@ enum class ServerStatus {
                 else -> "An error has occurred on the server side.\nPlease contact the admin."
             }
         }
+
+        val continueChecking: Boolean
+            get() {
+                return when (lastKnown) {
+                    ONLINE, BANNED, UNKNOWN, ERROR, OFFLINE -> false
+                    TIMEOUT, UNAUTHORIZED -> true
+                }
+            }
     }
 }

@@ -2,7 +2,7 @@ package moe.styx.common.compose.utils
 
 import android.os.Build
 import com.russhwolf.settings.get
-import moe.styx.common.compose.appConfig
+import moe.styx.common.compose.AppContextImpl.appConfig
 import moe.styx.common.compose.settings
 import moe.styx.common.data.DeviceInfo
 

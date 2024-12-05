@@ -20,21 +20,21 @@ import io.kamel.image.KamelImage
 import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.extensions.desktopPointerEvent
 import moe.styx.common.compose.extensions.getPainter
-import moe.styx.common.compose.extensions.getThumb
 import moe.styx.common.compose.settings
+import moe.styx.common.data.Image
 import moe.styx.common.data.Media
 import moe.styx.common.data.MediaEntry
 import moe.styx.common.data.MediaWatched
 
 @Composable
 fun AnimeCard(
-    media: Media,
+    mediaImagePair: Pair<Media, Image?>,
     showUnseenBadge: Boolean = false,
     watchedEntries: List<MediaWatched> = emptyList(),
     entryList: List<MediaEntry> = emptyList(),
     onClick: () -> Unit
 ) {
-    val image = media.getThumb()
+    val (media, image) = mediaImagePair
     val showNamesAllTheTime by remember { mutableStateOf(settings["display-names", false]) }
     val entries = if (showUnseenBadge) {
         entryList.filter { it.mediaID == media.GUID }
@@ -50,7 +50,7 @@ fun AnimeCard(
         Box(contentAlignment = Alignment.Center) {
             if (image != null && painter != null) {
                 KamelImage(
-                    painter,
+                    { painter },
                     contentDescription = media.name,
                     contentScale = ContentScale.FillBounds,
                     modifier = Modifier.padding(2.dp).align(Alignment.Center)
