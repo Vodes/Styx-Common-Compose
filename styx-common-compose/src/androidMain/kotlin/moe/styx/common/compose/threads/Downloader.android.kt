@@ -21,7 +21,7 @@ actual fun addToSystemDownloaderQueue(entries: List<MediaEntry>) {
     launchThreaded {
         for (ent in entries) {
             val media = Storage.stores.mediaStore.getOrEmpty().find { it.GUID eqI ent.mediaID } ?: continue
-            val downloaderRequest = DownloadManager.Request(Uri.parse("${Endpoints.WATCH.url}/${ent.GUID}?token=${login?.watchToken}"))
+            val downloaderRequest = DownloadManager.Request(Uri.parse("${Endpoints.WATCH.url()}/${ent.GUID}?token=${login?.watchToken}"))
                 .setMimeType("video/x-matroska")
                 .setTitle("$media - ${ent.entryNumber}")
                 .setDestinationUri(Uri.parse(DownloadQueue.tempDir.toString()))

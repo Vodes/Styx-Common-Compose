@@ -45,7 +45,7 @@ suspend fun isLoggedIn(): Boolean {
 fun generateCode(): CreationResponse? = runBlocking {
     val info = json.encodeToString(fetchDeviceInfo())
     val response: HttpResponse = httpClient.submitForm(
-        Endpoints.DEVICE_CREATE.url,
+        Endpoints.DEVICE_CREATE.url(),
         formParameters = Parameters.build {
             append("info", info)
         }
@@ -61,7 +61,7 @@ fun generateCode(): CreationResponse? = runBlocking {
 suspend fun checkLogin(token: String, first: Boolean = false): LoginResponse? {
     val response = runCatching {
         httpClient.submitForm(
-            (if (first) Endpoints.DEVICE_FIRST_AUTH else Endpoints.LOGIN).url,
+            (if (first) Endpoints.DEVICE_FIRST_AUTH else Endpoints.LOGIN).url(),
             formParameters = Parameters.build {
                 append("token", token)
                 append(

@@ -43,7 +43,7 @@ fun OnlineUsersIcon(onClickMedia: (Media) -> Unit) {
 @Composable
 fun UsersIconWithNum(num: Int, onClick: () -> Unit) {
     BadgedBox(badge = {
-        Badge(Modifier.size(20.dp).offset((-10).dp, 6.dp), MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.onSecondary) {
+        Badge(Modifier.size(22.dp).offset((-8).dp, 4.dp), MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.onSecondary) {
             Text("$num")
         }
     }) {

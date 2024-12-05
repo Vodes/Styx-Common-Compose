@@ -83,6 +83,7 @@ class MainDataViewModel : ScreenModel {
             Stores.favouriteStore.getBlocking(),
             Stores.watchedStore.getBlocking(),
             Stores.scheduleStore.getBlocking(),
+            Stores.proxyServerStore.getBlocking(),
             unixSeconds ?: currentUnixSeconds()
         )
     }
@@ -131,10 +132,11 @@ data class MainDataViewModelStorage(
     val favouritesList: List<Favourite> = emptyList(),
     val watchedList: List<MediaWatched> = emptyList(),
     val scheduleList: List<MediaSchedule> = emptyList(),
+    val proxyServerList: List<ProxyServer> = emptyList(),
     val updated: Long = 0L
 ) {
     override fun hashCode() =
-        (updated + mediaList.size + entryList.size + imageList.size + categoryList.size + favouritesList.size + watchedList.size + scheduleList.size).hashCode()
+        (updated + mediaList.size + entryList.size + imageList.size + categoryList.size + favouritesList.size + watchedList.size + scheduleList.size + proxyServerList.size).hashCode()
 
     override fun equals(other: Any?): Boolean {
         if (other !is MainDataViewModelStorage)
@@ -146,6 +148,7 @@ data class MainDataViewModelStorage(
                 watchedList.size == other.watchedList.size &&
                 favouritesList.size == other.favouritesList.size &&
                 categoryList.size == other.categoryList.size &&
-                scheduleList.size == other.scheduleList.size
+                scheduleList.size == other.scheduleList.size &&
+                proxyServerList.size == other.proxyServerList.size
     }
 }

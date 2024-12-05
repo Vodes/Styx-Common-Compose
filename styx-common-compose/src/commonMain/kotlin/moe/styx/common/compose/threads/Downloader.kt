@@ -120,7 +120,7 @@ object DownloadQueue : LifecycleTrackedJob(false) {
         SYSTEMFILES.createDirectories(tempDir, false)
 
         val output = tempDir / "$entryID.mkv"
-        val result = downloadFileStream("${Endpoints.WATCH.url}/${entryID}?token=${login?.watchToken}", output) {
+        val result = downloadFileStream("${Endpoints.WATCH.url()}/${entryID}?token=${login?.watchToken}", output) {
             async { currentDownload.emit(DownloadProgress(entryID, it)) }
         }
         currentDownload.emit(null)

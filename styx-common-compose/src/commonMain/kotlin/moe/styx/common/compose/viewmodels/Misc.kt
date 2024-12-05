@@ -71,7 +71,7 @@ abstract class OverviewViewModel : ScreenModel {
                     }
                 }
                 if (latestPreRelease != null) {
-                    if (appVersion < latestPreRelease) {
+                    if (appVersion < latestPreRelease && isOutdated != true) {
                         if (settings["check-for-pre-release", true])
                             availablePreRelease = latestPreRelease.toString()
                         Log.i { "Found newer pre-release version! ($availablePreRelease)" }

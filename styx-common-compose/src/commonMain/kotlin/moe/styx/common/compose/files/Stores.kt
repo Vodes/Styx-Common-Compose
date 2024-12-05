@@ -49,6 +49,10 @@ object Stores {
         listStoreOf(Path("${appConfig().appStoragePath}/store/favourites.json"), json = json)
     }
 
+    val proxyServerStore: KStore<List<ProxyServer>> by lazy {
+        listStoreOf(Path("${appConfig().appStoragePath}/store/servers.json"), json = json)
+    }
+
     val scheduleStore: KStore<List<MediaSchedule>> by lazy {
         listStoreOf(Path("${appConfig().appStoragePath}/store/schedules.json"), json = json)
     }

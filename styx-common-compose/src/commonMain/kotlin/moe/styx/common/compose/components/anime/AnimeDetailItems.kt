@@ -56,7 +56,7 @@ fun MediaGenreListing(media: Media) {
         }
         if (!media.tags.isNullOrBlank()) {
             AnimatedVisibility(isExpanded) {
-                FlowRow(Modifier.padding(5.dp)) {
+                FlowRow(Modifier.padding(5.dp, 1.dp)) {
                     media.tags!!.split(",").forEach { tag ->
                         OutlinedText(tag.trim(), MaterialTheme.colorScheme.secondary)
                     }
@@ -73,13 +73,13 @@ fun MediaRelations(mediaStorage: MediaStorage, onClick: (Media) -> Unit) {
         if (mediaStorage.hasPrequel()) {
             Column(Modifier.align(Alignment.Start)) {
                 Text("Prequel", Modifier.padding(4.dp, 5.dp, 4.dp, 6.dp), style = MaterialTheme.typography.bodyMedium)
-                AnimeListItem(mediaStorage.prequel!!, mediaStorage.prequelImage) { onClick(mediaStorage.prequel!!) }
+                AnimeListItem(mediaStorage.prequel!!, mediaStorage.prequelImage) { onClick(mediaStorage.prequel) }
             }
         }
         if (mediaStorage.hasSequel()) {
             Column(Modifier.align(Alignment.Start)) {
                 Text("Sequel", Modifier.padding(4.dp, 5.dp, 4.dp, 6.dp), style = MaterialTheme.typography.bodyMedium)
-                AnimeListItem(mediaStorage.sequel!!, mediaStorage.sequelImage) { onClick(mediaStorage.sequel!!) }
+                AnimeListItem(mediaStorage.sequel!!, mediaStorage.sequelImage) { onClick(mediaStorage.sequel) }
             }
         }
     }

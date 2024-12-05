@@ -15,7 +15,10 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
+import kotlinx.coroutines.launch
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.extensions.dynamicClick
 import moe.styx.common.compose.files.Storage
@@ -25,6 +28,7 @@ import moe.styx.common.compose.http.login
 import moe.styx.common.compose.threads.DownloadQueue
 import moe.styx.common.compose.threads.RequestQueue
 import moe.styx.common.compose.utils.LocalGlobalNavigator
+import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.compose.viewmodels.MainDataViewModelStorage
 import moe.styx.common.compose.viewmodels.MediaStorage
 import moe.styx.common.data.MediaEntry
@@ -121,6 +125,8 @@ fun EpisodeList(
 
 @Composable
 fun SelectedCard(selected: SnapshotStateList<String>, entries: List<MediaEntry>, onUpdate: () -> Unit = {}) {
+    val nav = LocalGlobalNavigator.current
+    val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
     val downloaded by Storage.stores.downloadedStore.collectWithEmptyInitial()
     val queued by DownloadQueue.queuedEntries.collectAsState()
     ElevatedCard(Modifier.padding(4.dp).fillMaxWidth().height(30.dp)) {
@@ -132,30 +138,36 @@ fun SelectedCard(selected: SnapshotStateList<String>, entries: List<MediaEntry>,
             IconButtonWithTooltip(Icons.Default.Visibility, "Set Watched") {
                 if (selected.isEmpty())
                     return@IconButtonWithTooltip
-                if (selected.size == 1) {
+                val job = if (selected.size == 1) {
                     val entry = entries.find { selected.first() eqI it.GUID }
                     if (entry == null)
                         return@IconButtonWithTooltip
                     RequestQueue.updateWatched(
                         MediaWatched(entry.GUID, login?.userID ?: "", currentUnixSeconds(), 0, 0F, 100F)
-                    )
+                    ).first
                 } else {
                     RequestQueue.addMultipleWatched(selected.mapNotNull { id -> entries.find { id eqI it.GUID } })
                 }
-                onUpdate()
+                sm.screenModelScope.launch {
+                    job.join()
+                    sm.updateData(true)
+                }
             }
             IconButtonWithTooltip(Icons.Default.VisibilityOff, "Set Unwatched") {
                 if (selected.isEmpty())
                     return@IconButtonWithTooltip
-                if (selected.size == 1) {
+                val job = if (selected.size == 1) {
                     val entry = entries.find { selected.first() eqI it.GUID }
                     if (entry == null)
                         return@IconButtonWithTooltip
-                    RequestQueue.removeWatched(entry)
+                    RequestQueue.removeWatched(entry).first
                 } else {
                     RequestQueue.removeMultipleWatched(selected.mapNotNull { id -> entries.find { id eqI it.GUID } })
                 }
-                onUpdate()
+                sm.screenModelScope.launch {
+                    job.join()
+                    sm.updateData(true)
+                }
             }
 
             IconButtonWithTooltip(Icons.Default.DownloadForOffline, "Download") {

@@ -21,7 +21,6 @@ fun AnimeListItem(media: Media, image: Image?, targetEpisodeNum: Int = 0, modifi
     val painter = image?.getPainter()
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.elevatedCardElevation(3.dp),
         onClick = onClick
     ) {
         Row(Modifier.height(80.dp)) {

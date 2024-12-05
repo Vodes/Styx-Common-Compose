@@ -27,7 +27,7 @@ suspend inline fun <reified T> getList(endpoint: Endpoints): ReceiveListResult<L
     Log.d { "getList Request to: ${endpoint.name}" }
     val response = runCatching {
         httpClient.submitForm(
-            endpoint.url,
+            endpoint.url(),
             formParameters = Parameters.build {
                 append("token", login!!.accessToken)
             }
@@ -66,7 +66,7 @@ inline fun <reified T> sendObjectWithResponse(endpoint: Endpoints, data: T?): Ap
         Log.d { "sendObjectWithResponse Request to: ${endpoint.name}" }
 
     val request = runCatching {
-        httpClient.submitForm(endpoint.url, formParameters = parameters {
+        httpClient.submitForm(endpoint.url(), formParameters = parameters {
             append("token", login!!.accessToken)
             append("content", json.encodeToString(data))
         })
@@ -117,7 +117,7 @@ inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
 
     val response = runCatching {
         httpClient.get {
-            url(endpoint.url)
+            url(endpoint.url())
         }
     }.onFailure {
         Log.e("getObject for Endpoint $endpoint", it) { "Request Failed" }

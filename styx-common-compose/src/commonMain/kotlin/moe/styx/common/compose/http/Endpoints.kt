@@ -1,6 +1,11 @@
 package moe.styx.common.compose.http
 
+import com.russhwolf.settings.get
 import moe.styx.common.compose.AppContextImpl.appConfig
+import moe.styx.common.compose.files.Stores
+import moe.styx.common.compose.files.getBlocking
+import moe.styx.common.compose.settings
+import moe.styx.common.extension.eqI
 
 enum class Endpoints(private val path: String) {
     LOGIN("/login"),
@@ -8,6 +13,7 @@ enum class Endpoints(private val path: String) {
     DEVICE_CREATE("/device/create"),
     DEVICE_FIRST_AUTH("/device/firstAuth"),
     HEARTBEAT("/heartbeat"),
+    PROXY_SERVERS("/proxy-servers"),
 
     MEDIA("/media/list"),
     MEDIA_ENTRIES("/media/entries"),
@@ -30,8 +36,18 @@ enum class Endpoints(private val path: String) {
     WATCH("/watch"),
 
     MPV("/mpv"),
-    MPV_DOWNLOAD("/mpv/download");
+    MPV_DOWNLOAD("/mpv/download"),
+    DOWNLOAD_BUILD_BASE("/download");
 
-    val url: String
-        get() = appConfig().apiBaseURL + this.path
+    fun url(): String {
+        val default = appConfig().apiBaseURL + this.path
+        val selectedServer = settings["selected-server", ""]
+        if (selectedServer.isNotBlank()) {
+            val proxy = Stores.proxyServerStore.getBlocking().find { it.name eqI selectedServer }
+            if (proxy != null) {
+                return proxy.baseURL.removeSuffix("/") + this.path
+            }
+        }
+        return default
+    }
 }
