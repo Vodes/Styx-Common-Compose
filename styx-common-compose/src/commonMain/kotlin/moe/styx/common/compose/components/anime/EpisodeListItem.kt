@@ -8,11 +8,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.DownloadForOffline
+import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,10 +23,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.russhwolf.settings.get
 import moe.styx.common.compose.components.misc.ExpandableText
 import moe.styx.common.compose.extensions.readableSize
 import moe.styx.common.compose.settings
+import moe.styx.common.compose.threads.DownloadProgress
 import moe.styx.common.data.MediaEntry
 import moe.styx.common.data.MediaWatched
 import moe.styx.common.extension.toDateString
@@ -36,6 +39,9 @@ fun LazyItemScope.EpisodeListItem(
     watched: MediaWatched?,
     showCheckboxes: Boolean,
     selectedIDs: SnapshotStateList<String>,
+    isDownloaded: Boolean = false,
+    isInQueue: Boolean = false,
+    downloadProgress: DownloadProgress? = null,
     modifier: Modifier = Modifier,
     onMediaInfoClick: () -> Unit
 ) {
@@ -51,7 +57,7 @@ fun LazyItemScope.EpisodeListItem(
                 textModifier = textModifier.basicMarquee(repeatDelayMillis = 300)
             Text(
                 item.entryNumber + if (title.isNullOrBlank()) "" else " - $title",
-                textModifier,
+                textModifier.fillMaxWidth(),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.titleMedium
@@ -80,7 +86,15 @@ fun LazyItemScope.EpisodeListItem(
                 }, modifier = Modifier.padding(0.dp, 6.dp, 0.dp, 0.dp))
             }
         },
-        overlineContent = { EpisodeListItemOverline(item, onMediaInfoClick = onMediaInfoClick) },
+        overlineContent = {
+            EpisodeListItemOverline(
+                item,
+                isDownloaded = isDownloaded,
+                isInQueue = isInQueue,
+                downloadProgress = downloadProgress,
+                onMediaInfoClick = onMediaInfoClick
+            )
+        },
         modifier = modifier.hoverable(interactionSource),
         colors = ListItemDefaults.colors(MaterialTheme.colorScheme.surfaceContainerLow),
         tonalElevation = 0.dp
@@ -88,7 +102,14 @@ fun LazyItemScope.EpisodeListItem(
 }
 
 @Composable
-fun EpisodeListItemOverline(item: MediaEntry, modifier: Modifier = Modifier, onMediaInfoClick: () -> Unit) {
+fun EpisodeListItemOverline(
+    item: MediaEntry,
+    modifier: Modifier = Modifier,
+    isDownloaded: Boolean = false,
+    isInQueue: Boolean = false,
+    downloadProgress: DownloadProgress? = null,
+    onMediaInfoClick: () -> Unit
+) {
     Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(
             item.timestamp.toDateString(),
@@ -98,7 +119,36 @@ fun EpisodeListItemOverline(item: MediaEntry, modifier: Modifier = Modifier, onM
         Text(
             item.fileSize.readableSize(),
             Modifier.padding(5.dp).clickable { onMediaInfoClick() },
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.labelMedium
         )
+
+        if (isDownloaded) {
+            Icon(
+                Icons.Filled.DownloadForOffline,
+                "Is available offline",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(19.dp)
+            )
+        } else if (downloadProgress != null) {
+            Box(Modifier.size(19.dp), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(
+                    { downloadProgress.progressPercent / 100f },
+                    modifier = Modifier.zIndex(5f).size(19.dp),
+                    trackColor = MaterialTheme.colorScheme.onSurface,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Icon(
+                    Icons.Filled.Download,
+                    "Is downloading: ${downloadProgress.progressPercent}%",
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(9.dp)
+                )
+            }
+        } else if (isInQueue) {
+            Icon(
+                Icons.Filled.Downloading, "Is in downloader queue", tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.size(19.dp)
+            )
+        }
     }
 }

@@ -90,10 +90,14 @@ fun EpisodeList(
                 }
             }
             itemsIndexed(associatedEntries, key = { _, item -> item.first.GUID }) { idx, item ->
+                val isDownloaded = remember(downloaded) { downloaded.find { it.entryID eqI item.first.GUID } != null }
                 Column(Modifier.fillMaxWidth()) {
                     EpisodeListItem(
                         item.first, item.second,
                         showSelection.value, selected,
+                        isDownloaded,
+                        downloadQueue.contains(item.first.GUID),
+                        currentlyDownloading?.let { if (it.entryID != item.first.GUID) null else it },
                         Modifier.defaultMinSize(0.dp, 75.dp)
                             .dynamicClick(regularClick = {
                                 if (!showSelection.value)
