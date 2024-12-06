@@ -41,8 +41,10 @@ class MainDataViewModel : ScreenModel {
         while ((ServerStatus.continueChecking || login == null) && isActive) {
             delay(2000)
             checkTimeout++;
-            if (ServerStatus.lastKnown == ServerStatus.UNKNOWN && checkTimeout >= 4)
+            if (ServerStatus.lastKnown in arrayOf(ServerStatus.UNKNOWN, ServerStatus.ERROR) && checkTimeout >= 4) {
+                _isLoadingStateFlow.emit(false)
                 this.cancel()
+            }
         }
         ensureActive()
         updateData(forceUpdate = true, updateStores = true)

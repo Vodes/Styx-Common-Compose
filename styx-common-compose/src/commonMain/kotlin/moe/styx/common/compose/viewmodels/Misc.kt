@@ -45,7 +45,7 @@ abstract class OverviewViewModel : ScreenModel {
 
     private suspend fun runLogin() {
         Log.d { "Checking login..." }
-        if (isLoggedIn == null) {
+        if (isLoggedIn == null || isLoggedIn == false) {
             isLoggedIn = isLoggedIn()
             Log.d { "Logged in: $isLoggedIn | ${login?.name}" }
         }
