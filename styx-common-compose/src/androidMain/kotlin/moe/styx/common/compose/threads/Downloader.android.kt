@@ -10,7 +10,11 @@ import moe.styx.common.compose.http.login
 import moe.styx.common.data.MediaEntry
 import moe.styx.common.extension.eqI
 import moe.styx.common.util.Log
+import moe.styx.common.util.SYSTEMFILES
 import moe.styx.common.util.launchThreaded
+import okio.Path
+import okio.Path.Companion.toOkioPath
+import java.io.File
 
 val downloadManager: DownloadManager by lazy {
     AppContextImpl.get().getSystemService(DownloadManager::class.java)
@@ -20,6 +24,7 @@ actual fun addToSystemDownloaderQueue(entries: List<MediaEntry>) {
     if (login == null)
         return
     launchThreaded {
+        val context = AppContextImpl.get()
         for (ent in entries) {
             val media = Storage.stores.mediaStore.getOrEmpty().find { it.GUID eqI ent.mediaID } ?: continue
             val downloadUriString = "${Endpoints.WATCH.url()}/${ent.GUID}?token=${login?.watchToken}"
@@ -28,27 +33,24 @@ actual fun addToSystemDownloaderQueue(entries: List<MediaEntry>) {
                     "Failed to parse uri from String: $downloadUriString"
                 }
             }.getOrNull()
-            val fileOutUriString = "file:/${DownloadQueue.tempDir.toString().removeSuffix("/")}/${ent.GUID}.mkv"
-            val fileOutUri = runCatching { Uri.parse(fileOutUriString) }.onFailure {
-                Log.e("Downloader", it) {
-                    "Failed to parse uri from String: $fileOutUriString"
-                }
-            }.getOrNull()
 
-            if (fileOutUri == null || downloadUri == null) {
-                Log.e {
-                    "Resulting uri ended up being null regardless!\n" +
-                            "FileOut: ${fileOutUri.toString()} | DownloadUri: ${downloadUri.toString()}"
-                }
+            if (downloadUri == null) {
+                Log.e { "Resulting uri ended up being null regardless!" }
                 continue
             }
 
             val downloaderRequest = DownloadManager.Request(downloadUri)
                 .setMimeType("video/x-matroska")
-                .setTitle("$media - ${ent.entryNumber}")
-                .setDestinationUri(fileOutUri)
+                .setTitle("${media.name} - ${ent.entryNumber}")
+                .setDestinationInExternalFilesDir(context, null, "temp/${ent.GUID}.mkv")
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
             downloadManager.enqueue(downloaderRequest)
         }
     }
+}
+
+actual fun getDownloadPaths(): Pair<Path, Path> {
+    val externalFiles = AppContextImpl.get().getExternalFilesDir(null)!!
+    return File(externalFiles, "temp").toOkioPath().also { SYSTEMFILES.createDirectories(it) } to
+            File(externalFiles, "downloaded").toOkioPath().also { SYSTEMFILES.createDirectories(it) }
 }

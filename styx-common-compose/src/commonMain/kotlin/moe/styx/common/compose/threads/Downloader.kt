@@ -34,10 +34,16 @@ object DownloadQueue : LifecycleTrackedJob(false) {
     val hasFailedDownloads = mutableStateOf(false)
 
     val tempDir by lazy {
-        "${appConfig().appCachePath}/temp".toPath()
+        if (Platform.current == Platform.ANDROID)
+            getDownloadPaths().first
+        else
+            "${appConfig().appCachePath}/temp".toPath()
     }
     val downloadedDir by lazy {
-        "${appConfig().appStoragePath}/downloaded".toPath()
+        if (Platform.current == Platform.ANDROID)
+            getDownloadPaths().second
+        else
+            "${appConfig().appStoragePath}/downloaded".toPath()
     }
 
     override fun createJob(): Job = launchGlobal {
@@ -161,3 +167,4 @@ data class DownloadedEntry(val entryID: String, val path: String) {
 }
 
 expect fun addToSystemDownloaderQueue(entries: List<MediaEntry>)
+expect fun getDownloadPaths(): Pair<Path, Path>
