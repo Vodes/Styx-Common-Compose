@@ -49,6 +49,11 @@ object DownloadQueue : LifecycleTrackedJob(false) {
     override fun createJob(): Job = launchGlobal {
         delay(5000)
         while (isActive) {
+            if (Platform.current == Platform.ANDROID) {
+                delay(1500)
+                updateSystemDownloaderQueue()
+                continue
+            }
             if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn()) {
                 delay(10000)
                 continue
@@ -167,4 +172,5 @@ data class DownloadedEntry(val entryID: String, val path: String) {
 }
 
 expect fun addToSystemDownloaderQueue(entries: List<MediaEntry>)
+expect fun updateSystemDownloaderQueue()
 expect fun getDownloadPaths(): Pair<Path, Path>

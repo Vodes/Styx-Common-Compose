@@ -25,3 +25,15 @@ fun Double.roundToDecimals(decimals: Int): Double {
 fun String.removeSomeHTMLTags(): String {
     return this.replace("<i>", "").replace("</i>", "").replace("<b>", "").replace("</b>", "")
 }
+
+private val appendedNumberRegex = "([0-9A-Fa-f]{8}-?[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{12})-\\d+".toRegex()
+
+fun String.getPathAndIDFromAndroidURI(): Pair<String, String> {
+    val withoutProtocol = "/${this.removePrefix("file:///").removePrefix("file://").removePrefix("file:/")}"
+    var id = withoutProtocol.substringAfterLast("/").substringBeforeLast(".")
+    val match = appendedNumberRegex.find(id)
+    if (match != null) {
+        id = match.groups[1]!!.value
+    }
+    return withoutProtocol to id
+}

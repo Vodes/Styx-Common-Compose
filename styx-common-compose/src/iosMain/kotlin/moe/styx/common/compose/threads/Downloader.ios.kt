@@ -10,3 +10,6 @@ actual fun addToSystemDownloaderQueue(entries: List<MediaEntry>) {
 actual fun getDownloadPaths(): Pair<Path, Path> {
     TODO("Not yet implemented")
 }
+
+actual fun updateSystemDownloaderQueue() {
+}
