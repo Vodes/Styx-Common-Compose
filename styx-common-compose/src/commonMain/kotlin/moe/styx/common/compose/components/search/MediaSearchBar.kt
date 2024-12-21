@@ -33,16 +33,13 @@ class MediaSearch(
     val stateEmitter: MutableStateFlow<SearchState>
         get() = _stateEmitter
 
-    val showFilters = mutableStateOf(false)
-
     @Composable
-    fun Component(modifier: Modifier = Modifier, handleFiltersInBar: Boolean = true) {
-        var showFilters by remember { showFilters }
+    fun Component(modifier: Modifier = Modifier) {
+        var showFilters by remember { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
         var internalState by remember { mutableStateOf(initialState) }
 
-        OutlinedTextField(
-            modifier = modifier, singleLine = true, value = internalState.search, shape = AppShapes.medium, label = { Text("Search") },
+        OutlinedTextField(modifier = modifier, singleLine = true, value = internalState.search, shape = AppShapes.medium, label = { Text("Search") },
             onValueChange = {
                 scope.launch {
                     internalState = internalState.copy(search = it)
@@ -72,35 +69,26 @@ class MediaSearch(
                 }
             })
 
-        if (handleFiltersInBar) {
-            AnimatedVisibility(showFilters) {
-                GenreCategoryFilters()
-            }
-        }
-    }
-
-    @Composable
-    fun GenreCategoryFilters() {
-        val scope = rememberCoroutineScope()
-        var internalState by remember { mutableStateOf(initialState) }
-        Surface(Modifier.fillMaxWidth().padding(7.dp)) {
-            ElevatedCard(Modifier.fillMaxWidth().padding(3.dp)) {
-                Column {
-                    Text("Category", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
-                    CategoryFilterBar(internalState, availableCategories) {
-                        scope.launch {
-                            internalState = internalState.copy(selectedCategories = it)
-                            _stateEmitter.emit(internalState)
-                            launchGlobal { searchStore.set(internalState) }
+        AnimatedVisibility(showFilters) {
+            Surface(Modifier.fillMaxWidth().padding(7.dp)) {
+                ElevatedCard(Modifier.fillMaxWidth().padding(3.dp)) {
+                    Column {
+                        Text("Category", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
+                        CategoryFilterBar(internalState, availableCategories) {
+                            scope.launch {
+                                internalState = internalState.copy(selectedCategories = it)
+                                _stateEmitter.emit(internalState)
+                                launchGlobal { searchStore.set(internalState) }
+                            }
                         }
-                    }
 
-                    Text("Genre", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
-                    GenreFilterBar(internalState, availableGenres) {
-                        scope.launch {
-                            internalState = internalState.copy(selectedGenres = it)
-                            _stateEmitter.emit(internalState)
-                            launchGlobal { searchStore.set(internalState) }
+                        Text("Genre", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
+                        GenreFilterBar(internalState, availableGenres) {
+                            scope.launch {
+                                internalState = internalState.copy(selectedGenres = it)
+                                _stateEmitter.emit(internalState)
+                                launchGlobal { searchStore.set(internalState) }
+                            }
                         }
                     }
                 }
