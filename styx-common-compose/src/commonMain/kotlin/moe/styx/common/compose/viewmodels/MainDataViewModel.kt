@@ -90,6 +90,11 @@ class MainDataViewModel : ScreenModel {
         )
     }
 
+    fun getMediaStorageForEntryID(entryID: String, storage: MainDataViewModelStorage): Pair<MediaEntry, MediaStorage> {
+        val entry = storage.entryList.find { it.GUID eqI entryID }!!
+        return entry to getMediaStorageForID(entry.mediaID, storage)
+    }
+
     fun getMediaStorageForID(id: String, storage: MainDataViewModelStorage): MediaStorage {
         Log.d { "Fetching metadata for: $id" }
         val media = storage.mediaList.find { it.GUID eqI id }!!
