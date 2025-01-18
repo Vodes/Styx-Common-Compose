@@ -37,6 +37,7 @@ kotlin {
                 api(libs.multiplatform.semver)
                 api(libs.kamel.image)
                 api(libs.sonner)
+                api(libs.stately.collections)
 
                 // IO
                 api(libs.kstore)

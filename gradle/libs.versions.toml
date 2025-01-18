@@ -3,7 +3,7 @@ android-minSdk = "27"
 android-compileSdk = "35"
 agp = "8.7.3"
 kotlin = "2.0.21"
-styx-common = "0.4.8"
+styx-common = "0.4.9"
 voyager = "f16519dd"
 kamel = "1.0.1"
 compose = "1.7.1"
@@ -16,10 +16,11 @@ islandtime = "0.7.0"
 android-lifecycle = "2.8.7"
 semver = "2.0.0"
 sonner = "0.4.0-SNAPSHOT1"
-
+stately = "2.1.0"
 
 [libraries]
 styx-common = { module = "moe.styx:styx-common", version.ref = "styx-common" }
+stately-collections = { module = "co.touchlab:stately-concurrent-collections", version.ref = "stately" }
 voyager-nav = { module = "moe.styx.forks.voyager:voyager-navigator", version.ref = "voyager" }
 voyager-transitions = { module = "moe.styx.forks.voyager:voyager-transitions", version.ref = "voyager" }
 voyager-screenmodel = { module = "moe.styx.forks.voyager:voyager-screenmodel", version.ref = "voyager" }

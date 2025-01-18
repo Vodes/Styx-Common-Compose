@@ -1,5 +1,6 @@
 package moe.styx.common.compose.http
 
+import co.touchlab.stately.collections.ConcurrentMutableMap
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
@@ -12,6 +13,8 @@ import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.http.httpClient
 import moe.styx.common.json
 import moe.styx.common.util.Log
+
+val failedRequests = ConcurrentMutableMap<Endpoints, Int>()
 
 /**
  * Function to receive a list of objects from an API endpoint.
@@ -33,10 +36,20 @@ suspend inline fun <reified T> getList(endpoint: Endpoints): ReceiveListResult<L
             }
         )
     }.onFailure {
-        Log.e("getList for Endpoint $endpoint", it) { "Request Failed" }
-            .also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
+        val fails = failedRequests.getOrElse(endpoint) { 0 }
+        failedRequests[endpoint] = fails + 1
+        if (fails < 2) {
+            Log.w("getList for Endpoint $endpoint", it) { "Request Failed, retrying (${fails + 1})" }
+                .also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
+            return getListRetry(endpoint)
+        } else {
+            Log.e("getList for Endpoint $endpoint", it) { "Request Failed" }
+                .also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
+        }
         return ReceiveListResult(-1, Result.failure(it))
     }.getOrNull()!!
+
+    failedRequests[endpoint] = 0
 
     ServerStatus.setLastKnown(response.status)
     Log.d { "getList Request response code for ${endpoint.name}: ${response.status.value}" }
@@ -49,6 +62,8 @@ suspend inline fun <reified T> getList(endpoint: Endpoints): ReceiveListResult<L
         Result.failure(Exception("Invalid response from server: ${response.bodyAsText()}"))
     )
 }
+
+suspend inline fun <reified T> getListRetry(endpoint: Endpoints): ReceiveListResult<List<T>?> = getList(endpoint)
 
 /**
  * Function to send a json encoded object to an API endpoint and receive its response.
@@ -71,9 +86,19 @@ inline fun <reified T> sendObjectWithResponse(endpoint: Endpoints, data: T?): Ap
             append("content", json.encodeToString(data))
         })
     }.onFailure {
-        Log.e("sendObjectWithResponse for Endpoint $endpoint", it) { "Request Failed" }
-            .also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
+        val fails = failedRequests.getOrElse(endpoint) { 0 }
+        failedRequests[endpoint] = fails + 1
+        if (fails < 2) {
+            Log.w("sendObjectWithResponse for Endpoint $endpoint", it) { "Request Failed, retrying (${fails + 1})" }
+                .also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
+            return@runBlocking sendObjectWithResponseRetry(endpoint, data)
+        } else {
+            Log.e("sendObjectWithResponse for Endpoint $endpoint", it) { "Request Failed" }
+                .also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
+        }
     }.getOrNull() ?: return@runBlocking null
+
+    failedRequests[endpoint] = 0
 
     ServerStatus.setLastKnown(request.status)
 
@@ -91,6 +116,9 @@ inline fun <reified T> sendObjectWithResponse(endpoint: Endpoints, data: T?): Ap
 
     return@runBlocking response
 }
+
+inline fun <reified T> sendObjectWithResponseRetry(endpoint: Endpoints, data: T?): ApiResponse? =
+    sendObjectWithResponse(endpoint, data)
 
 /**
  * Function to send a json encoded object to an API endpoint and check whether the response was a success.
