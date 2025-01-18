@@ -28,27 +28,35 @@ suspend inline fun <reified T> getList(endpoint: Endpoints): ReceiveListResult<L
             return ReceiveListResult(-1, Result.failure(Exception("Not logged in.")))
     }
     Log.d { "getList Request to: ${endpoint.name}" }
-    val response = runCatching {
-        httpClient.submitForm(
-            endpoint.url(),
-            formParameters = Parameters.build {
-                append("token", login!!.accessToken)
-            }
-        )
-    }.onFailure {
-        val fails = failedRequests.getOrElse(endpoint) { 0 }
-        failedRequests[endpoint] = fails + 1
-        if (fails < 2) {
-            Log.w("getList for Endpoint $endpoint", it) { "Request Failed, retrying (${fails + 1})" }
-                .also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
-            return getListRetry(endpoint)
-        } else {
-            Log.e("getList for Endpoint $endpoint", it) { "Request Failed" }
-                .also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
-        }
-        return ReceiveListResult(-1, Result.failure(it))
-    }.getOrNull()!!
 
+    var keepTrying = true
+    var response: HttpResponse? = null
+    while (keepTrying) {
+        response = runCatching {
+            keepTrying = false
+            httpClient.submitForm(
+                endpoint.url(),
+                formParameters = Parameters.build {
+                    append("token", login!!.accessToken)
+                }
+            )
+        }.onFailure {
+            val fails = failedRequests.getOrElse(endpoint) { 0 }
+            failedRequests[endpoint] = fails + 1
+            if (fails < 2) {
+                Log.w("getList for Endpoint $endpoint", it) { "Request Failed, retrying (${fails + 1})" }
+                    .also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
+                keepTrying = true
+            } else {
+                Log.e("getList for Endpoint $endpoint", it) { "Request Failed" }
+                    .also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
+            }
+            return ReceiveListResult(-1, Result.failure(it))
+        }.getOrNull()
+    }
+    if (response == null) {
+        return ReceiveListResult(-1, Result.failure(Exception("Failed after retrying!")))
+    }
     failedRequests[endpoint] = 0
 
     ServerStatus.setLastKnown(response.status)
@@ -62,8 +70,6 @@ suspend inline fun <reified T> getList(endpoint: Endpoints): ReceiveListResult<L
         Result.failure(Exception("Invalid response from server: ${response.bodyAsText()}"))
     )
 }
-
-suspend inline fun <reified T> getListRetry(endpoint: Endpoints): ReceiveListResult<List<T>?> = getList(endpoint)
 
 /**
  * Function to send a json encoded object to an API endpoint and receive its response.
@@ -80,23 +86,32 @@ inline fun <reified T> sendObjectWithResponse(endpoint: Endpoints, data: T?): Ap
     if (endpoint != Endpoints.HEARTBEAT)
         Log.d { "sendObjectWithResponse Request to: ${endpoint.name}" }
 
-    val request = runCatching {
-        httpClient.submitForm(endpoint.url(), formParameters = parameters {
-            append("token", login!!.accessToken)
-            append("content", json.encodeToString(data))
-        })
-    }.onFailure {
-        val fails = failedRequests.getOrElse(endpoint) { 0 }
-        failedRequests[endpoint] = fails + 1
-        if (fails < 2) {
-            Log.w("sendObjectWithResponse for Endpoint $endpoint", it) { "Request Failed, retrying (${fails + 1})" }
-                .also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
-            return@runBlocking sendObjectWithResponseRetry(endpoint, data)
-        } else {
-            Log.e("sendObjectWithResponse for Endpoint $endpoint", it) { "Request Failed" }
-                .also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
-        }
-    }.getOrNull() ?: return@runBlocking null
+    var keepTrying = true
+    var request: HttpResponse? = null
+
+    while (keepTrying) {
+        request = runCatching {
+            keepTrying = false
+            httpClient.submitForm(endpoint.url(), formParameters = parameters {
+                append("token", login!!.accessToken)
+                append("content", json.encodeToString(data))
+            })
+        }.onFailure {
+            val fails = failedRequests.getOrElse(endpoint) { 0 }
+            failedRequests[endpoint] = fails + 1
+            if (fails < 2) {
+                Log.w("sendObjectWithResponse for Endpoint $endpoint", it) { "Request Failed, retrying (${fails + 1})" }
+                    .also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
+                keepTrying = true
+            } else {
+                Log.e("sendObjectWithResponse for Endpoint $endpoint", it) { "Request Failed" }
+                    .also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
+            }
+        }.getOrNull()
+    }
+
+    if (request == null)
+        return@runBlocking null
 
     failedRequests[endpoint] = 0
 
@@ -116,9 +131,6 @@ inline fun <reified T> sendObjectWithResponse(endpoint: Endpoints, data: T?): Ap
 
     return@runBlocking response
 }
-
-inline fun <reified T> sendObjectWithResponseRetry(endpoint: Endpoints, data: T?): ApiResponse? =
-    sendObjectWithResponse(endpoint, data)
 
 /**
  * Function to send a json encoded object to an API endpoint and check whether the response was a success.
