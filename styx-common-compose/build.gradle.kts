@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "moe.styx"
-version = (System.getenv("SNAPSHOT_COMMIT") ?: "").ifBlank { "0.1.8" }
+version = (System.getenv("SNAPSHOT_COMMIT") ?: "").ifBlank { "0.1.9" }
 
 kotlin {
     applyDefaultHierarchyTemplate()
@@ -23,7 +23,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
-                implementation(compose.material)
                 implementation(compose.material3)
                 implementation(compose.materialIconsExtended)
 
