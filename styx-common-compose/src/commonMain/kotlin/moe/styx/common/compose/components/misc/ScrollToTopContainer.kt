@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ScrollToTopContainer(
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     scrollableState: ScrollableState,
     fabModifier: Modifier = Modifier,
     fabShape: Shape = FloatingActionButtonDefaults.shape,
@@ -39,7 +40,7 @@ fun ScrollToTopContainer(
 
     Box(modifier) {
         AnimatedVisibility(
-            showScrollUpButton,
+            showScrollUpButton && enabled,
             modifier = Modifier.zIndex(2f).align(Alignment.BottomEnd).padding(20.dp),
             enter = expandIn() + fadeIn(),
             exit = shrinkOut() + fadeOut()

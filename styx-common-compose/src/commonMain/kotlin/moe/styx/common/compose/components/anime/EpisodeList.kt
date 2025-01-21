@@ -20,6 +20,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.launch
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
+import moe.styx.common.compose.components.misc.ScrollToTopContainer
 import moe.styx.common.compose.extensions.dynamicClick
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.collectWithEmptyInitial
@@ -83,43 +84,56 @@ fun EpisodeList(
 
         val lazyListState = listState ?: rememberLazyListState()
 
-        LazyColumn(state = lazyListState) {
-            if (headerContent != null) {
-                item("header") {
-                    Column(Modifier.fillMaxWidth()) { headerContent() }
-                }
-            }
-            itemsIndexed(associatedEntries, key = { _, item -> item.first.GUID }) { idx, item ->
-                val isDownloaded = remember(downloaded) { downloaded.find { it.entryID eqI item.first.GUID } != null }
-                Column(Modifier.fillMaxWidth()) {
-                    EpisodeListItem(
-                        item.first, item.second,
-                        showSelection.value, selected,
-                        isDownloaded,
-                        downloadQueue.contains(item.first.GUID),
-                        currentlyDownloading?.let { if (it.entryID != item.first.GUID) null else it },
-                        Modifier.defaultMinSize(0.dp, 75.dp)
-                            .dynamicClick(regularClick = {
-                                if (!showSelection.value)
-                                    onPlay(item.first)
-                                else
-                                    if (selected.contains(item.first.GUID))
-                                        selected.remove(item.first.GUID)
-                                    else
-                                        selected.add(item.first.GUID)
-                            }) {
-                                showSelection.value = !showSelection.value
-                            }
-                    ) {
-                        showMediaInfoDialog = true
-                        selectedMedia = item.first
+        ScrollToTopContainer(
+            scrollableState = lazyListState,
+            enabled = associatedEntries.size >= 18,
+            fabModifier = Modifier.size(34.dp)
+        ) {
+            LazyColumn(state = lazyListState) {
+                if (headerContent != null) {
+                    item("header") {
+                        Column(Modifier.fillMaxWidth()) { headerContent() }
                     }
-                    if (idx != associatedEntries.size - 1) {
-                        HorizontalDivider(
-                            Modifier.fillMaxWidth().padding(0.dp, 3.dp, 0.dp, 3.dp),
-                            thickness = 2.dp,
-                            color = MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp)
-                        )
+                }
+                itemsIndexed(associatedEntries, key = { _, item -> item.first.GUID }) { idx, item ->
+                    val isDownloaded =
+                        remember(downloaded) { downloaded.find { it.entryID eqI item.first.GUID } != null }
+                    Column(Modifier.fillMaxWidth()) {
+                        EpisodeListItem(
+                            item.first, item.second,
+                            showSelection.value, selected,
+                            isDownloaded,
+                            downloadQueue.contains(item.first.GUID),
+                            currentlyDownloading?.let { if (it.entryID != item.first.GUID) null else it },
+                            Modifier.defaultMinSize(0.dp, 75.dp)
+                                .dynamicClick(regularClick = {
+                                    if (!showSelection.value)
+                                        onPlay(item.first)
+                                    else
+                                        if (selected.contains(item.first.GUID))
+                                            selected.remove(item.first.GUID)
+                                        else
+                                            selected.add(item.first.GUID)
+                                }) {
+                                    showSelection.value = !showSelection.value
+                                }
+                        ) {
+                            showMediaInfoDialog = true
+                            selectedMedia = item.first
+                        }
+                        if (idx != associatedEntries.size - 1) {
+                            HorizontalDivider(
+                                Modifier.fillMaxWidth().padding(0.dp, 3.dp, 0.dp, 3.dp),
+                                thickness = 2.dp,
+                                color = MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp)
+                            )
+                        }
+                    }
+                }
+
+                if (associatedEntries.size >= 18) {
+                    item {
+                        Spacer(Modifier.height(25.dp))
                     }
                 }
             }
