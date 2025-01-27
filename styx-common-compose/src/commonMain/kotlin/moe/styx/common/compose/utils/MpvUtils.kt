@@ -84,7 +84,7 @@ object MpvDesc {
 data class MpvPreferences(
     val gpuAPI: String = gpuApiChoices[0],
     val videoOutputDriver: String = videoOutputDriverChoices[0],
-    val profile: String = if (Platform.current == Platform.JVM) profileChoices[0] else profileChoices[1],
+    val profile: String = if (Platform.current == Platform.JVM) profileChoices[0] else profileChoices[2],
     val deband: Boolean = Platform.current == Platform.JVM,
     val debandIterations: String = if (Platform.current == Platform.JVM) debandIterationsChoices[0] else debandIterationsChoices[2],
     val hwDecoding: Boolean = true,
