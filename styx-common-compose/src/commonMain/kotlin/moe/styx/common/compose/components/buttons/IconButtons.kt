@@ -41,6 +41,7 @@ fun IconButtonWithTooltip(
     icon: ImageVector,
     tooltip: String,
     modifier: Modifier = Modifier,
+    iconModifier: Modifier = Modifier,
     colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
     enabled: Boolean = true,
     tint: Color = MaterialTheme.colorScheme.onSurface,
@@ -48,7 +49,7 @@ fun IconButtonWithTooltip(
 ) {
     ToolTipWrapper(tooltip) {
         IconButton(onClick, modifier = modifier, enabled = enabled, colors = colors) {
-            Icon(icon, tooltip, tint = tint)
+            Icon(icon, tooltip, tint = tint, modifier = iconModifier)
         }
     }
 }
