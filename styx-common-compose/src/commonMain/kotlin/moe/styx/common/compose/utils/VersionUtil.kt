@@ -10,14 +10,19 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import moe.styx.common.http.httpClient
 import moe.styx.common.json
+import moe.styx.common.util.Log
 
 suspend fun fetchVersions(url: String): List<Version> {
-    val response = httpClient.get(url)
-    val jsonArray = json.decodeFromString<JsonArray>(response.bodyAsText())
-    val versions = mutableListOf<Version>()
-    jsonArray.iterator().forEach { element ->
-        val obj = element.jsonObject
-        obj["name"]?.jsonPrimitive?.contentOrNull?.toVersionOrNull(false)?.let { versions.add(it) }
-    }
-    return versions
+    return runCatching {
+        val response = httpClient.get(url)
+        val jsonArray = json.decodeFromString<JsonArray>(response.bodyAsText())
+        val versions = mutableListOf<Version>()
+        jsonArray.iterator().forEach { element ->
+            val obj = element.jsonObject
+            obj["name"]?.jsonPrimitive?.contentOrNull?.toVersionOrNull(false)?.let { versions.add(it) }
+        }
+        versions
+    }.onFailure {
+        Log.w(null, it) { "Could not fetch versions!" }
+    }.getOrNull() ?: emptyList()
 }

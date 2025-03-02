@@ -7,6 +7,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.russhwolf.settings.get
 import io.github.z4kn4fein.semver.toVersion
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.styx.common.compose.AppContextImpl
 import moe.styx.common.compose.http.isLoggedIn
@@ -59,7 +60,13 @@ abstract class OverviewViewModel : ScreenModel {
                 val versionCheckURL = AppContextImpl.appConfig().versionCheckURL
                 if (versionCheckURL.isBlank())
                     return@versionCheck
-                val versions = fetchVersions(versionCheckURL)
+                var versions = fetchVersions(versionCheckURL)
+                var attempts = 0;
+                while (versions.isEmpty() && attempts < 3) {
+                    delay(5000)
+                    versions = fetchVersions(versionCheckURL)
+                    attempts++
+                }
                 versions.sortedDescending()
                 val appVersion = AppContextImpl.appConfig().appVersion.toVersion(false)
                 val latestVersion = versions.firstOrNull { !it.isPreRelease }
