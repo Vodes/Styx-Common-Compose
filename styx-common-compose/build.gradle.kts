@@ -30,7 +30,6 @@ kotlin {
                 api(libs.anilist.kmp)
 
                 // Other stuff
-                api(libs.multiplatform.imageloader)
                 api(libs.multiplatform.islandtime)
                 api(libs.multiplatform.lifecycle)
                 api(libs.multiplatform.settings)

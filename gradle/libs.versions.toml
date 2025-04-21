@@ -11,7 +11,6 @@ compose = "1.7.3"
 multiplatform-settings = "1.3.0"
 kstore = "0.9.1"
 oshi = "6.8.1"
-multiplatform-imageloader = "1.7.6"
 multiplatform-lifecycle = "0.0.2"
 islandtime = "0.7.0"
 android-lifecycle = "2.8.7"
@@ -28,7 +27,6 @@ voyager-screenmodel = { module = "moe.styx.forks.voyager:voyager-screenmodel", v
 voyager-tabnav = { module = "moe.styx.forks.voyager:voyager-tab-navigator", version.ref = "voyager" }
 voyager-bottomsheetnav = { module = "moe.styx.forks.voyager:voyager-bottom-sheet-navigator", version.ref = "voyager" }
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
-multiplatform-imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "multiplatform-imageloader" }
 multiplatform-lifecycle = { module = "io.github.kevinnzou:compose-multiplatform-lifecycle-tracker", version.ref = "multiplatform-lifecycle" }
 multiplatform-islandtime = { module = "io.islandtime:core", version.ref = "islandtime" }
 multiplatform-semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }

@@ -2,7 +2,6 @@ package moe.styx.common.compose.extensions
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
-import com.seiko.imageloader.ImageLoader
 import io.kamel.core.Resource
 import io.kamel.core.config.KamelConfig
 import io.kamel.core.config.httpUrlFetcher
@@ -31,8 +30,6 @@ val kamelConfig by lazy {
         httpUrlFetcher(httpClient)
     }
 }
-
-expect fun getImageLoader(): ImageLoader
 
 /**
  * Extension to get the remote URL for the image.
