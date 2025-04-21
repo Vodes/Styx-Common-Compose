@@ -27,6 +27,7 @@ kotlin {
                 implementation(compose.materialIconsExtended)
 
                 api(libs.styx.common)
+                api(libs.anilist.kmp)
 
                 // Other stuff
                 api(libs.multiplatform.imageloader)

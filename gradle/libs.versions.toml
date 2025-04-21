@@ -2,14 +2,15 @@
 android-minSdk = "27"
 android-compileSdk = "35"
 agp = "8.7.3"
-kotlin = "2.0.21"
-styx-common = "0.4.14"
+kotlin = "2.1.10"
+styx-common = "0.5.2"
+anilist-kmp = "0.0.2"
 voyager = "f16519dd"
-kamel = "1.0.1"
-compose = "1.7.1"
-multiplatform-settings = "1.2.0"
-kstore = "0.9.0"
-oshi = "6.6.5"
+kamel = "1.0.3"
+compose = "1.7.3"
+multiplatform-settings = "1.3.0"
+kstore = "0.9.1"
+oshi = "6.8.1"
 multiplatform-imageloader = "1.7.6"
 multiplatform-lifecycle = "0.0.2"
 islandtime = "0.7.0"
@@ -20,6 +21,7 @@ sonner = "0.4.0-SNAPSHOT1"
 
 [libraries]
 styx-common = { module = "moe.styx:styx-common", version.ref = "styx-common" }
+anilist-kmp = { module = "pw.vodes:anilist-kmp", version.ref = "anilist-kmp" }
 voyager-nav = { module = "moe.styx.forks.voyager:voyager-navigator", version.ref = "voyager" }
 voyager-transitions = { module = "moe.styx.forks.voyager:voyager-transitions", version.ref = "voyager" }
 voyager-screenmodel = { module = "moe.styx.forks.voyager:voyager-screenmodel", version.ref = "voyager" }
