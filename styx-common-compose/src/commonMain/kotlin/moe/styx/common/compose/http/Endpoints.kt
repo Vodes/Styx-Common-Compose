@@ -21,6 +21,7 @@ enum class Endpoints(private val path: String) {
     IMAGES("/media/images"),
     CATEGORIES("/media/categories"),
     SCHEDULES("/media/schedules"),
+    MEDIA_PREFERENCES("/media/preferences"),
 
     FAVOURITES("/favourites/list"),
     FAVOURITES_ADD("/favourites/add"),
