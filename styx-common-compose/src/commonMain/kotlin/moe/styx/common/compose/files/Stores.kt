@@ -57,6 +57,10 @@ object Stores {
         listStoreOf(Path("${appConfig().appStoragePath}/store/schedules.json"), json = json)
     }
 
+    val mediaPreferencesStore: KStore<List<UserMediaPreferences>> by lazy {
+        listStoreOf(Path("${appConfig().appStoragePath}/store/media-preferences.json"), json = json)
+    }
+
     val changesStore: KStore<Changes> by lazy {
         storeOf(Path("${appConfig().appStoragePath}/store/changes.json"), Changes(0, 0), json = json)
     }

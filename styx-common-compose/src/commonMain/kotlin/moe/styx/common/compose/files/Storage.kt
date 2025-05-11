@@ -72,7 +72,8 @@ object Storage {
                 launch(dataLoaderDispatcher) { Stores.categoryStore.updateFromEndpoint(Endpoints.CATEGORIES) },
                 launch(dataLoaderDispatcher) { Stores.favouriteStore.updateFromEndpoint(Endpoints.FAVOURITES) },
                 launch(dataLoaderDispatcher) { Stores.watchedStore.updateFromEndpoint(Endpoints.WATCHED) },
-                launch(dataLoaderDispatcher) { Stores.proxyServerStore.updateFromEndpoint(Endpoints.PROXY_SERVERS) }
+                launch(dataLoaderDispatcher) { Stores.proxyServerStore.updateFromEndpoint(Endpoints.PROXY_SERVERS) },
+                launch(dataLoaderDispatcher) { Stores.mediaPreferencesStore.updateFromEndpoint(Endpoints.MEDIA_PREFS) },
             )
             if (shouldUpdateMedia || shouldUpdateEntries) {
                 jobs.add(launch(dataLoaderDispatcher) { Stores.imageStore.updateFromEndpoint(Endpoints.IMAGES) })
