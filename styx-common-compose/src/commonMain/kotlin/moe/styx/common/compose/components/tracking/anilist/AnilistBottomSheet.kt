@@ -18,7 +18,13 @@ import moe.styx.common.data.Media
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AnilistButtomSheet(media: Media, mainVm: MainDataViewModel, sheetModel: AnilistBottomSheetModel, onDismiss: () -> Unit) {
+fun AnilistButtomSheet(
+    media: Media,
+    mainVm: MainDataViewModel,
+    sheetModel: AnilistBottomSheetModel,
+    onURIClick: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
     val toaster = LocalToaster.current
     val sheetState = rememberModalBottomSheetState()
     LaunchedEffect(mainVm.anilistUser, media.GUID) {
@@ -40,7 +46,7 @@ fun AnilistButtomSheet(media: Media, mainVm: MainDataViewModel, sheetModel: Anil
                     anilistData?.alMedia?.map { media -> media to anilistData?.userMedia?.find { it.media.id == media.id } }
                 if (mapped != null) {
                     mapped.forEach { mappedMedia ->
-                        AnilistMediaComponent(mainVm.anilistUser, mappedMedia.first, mappedMedia.second) {
+                        AnilistMediaComponent(mainVm.anilistUser, mappedMedia.first, mappedMedia.second, onURIClick) {
                             sheetModel.updateRemoteStatus(mainVm, it, media)
                         }
                     }
