@@ -77,6 +77,10 @@ android {
     }
 }
 
+compose.resources {
+    publicResClass = true
+}
+
 publishing {
     repositories {
         maven {
