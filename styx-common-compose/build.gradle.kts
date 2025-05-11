@@ -47,6 +47,11 @@ kotlin {
                 api(libs.voyager.screenmodel)
                 api(libs.voyager.tabnav)
                 api(libs.voyager.bottomsheetnav)
+
+                // Dialogs
+                api(libs.dialogs.core)
+                api(libs.dialogs.list)
+                api(libs.dialogs.number)
             }
         }
         val androidMain by getting {

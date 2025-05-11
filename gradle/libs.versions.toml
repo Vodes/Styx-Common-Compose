@@ -2,9 +2,9 @@
 android-minSdk = "27"
 android-compileSdk = "35"
 agp = "8.7.3"
-kotlin = "2.1.10"
+kotlin = "2.1.20"
 styx-common = "0.5.2"
-anilist-kmp = "0.0.2"
+anilist-kmp = "0.0.3"
 voyager = "f16519dd"
 kamel = "1.0.3"
 compose = "1.7.3"
@@ -16,6 +16,7 @@ islandtime = "0.7.0"
 android-lifecycle = "2.8.7"
 semver = "2.0.0"
 sonner = "0.4.0-SNAPSHOT1"
+compose-dialogs = "2.1.3"
 
 
 [libraries]
@@ -26,6 +27,9 @@ voyager-transitions = { module = "moe.styx.forks.voyager:voyager-transitions", v
 voyager-screenmodel = { module = "moe.styx.forks.voyager:voyager-screenmodel", version.ref = "voyager" }
 voyager-tabnav = { module = "moe.styx.forks.voyager:voyager-tab-navigator", version.ref = "voyager" }
 voyager-bottomsheetnav = { module = "moe.styx.forks.voyager:voyager-bottom-sheet-navigator", version.ref = "voyager" }
+dialogs-core = { module = "io.github.mflisar.composedialogs:core", version.ref = "compose-dialogs" }
+dialogs-list = { module = "io.github.mflisar.composedialogs:dialog-list", version.ref = "compose-dialogs" }
+dialogs-number = { module = "io.github.mflisar.composedialogs:dialog-number", version.ref = "compose-dialogs" }
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
 multiplatform-lifecycle = { module = "io.github.kevinnzou:compose-multiplatform-lifecycle-tracker", version.ref = "multiplatform-lifecycle" }
 multiplatform-islandtime = { module = "io.islandtime:core", version.ref = "islandtime" }
@@ -36,7 +40,6 @@ kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
 jvm-oshi = { module = "com.github.oshi:oshi-core", version.ref = "oshi" }
 android-lifecycle-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "android-lifecycle" }
-
 
 [plugins]
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
