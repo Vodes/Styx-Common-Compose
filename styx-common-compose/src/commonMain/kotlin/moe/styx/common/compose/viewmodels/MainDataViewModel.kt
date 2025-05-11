@@ -1,10 +1,14 @@
 package moe.styx.common.compose.viewmodels
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.russhwolf.settings.get
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import moe.styx.common.compose.components.tracking.anilist.AlUser
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.Stores
 import moe.styx.common.compose.files.getBlocking
@@ -15,6 +19,8 @@ import moe.styx.common.data.*
 import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.extension.eqI
 import moe.styx.common.util.Log
+import pw.vodes.anilistkmp.AnilistApiClient
+import pw.vodes.anilistkmp.ext.fetchViewer
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -27,6 +33,11 @@ class MainDataViewModel : ScreenModel {
     private val _isLoadingStateFlow = MutableStateFlow(false)
     val isLoadingStateFlow = _isLoadingStateFlow.combine(Storage.isLoaded.asStateFlow()) { a, b -> a || !b }
         .stateIn(screenModelScope, SharingStarted.WhileSubscribed(2000), false)
+
+    var anilistApiClient by mutableStateOf<AnilistApiClient?>(null)
+        private set
+    var anilistUser by mutableStateOf<AlUser?>(null)
+        private set
 
     init {
         Log.d { "Initializing MainDataViewModel" }
@@ -64,6 +75,7 @@ class MainDataViewModel : ScreenModel {
     fun updateData(forceUpdate: Boolean = false, updateStores: Boolean = false) {
         screenModelScope.launch {
             if (updateStores) {
+                launch { runAnilistCheck() }
                 Log.d { "Updating storage with stores..." }
                 launch { Storage.loadData() }.also { Storage.refreshDataJob = it }.join()
                 Storage.refreshDataJob = null
@@ -113,6 +125,24 @@ class MainDataViewModel : ScreenModel {
             sequel?.let { storage.imageList.find { it.GUID eqI sequel.thumbID } },
             entries
         )
+    }
+
+    private suspend fun runAnilistCheck() {
+        if (login != null && ServerStatus.lastKnown != ServerStatus.UNKNOWN && anilistUser == null) {
+            if (login?.anilistData != null) {
+                Log.d { "Logging in to anilist..." }
+                anilistApiClient = AnilistApiClient(login!!.anilistData!!.accessToken)
+                val viewerResp = anilistApiClient!!.fetchViewer()
+                if (viewerResp.data == null) {
+                    Log.e(exception = viewerResp.exception) { "Could not login to anilist user!" }
+                } else {
+                    anilistUser = viewerResp.data
+                    Log.d { "Logged in to AniList as: ${anilistUser!!.name} (${anilistUser!!.id})" }
+                }
+            } else {
+                anilistApiClient = AnilistApiClient()
+            }
+        }
     }
 }
 
