@@ -1,5 +1,6 @@
 package moe.styx.common.compose.threads
 
+import io.github.xxfast.kstore.extensions.getOrEmpty
 import kotlinx.coroutines.*
 import moe.styx.common.Platform
 import moe.styx.common.compose.files.*
@@ -35,6 +36,11 @@ object RequestQueue : LifecycleTrackedJob() {
             if (watchedStore.toUpdate.isNotEmpty() || watchedStore.toRemove.isNotEmpty()) {
                 syncWatched(watchedStore)
             }
+
+            val prefStore = Stores.queuedPrefsStore.getOrEmpty()
+            if (prefStore.isNotEmpty()) {
+                prefStore.forEach { updateMediaPreference(it) }
+            }
             delay(15000L)
         }
     }
@@ -64,6 +70,31 @@ object RequestQueue : LifecycleTrackedJob() {
         }
         runJob = true
         currentJob = createJob()
+    }
+
+    fun updateMediaPreference(preference: UserMediaPreferences): Pair<Job, Job>? {
+        val prefs = Storage.stores.mediaPreferencesStore.getBlocking()
+        val existing = prefs.find { it.mediaID == preference.mediaID }
+        val storageUpdateJob = CoroutineScope(Storage.dataLoaderDispatcher).launch {
+            Storage.stores.mediaPreferencesStore.updateList {
+                it.replaceIfNotNull(existing, preference)
+            }
+            Storage.stores.queuedPrefsStore.updateList { list ->
+                list.removeAll { it.mediaID == preference.mediaID }
+            }
+        }
+        return storageUpdateJob to launchThreaded {
+            storageUpdateJob.join()
+            if (ServerStatus.lastKnown == ServerStatus.UNKNOWN || !isLoggedIn() || !sendObject(
+                    Endpoints.MEDIA_PREFS_UPDATE,
+                    preference
+                )
+            ) {
+                Storage.stores.queuedPrefsStore.updateList {
+                    it.add(preference)
+                }
+            }
+        }
     }
 
     fun addFav(media: Media): Pair<Job, Job>? {

@@ -124,7 +124,8 @@ class MainDataViewModel : ScreenModel {
             prequel?.let { storage.imageList.find { it.GUID eqI prequel.thumbID } },
             sequel,
             sequel?.let { storage.imageList.find { it.GUID eqI sequel.thumbID } },
-            entries
+            entries,
+            storage.userMediaPreferences.find { it.mediaID == media.GUID }?.mediaPreferences
         )
     }
 
@@ -155,6 +156,7 @@ data class MediaStorage(
     val sequel: Media?,
     val sequelImage: Image?,
     val entries: List<MediaEntry>,
+    val preferences: MediaPreferences?,
 ) {
     fun hasPrequel(): Boolean = prequel != null && prequelImage != null
     fun hasSequel(): Boolean = sequel != null && sequelImage != null

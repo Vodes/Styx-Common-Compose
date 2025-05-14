@@ -73,6 +73,10 @@ object Stores {
         storeOf(Path("${appConfig().appStoragePath}/queued/watched-changes.json"), QueuedWatchedChanges(), json = json)
     }
 
+    val queuedPrefsStore: KStore<List<UserMediaPreferences>> by lazy {
+        listStoreOf(Path("${appConfig().appStoragePath}/queued/watched-changes.json"), json = json)
+    }
+
     val downloadedStore: KStore<List<DownloadedEntry>> by lazy {
         listStoreOf(Path("${appConfig().appStoragePath}/store/downloaded.json"), json = json)
     }
