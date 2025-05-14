@@ -4,6 +4,7 @@ import com.russhwolf.settings.get
 import kotlinx.serialization.Serializable
 import moe.styx.common.Platform
 import moe.styx.common.compose.settings
+import moe.styx.common.data.MediaPreferences
 import moe.styx.common.extension.capitalize
 import moe.styx.common.json
 
@@ -97,17 +98,17 @@ data class MpvPreferences(
     val preferEnDub: Boolean = false,
     val preferDeDub: Boolean = false,
 ) {
-    fun getSlangArg(): String {
-        return if (preferGerman)
+    fun getSlangArg(mediaPreferences: MediaPreferences?): String {
+        return if (mediaPreferences?.preferGermanSub ?: preferGerman)
             "de,ger,en,eng"
         else
             "en,eng,de,ger"
     }
 
-    fun getAlangArg(): String {
-        return if (preferEnDub)
+    fun getAlangArg(mediaPreferences: MediaPreferences?): String {
+        return if (mediaPreferences?.preferEnglishDub ?: preferEnDub)
             "en,eng,jp,jpn,de,ger"
-        else if (preferDeDub)
+        else if (mediaPreferences?.preferGermanDub ?: preferDeDub)
             "de,ger,jp,jpn,en,eng"
         else
             "jp,jpn,en,eng,de,ger"

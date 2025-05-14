@@ -114,7 +114,9 @@ class MainDataViewModel : ScreenModel {
         val prequel = if (media.prequel.isNullOrBlank()) null else storage.mediaList.find { it.GUID eqI media.prequel }
         val sequel = if (media.sequel.isNullOrBlank()) null else storage.mediaList.find { it.GUID eqI media.sequel }
         val filtered = storage.entryList.filter { it.mediaID eqI media.GUID }
-        val entries = if (settings["episode-asc", false]) filtered.sortedBy {
+        val prefs = storage.userMediaPreferences.find { it.mediaID eqI media.GUID }
+        val sortAsc = prefs?.mediaPreferences?.sortEpisodesAscendingly ?: settings["episode-asc", false]
+        val entries = if (sortAsc) filtered.sortedBy {
             it.entryNumber.toDoubleOrNull() ?: 0.0
         } else filtered.sortedByDescending { it.entryNumber.toDoubleOrNull() ?: 0.0 }
         return MediaStorage(
@@ -125,7 +127,7 @@ class MainDataViewModel : ScreenModel {
             sequel,
             sequel?.let { storage.imageList.find { it.GUID eqI sequel.thumbID } },
             entries,
-            storage.userMediaPreferences.find { it.mediaID == media.GUID }?.mediaPreferences
+            prefs?.mediaPreferences
         )
     }
 
