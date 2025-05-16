@@ -44,7 +44,7 @@ fun MappingCollection.mapLocalToRemote(
                 it
         }
         val watched = watched.find { it.entryID == entry.GUID }
-        if (discardNonWatched && (watched == null || watched.maxProgress < 0.85F))
+        if (discardNonWatched && (watched == null || watched.maxProgress < 85F))
             continue
         var localMapping: LocalRemoteMapping? = null
         for (mapping in specificEpisodeMappings) {
