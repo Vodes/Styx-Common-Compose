@@ -135,18 +135,23 @@ class MainDataViewModel : ScreenModel {
         if (login != null && ServerStatus.lastKnown != ServerStatus.UNKNOWN && anilistUser == null) {
             if (login?.anilistData != null) {
                 Log.d { "Logging in to anilist..." }
-                anilistApiClient = AnilistApiClient(login!!.anilistData!!.accessToken)
+                anilistApiClient = AnilistApiClient(login!!.anilistData!!.accessToken).also { publicAnilistApiClient = it }
                 val viewerResp = anilistApiClient!!.fetchViewer()
                 if (viewerResp.data == null) {
                     Log.e(exception = viewerResp.exception) { "Could not login to anilist user!" }
                 } else {
-                    anilistUser = viewerResp.data
+                    anilistUser = viewerResp.data.also { publicAnilistUser = it }
                     Log.d { "Logged in to AniList as: ${anilistUser!!.name} (${anilistUser!!.id})" }
                 }
             } else {
                 anilistApiClient = AnilistApiClient()
             }
         }
+    }
+
+    companion object {
+        var publicAnilistApiClient: AnilistApiClient? = null
+        var publicAnilistUser: AlUser? = null
     }
 }
 
