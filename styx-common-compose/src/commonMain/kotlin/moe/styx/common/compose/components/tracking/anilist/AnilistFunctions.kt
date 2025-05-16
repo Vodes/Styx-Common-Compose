@@ -36,7 +36,7 @@ fun syncAnilistProgress(
         val status = CommonMediaStatus(
             anilistDataEntry.second?.listEntry?.id ?: -1,
             anilistDataEntry.first.id,
-            if (knownMax != null && knownMax >= group.value.first().remoteNum) CommonMediaListStatus.COMPLETED else CommonMediaListStatus.WATCHING,
+            if (knownMax != null && knownMax <= group.value.first().remoteNum) CommonMediaListStatus.COMPLETED else CommonMediaListStatus.WATCHING,
             group.value.first().remoteNum,
             knownMax ?: Int.MAX_VALUE
         )
