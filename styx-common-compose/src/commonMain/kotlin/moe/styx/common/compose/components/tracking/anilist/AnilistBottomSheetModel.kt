@@ -16,9 +16,7 @@ import moe.styx.common.data.Media
 import moe.styx.common.data.tmdb.decodeMapping
 import moe.styx.common.util.Log
 import pw.vodes.anilistkmp.ext.deleteMediaListEntries
-import pw.vodes.anilistkmp.ext.fetchUserMediaList
 import pw.vodes.anilistkmp.ext.saveMediaListEntry
-import pw.vodes.anilistkmp.ext.searchMedia
 
 
 class AnilistBottomSheetModel : ScreenModel {
@@ -34,13 +32,7 @@ class AnilistBottomSheetModel : ScreenModel {
         if (mappings.anilistMappings.isEmpty())
             return@launch
 
-        val fetchedAlMedia = mainVm.anilistApiClient!!.searchMedia(idIn = mappings.anilistMappings.map { it.remoteID })
-        val userAlMedia =
-            mainVm.anilistUser?.let { user ->
-                mainVm.anilistApiClient!!.fetchUserMediaList(
-                    userID = user.id,
-                    mediaIdIn = mappings.anilistMappings.map { it.remoteID })
-            }
+        val (fetchedAlMedia, userAlMedia) = fetchAnilistDataForMapping(mappings, mainVm.anilistApiClient!!, mainVm.anilistUser)
 
         if (fetchedAlMedia.data.isEmpty()) {
             val messageString = fetchedAlMedia.errors?.map { it.message }?.joinToString { "\n" }
