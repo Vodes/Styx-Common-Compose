@@ -1,6 +1,7 @@
 package moe.styx.common.compose.components.tracking.common
 
 import moe.styx.common.compose.components.tracking.common.CommonMediaListStatus.Companion.fromAnilistStatus
+import moe.styx.common.util.Log
 import pw.vodes.anilistkmp.graphql.type.MediaListStatus
 
 enum class CommonMediaListStatus {
@@ -46,4 +47,12 @@ data class CommonMediaStatus(
 ) {
     val hasProgress get() = progress > 0
     val hasKnownMax get() = knownMax != Int.MAX_VALUE
+}
+
+data class CommonTrackingResult(val success: Boolean, val errorMessage: String? = null, val exception: Exception? = null) {
+    init {
+        if (!success && (!errorMessage.isNullOrBlank() || exception != null)) {
+            Log.e(exception = exception) { errorMessage ?: "Failed to update tracking on remote site!" }
+        }
+    }
 }

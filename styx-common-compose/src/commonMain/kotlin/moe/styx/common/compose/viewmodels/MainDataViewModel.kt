@@ -72,20 +72,18 @@ class MainDataViewModel : ScreenModel {
         }
     }
 
-    fun updateData(forceUpdate: Boolean = false, updateStores: Boolean = false) {
-        screenModelScope.launch {
-            if (updateStores) {
-                launch { runAnilistCheck() }
-                Log.d { "Updating storage with stores..." }
-                launch { Storage.loadData() }.also { Storage.refreshDataJob = it }.join()
-                Storage.refreshDataJob = null
-            } else
-                Log.d { "Updating storage without stores..." }
-            if (forceUpdate)
-                _storageFlow.emit(getUpdatedStorage())
-            else
-                _storageFlow.getAndUpdate { getUpdatedStorage(it.updated) }
-        }
+    fun updateData(forceUpdate: Boolean = false, updateStores: Boolean = false) = screenModelScope.launch {
+        if (updateStores) {
+            launch { runAnilistCheck() }
+            Log.d { "Updating storage with stores..." }
+            launch { Storage.loadData() }.also { Storage.refreshDataJob = it }.join()
+            Storage.refreshDataJob = null
+        } else
+            Log.d { "Updating storage without stores..." }
+        if (forceUpdate)
+            _storageFlow.emit(getUpdatedStorage())
+        else
+            _storageFlow.getAndUpdate { getUpdatedStorage(it.updated) }
     }
 
     private fun getUpdatedStorage(unixSeconds: Long? = null): MainDataViewModelStorage {

@@ -9,3 +9,4 @@ typealias AlUserEntry = MediaListEntry
 typealias AlMediaList = List<MediaBig>
 typealias AlUserMediaEntries = List<MediaListEntry>
 typealias AlUser = User
+typealias AlTrackingData = Map<AlMedia, AlUserEntry?>

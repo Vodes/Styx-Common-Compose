@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dokar.sonner.ToastType
+import kotlinx.coroutines.launch
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.utils.LocalToaster
 import moe.styx.common.compose.viewmodels.MainDataViewModel
@@ -27,6 +28,7 @@ fun AnilistButtomSheet(
     val sheetState = rememberModalBottomSheetState()
     val media = remember(mediaStorage) { mediaStorage.media }
     val storage by mainVm.storageFlow.collectAsState()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(mainVm.anilistUser, media.GUID) {
         sheetModel.fetchMediaState(mainVm, media)
@@ -40,25 +42,31 @@ fun AnilistButtomSheet(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             if (anilistData == null) {
                 Text("Loading anilist data...", style = MaterialTheme.typography.headlineMedium)
-            } else if (anilistData?.errored == true) {
-                Text("Failed to load anilist data! Please send the logs to the admin.", style = MaterialTheme.typography.headlineMedium)
+            } else if (anilistData == null && !sheetModel.errorString.isNullOrBlank()) {
+                Text(sheetModel.errorString!!, style = MaterialTheme.typography.headlineMedium)
             } else {
-                val mapped =
-                    anilistData?.alMedia?.map { media -> media to anilistData?.userMedia?.find { it.media.id == media.id } }
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text("AniList", Modifier.padding(10.dp, 3.dp).weight(1f), style = MaterialTheme.typography.headlineMedium)
-                    if (mapped != null && mainVm.anilistUser != null) {
+                    if (anilistData != null && mainVm.anilistUser != null) {
                         IconButtonWithTooltip(Icons.Default.Sync, "Sync progress", modifier = Modifier.padding(5.dp, 0.dp)) {
-                            syncAnilistProgress(media, mapped, mediaStorage.entries, storage.watchedList) {
-                                sheetModel.updateRemoteStatus(mainVm, it, media)
+                            scope.launch {
+                                val result = AnilistTracking.syncAnilistProgress(
+                                    mediaStorage,
+                                    storage.watchedList,
+                                    anilistData,
+                                    mainVm.anilistApiClient,
+                                    mainVm.anilistUser
+                                )
+                                if (!result.success)
+                                    sheetModel.errorString = result.errorMessage!!
                             }
                         }
                     }
                 }
 
-                if (mapped != null) {
-                    mapped.forEach { mappedMedia ->
-                        AnilistMediaComponent(mainVm.anilistUser, mappedMedia.first, mappedMedia.second, onURIClick) {
+                if (anilistData != null) {
+                    anilistData!!.entries.forEach { mappedMedia ->
+                        AnilistMediaComponent(mainVm.anilistUser, mappedMedia.key, mappedMedia.value, onURIClick) {
                             sheetModel.updateRemoteStatus(mainVm, it, media)
                         }
                     }
