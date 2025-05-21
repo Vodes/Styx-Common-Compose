@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.components.misc.ScrollToTopContainer
 import moe.styx.common.compose.extensions.dynamicClick
+import moe.styx.common.compose.extensions.joinAndSyncProgress
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.collectWithEmptyInitial
 import moe.styx.common.compose.files.updateList
@@ -156,35 +157,33 @@ fun SelectedCard(selected: SnapshotStateList<String>, entries: List<MediaEntry>,
             IconButtonWithTooltip(Icons.Default.Visibility, "Set Watched") {
                 if (selected.isEmpty())
                     return@IconButtonWithTooltip
-                val job = if (selected.size == 1) {
-                    val entry = entries.find { selected.first() eqI it.GUID }
-                    if (entry == null)
-                        return@IconButtonWithTooltip
+                val entries = selected.mapNotNull { id -> entries.find { id eqI it.GUID } }
+                val job = if (entries.size == 1) {
+                    val entry = entries.first()
                     RequestQueue.updateWatched(
                         MediaWatched(entry.GUID, login?.userID ?: "", currentUnixSeconds(), 0, 0F, 100F)
                     ).first
                 } else {
-                    RequestQueue.addMultipleWatched(selected.mapNotNull { id -> entries.find { id eqI it.GUID } })
+                    RequestQueue.addMultipleWatched(entries)
                 }
                 sm.screenModelScope.launch {
                     job.join()
-                    sm.updateData(true)
+                    sm.updateData(true).joinAndSyncProgress(entries.maxByOrNull { it.entryNumber }!!, sm)
                 }
             }
             IconButtonWithTooltip(Icons.Default.VisibilityOff, "Set Unwatched") {
                 if (selected.isEmpty())
                     return@IconButtonWithTooltip
-                val job = if (selected.size == 1) {
-                    val entry = entries.find { selected.first() eqI it.GUID }
-                    if (entry == null)
-                        return@IconButtonWithTooltip
+                val entries = selected.mapNotNull { id -> entries.find { id eqI it.GUID } }
+                val job = if (entries.size == 1) {
+                    val entry = entries.first()
                     RequestQueue.removeWatched(entry).first
                 } else {
-                    RequestQueue.removeMultipleWatched(selected.mapNotNull { id -> entries.find { id eqI it.GUID } })
+                    RequestQueue.removeMultipleWatched(entries)
                 }
                 sm.screenModelScope.launch {
                     job.join()
-                    sm.updateData(true)
+                    sm.updateData(true).joinAndSyncProgress(entries.maxByOrNull { it.entryNumber }!!, sm)
                 }
             }
 
