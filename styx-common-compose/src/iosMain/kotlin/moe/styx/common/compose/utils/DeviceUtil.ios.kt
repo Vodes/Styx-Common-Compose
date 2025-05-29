@@ -20,3 +20,7 @@ actual fun fetchDeviceInfo(): DeviceInfo {
         appConfig().appSecret
     )
 }
+
+actual fun openURI(uri: String?) {
+    TODO("Not implemented yet.")
+}

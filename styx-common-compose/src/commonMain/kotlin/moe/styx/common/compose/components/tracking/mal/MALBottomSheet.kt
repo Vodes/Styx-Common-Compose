@@ -22,7 +22,6 @@ fun MALButtomSheet(
     mediaStorage: MediaStorage,
     mainVm: MainDataViewModel,
     sheetModel: MALBottomSheetModel,
-    onURIClick: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
     val toaster = LocalToaster.current
@@ -80,7 +79,7 @@ fun MALButtomSheet(
 
                 if (!malData.isNullOrEmpty()) {
                     malData!!.sortedBy { it.id }.forEach { malMedia ->
-                        MALMediaComponent(mainVm.malUser, malMedia, !sheetModel.isLoading, onURIClick) {
+                        MALMediaComponent(mainVm.malUser, malMedia, !sheetModel.isLoading) {
                             sheetModel.updateRemoteStatus(mainVm, it, media)
                         }
                     }

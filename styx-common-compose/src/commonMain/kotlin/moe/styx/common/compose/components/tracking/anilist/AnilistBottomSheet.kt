@@ -22,7 +22,6 @@ fun AnilistButtomSheet(
     mediaStorage: MediaStorage,
     mainVm: MainDataViewModel,
     sheetModel: AnilistBottomSheetModel,
-    onURIClick: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
     val toaster = LocalToaster.current
@@ -77,7 +76,7 @@ fun AnilistButtomSheet(
 
                 if (anilistData != null) {
                     anilistData!!.entries.forEach { mappedMedia ->
-                        AnilistMediaComponent(mainVm.anilistUser, mappedMedia.key, mappedMedia.value, !sheetModel.isLoading, onURIClick) {
+                        AnilistMediaComponent(mainVm.anilistUser, mappedMedia.key, mappedMedia.value, !sheetModel.isLoading) {
                             sheetModel.updateRemoteStatus(mainVm, it, media)
                         }
                     }

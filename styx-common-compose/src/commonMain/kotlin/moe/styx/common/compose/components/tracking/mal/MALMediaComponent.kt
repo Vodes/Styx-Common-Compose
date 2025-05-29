@@ -18,7 +18,6 @@ fun MALMediaComponent(
     malUser: MALUser?,
     malMedia: MALMedia,
     isEnabled: Boolean,
-    onUriClick: (String) -> Unit = {},
     onStatusUpdate: (CommonMediaStatus) -> Unit
 ) {
     Column(Modifier.fillMaxWidth().padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -40,7 +39,6 @@ fun MALMediaComponent(
             "https://myanimelist.net/anime/${malMedia.id}",
             malUser != null,
             isEnabled,
-            onUriClick,
             status
         ) {
             onStatusUpdate(it)

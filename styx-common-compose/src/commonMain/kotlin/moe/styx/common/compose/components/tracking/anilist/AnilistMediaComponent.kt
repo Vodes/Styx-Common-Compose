@@ -19,7 +19,6 @@ fun AnilistMediaComponent(
     alMedia: AlMedia,
     entry: AlUserEntry? = null,
     isEnabled: Boolean = true,
-    onUriClick: (String) -> Unit = {},
     onStatusUpdate: (CommonMediaStatus) -> Unit
 ) {
     Column(Modifier.fillMaxWidth().padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -41,7 +40,6 @@ fun AnilistMediaComponent(
             "https://anilist.co/anime/${alMedia.id}",
             viewer != null,
             isEnabled,
-            onUriClick,
             status
         ) {
             onStatusUpdate(it)

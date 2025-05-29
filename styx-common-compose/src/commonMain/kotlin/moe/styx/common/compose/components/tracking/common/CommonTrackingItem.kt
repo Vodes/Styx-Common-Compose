@@ -16,6 +16,7 @@ import io.kamel.image.KamelImage
 import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.extensions.getPainter
+import moe.styx.common.compose.utils.openURI
 import moe.styx.common.data.Image
 import moe.styx.common.extension.capitalize
 import moe.styx.common.extension.eqI
@@ -29,7 +30,6 @@ fun RemoteMediaComponent(
     remoteURL: String,
     isLoggedIn: Boolean,
     isEnabled: Boolean,
-    onUriClick: (String) -> Unit = {},
     status: CommonMediaStatus,
     onStatusUpdate: (CommonMediaStatus) -> Unit = {}
 ) {
@@ -61,7 +61,7 @@ fun RemoteMediaComponent(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(title, modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelLarge)
                     IconButtonWithTooltip(Icons.Filled.OpenInNewOff, "Open website") {
-                        onUriClick(remoteURL)
+                        openURI(remoteURL)
                     }
                 }
 
