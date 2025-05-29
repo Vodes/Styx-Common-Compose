@@ -36,7 +36,7 @@ class AnilistBottomSheetModel : ScreenModel {
         isLoading = true
         val result = AnilistTracking.updateRemoteStatus(status, mainVm.anilistApiClient, mainVm.anilistUser)
         if (result.success)
-            fetchMediaState(mainVm, media)
+            fetchMediaState(mainVm, media).join()
         else
             errorString = result.errorMessage!!.substringBefore(":") + "!"
         isLoading = false

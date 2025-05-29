@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dokar.sonner.ToastType
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.utils.LocalToaster
@@ -49,14 +50,12 @@ fun MALButtomSheet(
                 Text(sheetModel.errorString!!, style = MaterialTheme.typography.headlineMedium)
             } else {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Row {
-                        Text("MyAnimeList", Modifier.padding(10.dp, 3.dp).weight(1f), style = MaterialTheme.typography.headlineMedium)
-                        if (sheetModel.isLoading)
-                            LinearProgressIndicator(
-                                modifier = Modifier.padding(7.dp, 3.dp),
-                                trackColor = MaterialTheme.colorScheme.surfaceColorAtElevation(12.dp)
-                            )
-                    }
+                    Text("MyAnimeList", Modifier.padding(10.dp, 3.dp).weight(1f), style = MaterialTheme.typography.headlineMedium)
+                    if (sheetModel.isLoading)
+                        LinearProgressIndicator(
+                            modifier = Modifier.padding(7.dp, 3.dp).width(25.dp),
+                            trackColor = MaterialTheme.colorScheme.surfaceColorAtElevation(12.dp)
+                        )
                     if (malData != null && mainVm.malUser != null) {
                         IconButtonWithTooltip(Icons.Default.Sync, "Sync progress", modifier = Modifier.padding(5.dp, 0.dp)) {
                             scope.launch {
@@ -69,8 +68,11 @@ fun MALButtomSheet(
                                     mainVm.malUser
                                 )
                                 if (!result.success)
-                                    sheetModel.errorString = result.errorMessage!!
-                                sheetModel.isLoading = false
+                                    sheetModel.errorString = result.errorMessage!!.also { sheetModel.isLoading = false }
+                                else {
+                                    delay(300)
+                                    sheetModel.fetchMediaState(mainVm, media).join()
+                                }
                             }
                         }
                     }

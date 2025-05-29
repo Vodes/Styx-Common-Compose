@@ -53,7 +53,7 @@ class MALBottomSheetModel : ScreenModel {
         isLoading = true
         val result = MALTracking.updateRemoteStatus(status, mainVm.malApiClient, mainVm.malUser)
         if (result.success)
-            fetchMediaState(mainVm, media)
+            fetchMediaState(mainVm, media).join()
         else
             errorString = result.errorMessage
         isLoading = false
