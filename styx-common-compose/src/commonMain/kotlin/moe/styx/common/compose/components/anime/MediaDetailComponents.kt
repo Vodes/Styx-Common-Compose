@@ -42,6 +42,8 @@ fun StupidImageNameArea(
     dynamicMaxWidth: Dp = 760.dp,
     requiredMinHeight: Dp = 150.dp,
     requiredMaxHeight: Dp = 500.dp,
+    requiredMaxWidth: Dp = 385.dp,
+    enforceConstraints: Boolean = false,
     openURI: (String) -> Unit = {},
     otherContent: @Composable () -> Unit = {}
 ) {
@@ -59,7 +61,11 @@ fun StupidImageNameArea(
             else {
                 // Theoretical max size that should be reached at this window width
                 // Just force to not have layout spacing issues lmao
-                BigScalingCardImage(painter, Modifier.fillMaxHeight(), cardModifier = Modifier.aspectRatio(0.71F))
+                if (enforceConstraints) {
+                    BigScalingCardImage(painter, Modifier.requiredSize(requiredMaxWidth, requiredMaxHeight))
+                } else {
+                    BigScalingCardImage(painter, Modifier.fillMaxHeight(), cardModifier = Modifier.aspectRatio(0.71F))
+                }
             }
             Column(Modifier.fillMaxWidth().weight(1f, true)) {
                 MediaNameListing(media, Modifier.align(Alignment.Start))
