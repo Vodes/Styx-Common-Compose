@@ -23,6 +23,16 @@ enum class CommonMediaListStatus {
         else -> null
     }
 
+    fun toMalStatus(): Pair<String, Boolean>? = when (this) {
+        WATCHING -> "watching" to false
+        PLANNING -> "plan_to_watch" to false
+        COMPLETED -> "completed" to false
+        DROPPED -> "dropped" to false
+        PAUSED -> "on_hold" to false
+        REPEATING -> "watching" to true
+        else -> null
+    }
+
     companion object {
         fun fromAnilistStatus(status: MediaListStatus): CommonMediaListStatus = when (status) {
             MediaListStatus.CURRENT -> WATCHING
@@ -31,6 +41,15 @@ enum class CommonMediaListStatus {
             MediaListStatus.DROPPED -> DROPPED
             MediaListStatus.PAUSED -> PAUSED
             MediaListStatus.REPEATING -> REPEATING
+            else -> NONE
+        }
+
+        fun fromMalStatus(status: String, isRewatching: Boolean): CommonMediaListStatus = when (status.lowercase()) {
+            "watching" -> if (!isRewatching) WATCHING else REPEATING
+            "completed" -> COMPLETED
+            "dropped" -> DROPPED
+            "on_hold" -> PAUSED
+            "plan_to_watch" -> PLANNING
             else -> NONE
         }
     }

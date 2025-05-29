@@ -25,6 +25,8 @@ enum class Endpoints(private val path: String) {
     MEDIA_PREFS("/media/preferences/list"),
     MEDIA_PREFS_UPDATE("/media/preferences/update"),
 
+    MAL_TOKEN("/mal/fetch-token"),
+
     FAVOURITES("/favourites/list"),
     FAVOURITES_ADD("/favourites/add"),
     FAVOURITES_DELETE("/favourites/delete"),

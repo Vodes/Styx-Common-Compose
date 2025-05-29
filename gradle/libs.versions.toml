@@ -2,8 +2,9 @@
 android-minSdk = "27"
 android-compileSdk = "35"
 agp = "8.7.3"
-kotlin = "2.1.20"
-styx-common = "0.5.4"
+kotlin = "2.1.21"
+styx-common = "0.5.6"
+styx-mal = "0.0.3"
 anilist-kmp = "0.0.3"
 voyager = "f16519dd"
 kamel = "1.0.5"
@@ -21,6 +22,7 @@ compose-dialogs = "2.1.3"
 
 [libraries]
 styx-common = { module = "moe.styx:styx-common", version.ref = "styx-common" }
+styx-mal = { module = "moe.styx:styx-lib-mal", version.ref = "styx-mal" }
 anilist-kmp = { module = "pw.vodes:anilist-kmp", version.ref = "anilist-kmp" }
 voyager-nav = { module = "moe.styx.forks.voyager:voyager-navigator", version.ref = "voyager" }
 voyager-transitions = { module = "moe.styx.forks.voyager:voyager-transitions", version.ref = "voyager" }

@@ -1,4 +1,4 @@
-package moe.styx.common.compose.components.tracking.anilist
+package moe.styx.common.compose.components.tracking.mal
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,36 +10,35 @@ import androidx.compose.ui.unit.dp
 import moe.styx.common.compose.components.tracking.common.CommonMediaListStatus
 import moe.styx.common.compose.components.tracking.common.CommonMediaStatus
 import moe.styx.common.compose.components.tracking.common.RemoteMediaComponent
-import moe.styx.common.compose.components.tracking.common.toCommon
-import pw.vodes.anilistkmp.graphql.fragment.User
+import moe.styx.libs.mal.types.MALMedia
+import moe.styx.libs.mal.types.MALUser
 
 @Composable
-fun AnilistMediaComponent(
-    viewer: User?,
-    alMedia: AlMedia,
-    entry: AlUserEntry? = null,
-    isEnabled: Boolean = true,
+fun MALMediaComponent(
+    malUser: MALUser?,
+    malMedia: MALMedia,
+    isEnabled: Boolean,
     onUriClick: (String) -> Unit = {},
     onStatusUpdate: (CommonMediaStatus) -> Unit
 ) {
     Column(Modifier.fillMaxWidth().padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        var status by remember(viewer, entry?.listEntry) {
+        var status by remember(malUser, malMedia.listStatus) {
             mutableStateOf(
                 CommonMediaStatus(
-                    entry?.listEntry?.id ?: -1,
-                    alMedia.id,
-                    entry?.listEntry?.status?.toCommon() ?: CommonMediaListStatus.NONE,
-                    entry?.listEntry?.progress ?: -1,
-                    alMedia.episodes ?: Int.MAX_VALUE
+                    -1,
+                    malMedia.id,
+                    malMedia.listStatus?.let { CommonMediaListStatus.fromMalStatus(it.status, it.isRewatching) } ?: CommonMediaListStatus.NONE,
+                    malMedia.listStatus?.watchedEpisodes ?: -1,
+                    malMedia.numEpisodes ?: Int.MAX_VALUE
                 )
             )
         }
 
         RemoteMediaComponent(
-            alMedia.title?.english ?: (alMedia.title?.romaji ?: ""),
-            alMedia.coverImage?.large ?: "",
-            "https://anilist.co/anime/${alMedia.id}",
-            viewer != null,
+            malMedia.title,
+            malMedia.mainPicture.large ?: malMedia.mainPicture.medium,
+            "https://myanimelist.net/anime/${malMedia.id}",
+            malUser != null,
             isEnabled,
             onUriClick,
             status

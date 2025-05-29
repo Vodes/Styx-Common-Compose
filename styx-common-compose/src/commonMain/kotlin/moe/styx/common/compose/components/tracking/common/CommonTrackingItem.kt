@@ -28,6 +28,7 @@ fun RemoteMediaComponent(
     imageURL: String,
     remoteURL: String,
     isLoggedIn: Boolean,
+    isEnabled: Boolean,
     onUriClick: (String) -> Unit = {},
     status: CommonMediaStatus,
     onStatusUpdate: (CommonMediaStatus) -> Unit = {}
@@ -69,7 +70,7 @@ fun RemoteMediaComponent(
                         {
                             showStatusDialog = true
                         },
-                        enabled = isLoggedIn,
+                        enabled = isLoggedIn && isEnabled,
                         modifier = Modifier.padding(3.dp),
                         colors = CardDefaults.elevatedCardColors(MaterialTheme.colorScheme.tertiaryContainer),
                         elevation = CardDefaults.elevatedCardElevation(1.dp)
@@ -89,7 +90,7 @@ fun RemoteMediaComponent(
                         {
                             showEpisodeDialog = true
                         },
-                        enabled = isLoggedIn,
+                        enabled = isLoggedIn && isEnabled,
                         modifier = Modifier.padding(3.dp),
                         colors = CardDefaults.elevatedCardColors(MaterialTheme.colorScheme.tertiaryContainer),
                         elevation = CardDefaults.elevatedCardElevation(1.dp)
@@ -113,7 +114,7 @@ fun RemoteMediaComponent(
                         },
                         enabled = if (status.hasProgress && status.hasKnownMax && isLoggedIn)
                             status.progress < status.knownMax
-                        else isLoggedIn,
+                        else isLoggedIn && isEnabled,
                         modifier = Modifier.padding(3.dp),
                         colors = CardDefaults.elevatedCardColors(MaterialTheme.colorScheme.secondaryContainer),
                         elevation = CardDefaults.elevatedCardElevation(1.dp)

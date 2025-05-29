@@ -12,6 +12,7 @@ import moe.styx.common.compose.components.tracking.anilist.AlUser
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.Stores
 import moe.styx.common.compose.files.getBlocking
+import moe.styx.common.compose.http.MalApiClient
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.ServerStatus
@@ -19,6 +20,8 @@ import moe.styx.common.data.*
 import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.extension.eqI
 import moe.styx.common.util.Log
+import moe.styx.libs.mal.ext.fetching.fetchCurrentUser
+import moe.styx.libs.mal.types.MALUser
 import pw.vodes.anilistkmp.AnilistApiClient
 import pw.vodes.anilistkmp.ext.fetchViewer
 import kotlin.time.DurationUnit
@@ -37,6 +40,11 @@ class MainDataViewModel : ScreenModel {
     var anilistApiClient by mutableStateOf<AnilistApiClient?>(null)
         private set
     var anilistUser by mutableStateOf<AlUser?>(null)
+        private set
+
+    var malApiClient by mutableStateOf<MalApiClient?>(null)
+        private set
+    var malUser by mutableStateOf<MALUser?>(null)
         private set
 
     init {
@@ -75,6 +83,7 @@ class MainDataViewModel : ScreenModel {
     fun updateData(forceUpdate: Boolean = false, updateStores: Boolean = false) = screenModelScope.launch {
         if (updateStores) {
             launch { runAnilistCheck() }
+            launch { runMALCheck() }
             Log.d { "Updating storage with stores..." }
             launch { Storage.loadData() }.also { Storage.refreshDataJob = it }.join()
             Storage.refreshDataJob = null
@@ -132,11 +141,11 @@ class MainDataViewModel : ScreenModel {
     private suspend fun runAnilistCheck() {
         if (login != null && ServerStatus.lastKnown != ServerStatus.UNKNOWN && anilistUser == null) {
             if (login?.anilistData != null) {
-                Log.d { "Logging in to anilist..." }
+                Log.d { "Logging in to AniList..." }
                 anilistApiClient = AnilistApiClient(login!!.anilistData!!.accessToken).also { publicAnilistApiClient = it }
                 val viewerResp = anilistApiClient!!.fetchViewer()
                 if (viewerResp.data == null) {
-                    Log.e(exception = viewerResp.exception) { "Could not login to anilist user!" }
+                    Log.e(exception = viewerResp.exception) { "Could not login to AniList user!" }
                 } else {
                     anilistUser = viewerResp.data.also { publicAnilistUser = it }
                     Log.d { "Logged in to AniList as: ${anilistUser!!.name} (${anilistUser!!.id})" }
@@ -147,9 +156,27 @@ class MainDataViewModel : ScreenModel {
         }
     }
 
+    private suspend fun runMALCheck() {
+        if (login != null && ServerStatus.lastKnown != ServerStatus.UNKNOWN && malUser == null) {
+            if (login?.malData != null) {
+                Log.d { "Logging in to MyAnimeList..." }
+                malApiClient = MalApiClient(login!!.malData!!).also { publicMalApiClient = it }
+                val userResp = malApiClient!!.fetchCurrentUser()
+                if (!userResp.isSuccess || userResp.data == null) {
+                    return
+                }
+                malUser = userResp.data!!.also { publicMalUser = it }
+                Log.d { "Logged in to MyAnimeList as: ${malUser!!.name} (${malUser!!.id})" }
+            }
+        }
+    }
+
     companion object {
         var publicAnilistApiClient: AnilistApiClient? = null
         var publicAnilistUser: AlUser? = null
+
+        var publicMalApiClient: MalApiClient? = null
+        var publicMalUser: MALUser? = null
     }
 }
 

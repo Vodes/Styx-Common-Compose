@@ -5,7 +5,6 @@ import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.encodeToString
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.data.ApiResponse
 import moe.styx.common.extension.currentUnixSeconds
@@ -108,7 +107,7 @@ inline fun <reified T> sendObject(endpoint: Endpoints, data: T?): Boolean = runB
  * @param endpoint API Endpoint
  * @return Object deserialized with the type defined
  */
-inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
+inline fun <reified T> getObject(endpoint: Endpoints, withAuth: Boolean = false): T? = runBlocking {
     if (login == null || currentUnixSeconds() > login!!.tokenExpiry) {
         if (!isLoggedIn())
             return@runBlocking null
@@ -116,9 +115,18 @@ inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
     Log.d { "getObject Request to: ${endpoint.name}" }
 
     val response = runCatching {
-        httpClient.get {
-            url(endpoint.url())
+        if (!withAuth) {
+            httpClient.get {
+                url(endpoint.url())
+            }
+        } else {
+            httpClient.submitForm(endpoint.url(), formParameters = parameters {
+                append("token", login!!.accessToken)
+            }) {
+                method = HttpMethod.Post
+            }
         }
+
     }.onFailure {
         Log.e("getObject for Endpoint $endpoint", it) { "Request Failed" }
             .also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }

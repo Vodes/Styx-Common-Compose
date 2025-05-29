@@ -3,6 +3,7 @@ package moe.styx.common.compose.components.tracking.common
 import com.russhwolf.settings.get
 import kotlinx.coroutines.flow.first
 import moe.styx.common.compose.components.tracking.anilist.AnilistTracking
+import moe.styx.common.compose.components.tracking.mal.MALTracking
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.ServerStatus
@@ -10,7 +11,7 @@ import moe.styx.common.compose.viewmodels.MainDataViewModel
 
 object CommonTrackingFunctions {
     suspend fun syncProgressForEntry(entryID: String, mainDataViewModel: MainDataViewModel, auto: Boolean) {
-        if (login == null || ServerStatus.lastKnown == ServerStatus.UNKNOWN || login?.anilistData == null) {
+        if (login == null || ServerStatus.lastKnown == ServerStatus.UNKNOWN || (login?.anilistData == null && login?.malData == null)) {
             return
         }
         val storage = mainDataViewModel.storageFlow.first()
@@ -19,6 +20,9 @@ object CommonTrackingFunctions {
         if (!autoSyncEnabled && auto)
             return
 
-        AnilistTracking.syncAnilistProgress(mediaStorage, storage.watchedList, null)
+        if (login?.anilistData != null)
+            AnilistTracking.syncAnilistProgress(mediaStorage, storage.watchedList, null)
+        if (login?.malData != null)
+            MALTracking.syncMALProgress(mediaStorage, storage.watchedList, null)
     }
 }

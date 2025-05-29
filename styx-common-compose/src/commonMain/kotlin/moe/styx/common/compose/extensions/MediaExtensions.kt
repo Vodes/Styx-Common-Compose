@@ -30,6 +30,16 @@ fun ScheduleWeekday.dayOfWeek(): DayOfWeek {
     }
 }
 
+fun Media.minimalSearchString(): String {
+    return this.name.let {
+        val split = it.split(" ")
+        if (split.size < 2)
+            it
+        else
+            if (split[0].length <= 2) split[2] else split[0]
+    }
+}
+
 fun MediaSchedule.getTargetTime(): ZonedDateTime {
     val now = DateTime.now().at(TimeZone("Europe/Berlin"))
     val adjusted = now.copy(hour = this.hour, minute = this.minute)

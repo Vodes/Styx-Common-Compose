@@ -1,4 +1,4 @@
-package moe.styx.common.compose.components.tracking.anilist
+package moe.styx.common.compose.components.tracking.mal
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -17,10 +17,10 @@ import moe.styx.common.compose.viewmodels.MediaStorage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AnilistButtomSheet(
+fun MALButtomSheet(
     mediaStorage: MediaStorage,
     mainVm: MainDataViewModel,
-    sheetModel: AnilistBottomSheetModel,
+    sheetModel: MALBottomSheetModel,
     onURIClick: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -30,50 +30,55 @@ fun AnilistButtomSheet(
     val storage by mainVm.storageFlow.collectAsState()
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(mainVm.anilistUser, media.GUID) {
-        sheetModel.fetchMediaState(mainVm, media)
+    LaunchedEffect(mainVm.malUser, media.GUID) {
+        if (mainVm.malUser == null)
+            sheetModel.fetchMediaStateNonAuth(media)
+        else
+            sheetModel.fetchMediaState(mainVm, media)
     }
-    val anilistData by sheetModel.anilistData.collectAsState()
+    val malData by sheetModel.malData.collectAsState()
     if (!sheetModel.errorString.isNullOrBlank()) {
         toaster.show(sheetModel.errorString!!, type = ToastType.Error)
         sheetModel.errorString = null
     }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            if (anilistData == null) {
-                Text("Loading anilist data...", style = MaterialTheme.typography.headlineMedium)
-            } else if (anilistData == null && !sheetModel.errorString.isNullOrBlank()) {
+            if (malData == null) {
+                Text("Loading MAL data...", style = MaterialTheme.typography.headlineMedium)
+            } else if (malData == null && !sheetModel.errorString.isNullOrBlank()) {
                 Text(sheetModel.errorString!!, style = MaterialTheme.typography.headlineMedium)
             } else {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Row {
-                        Text("AniList", Modifier.padding(10.dp, 3.dp).weight(1f), style = MaterialTheme.typography.headlineMedium)
+                        Text("MyAnimeList", Modifier.padding(10.dp, 3.dp).weight(1f), style = MaterialTheme.typography.headlineMedium)
                         if (sheetModel.isLoading)
                             LinearProgressIndicator(
                                 modifier = Modifier.padding(7.dp, 3.dp),
                                 trackColor = MaterialTheme.colorScheme.surfaceColorAtElevation(12.dp)
                             )
                     }
-                    if (anilistData != null && mainVm.anilistUser != null) {
+                    if (malData != null && mainVm.malUser != null) {
                         IconButtonWithTooltip(Icons.Default.Sync, "Sync progress", modifier = Modifier.padding(5.dp, 0.dp)) {
                             scope.launch {
-                                val result = AnilistTracking.syncAnilistProgress(
+                                sheetModel.isLoading = true
+                                val result = MALTracking.syncMALProgress(
                                     mediaStorage,
                                     storage.watchedList,
-                                    anilistData,
-                                    mainVm.anilistApiClient,
-                                    mainVm.anilistUser
+                                    malData,
+                                    mainVm.malApiClient,
+                                    mainVm.malUser
                                 )
                                 if (!result.success)
                                     sheetModel.errorString = result.errorMessage!!
+                                sheetModel.isLoading = false
                             }
                         }
                     }
                 }
 
-                if (anilistData != null) {
-                    anilistData!!.entries.forEach { mappedMedia ->
-                        AnilistMediaComponent(mainVm.anilistUser, mappedMedia.key, mappedMedia.value, !sheetModel.isLoading, onURIClick) {
+                if (!malData.isNullOrEmpty()) {
+                    malData!!.sortedBy { it.id }.forEach { malMedia ->
+                        MALMediaComponent(mainVm.malUser, malMedia, !sheetModel.isLoading, onURIClick) {
                             sheetModel.updateRemoteStatus(mainVm, it, media)
                         }
                     }

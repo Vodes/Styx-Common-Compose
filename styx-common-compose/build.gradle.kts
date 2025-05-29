@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "moe.styx"
-version = (System.getenv("SNAPSHOT_COMMIT") ?: "").ifBlank { "0.2.0" }
+version = (System.getenv("SNAPSHOT_COMMIT") ?: "").ifBlank { "0.2.1-SNAPSHOT1" }
 
 kotlin {
     applyDefaultHierarchyTemplate()
@@ -28,6 +28,7 @@ kotlin {
                 implementation(compose.components.resources)
 
                 api(libs.styx.common)
+                api(libs.styx.mal)
                 api(libs.anilist.kmp)
 
                 // Other stuff
