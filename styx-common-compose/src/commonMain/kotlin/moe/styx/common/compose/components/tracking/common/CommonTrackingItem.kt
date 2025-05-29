@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import io.kamel.image.KamelImage
 import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
+import moe.styx.common.compose.extensions.clickableNoIndicator
 import moe.styx.common.compose.extensions.getPainter
 import moe.styx.common.compose.utils.openURI
 import moe.styx.common.data.Image
@@ -46,7 +47,9 @@ fun RemoteMediaComponent(
             )
             val painter = image.getPainter()
             Box(
-                Modifier.padding(10.dp).clip(AppShapes.large).width(96.dp).heightIn(0.dp, 145.dp).fillMaxHeight()
+                Modifier.padding(10.dp).clip(AppShapes.large).width(96.dp).heightIn(0.dp, 145.dp).fillMaxHeight().clickableNoIndicator {
+                    openURI(imageURL)
+                }
             ) {
                 KamelImage(
                     { painter },

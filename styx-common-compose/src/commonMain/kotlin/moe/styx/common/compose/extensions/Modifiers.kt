@@ -1,5 +1,9 @@
 package moe.styx.common.compose.extensions
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 
 /**
@@ -17,3 +21,11 @@ expect fun Modifier.desktopPointerEvent(onEnter: () -> Unit, onLeave: () -> Unit
  * @param otherClick    Function to be called when long-pressed or right-clicked
  */
 expect fun Modifier.dynamicClick(regularClick: () -> Unit = {}, otherClick: () -> Unit = {}): Modifier
+
+@Composable
+fun Modifier.clickableNoIndicator(enabled: Boolean = true, onClick: () -> Unit): Modifier {
+    val interactionSource = remember { MutableInteractionSource() }
+    return this.clickable(interactionSource, null, enabled) {
+        onClick()
+    }
+}

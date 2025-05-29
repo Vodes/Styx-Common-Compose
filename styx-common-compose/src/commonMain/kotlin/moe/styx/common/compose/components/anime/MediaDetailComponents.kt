@@ -24,6 +24,7 @@ import moe.styx.common.compose.components.tracking.mal.MALBottomSheetModel
 import moe.styx.common.compose.components.tracking.mal.MALButtomSheet
 import moe.styx.common.compose.extensions.getPainter
 import moe.styx.common.compose.utils.LocalGlobalNavigator
+import moe.styx.common.compose.utils.openURI
 import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.compose.viewmodels.MediaStorage
 import moe.styx.common.data.tmdb.decodeMapping
@@ -44,7 +45,6 @@ fun StupidImageNameArea(
     requiredMaxHeight: Dp = 500.dp,
     requiredMaxWidth: Dp = 385.dp,
     enforceConstraints: Boolean = false,
-    openURI: (String) -> Unit = {},
     otherContent: @Composable () -> Unit = {}
 ) {
     val (media, img) = mediaStorage.media to mediaStorage.image
@@ -71,7 +71,7 @@ fun StupidImageNameArea(
                 MediaNameListing(media, Modifier.align(Alignment.Start))
                 otherContent()
                 Spacer(Modifier.weight(1f, true))
-                MappingIcons(mediaStorage, mappingIconModifier, openURI)
+                MappingIcons(mediaStorage, mappingIconModifier)
             }
         }
     }
@@ -95,7 +95,7 @@ fun BigScalingCardImage(image: Resource<Painter>?, modifier: Modifier = Modifier
 }
 
 @Composable
-fun MappingIcons(mediaStorage: MediaStorage, modifier: Modifier, openURI: (String) -> Unit = {}) {
+fun MappingIcons(mediaStorage: MediaStorage, modifier: Modifier) {
     val mappings = mediaStorage.media.decodeMapping() ?: return
     val tmdbURL =
         mappings.tmdbMappings.minByOrNull { it.remoteID }?.remoteID?.let { "https://themoviedb.org/${if (mediaStorage.media.isSeries.toBoolean()) "tv" else "movie"}/$it" }
@@ -138,14 +138,14 @@ fun MappingIcons(mediaStorage: MediaStorage, modifier: Modifier, openURI: (Strin
     if (showAnilistSheet) {
         val state = nav.rememberNavigatorScreenModel("al-sheet-${mediaStorage.media.GUID}") { AnilistBottomSheetModel() }
         val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
-        AnilistButtomSheet(mediaStorage, sm, state, { openURI(it) }) {
+        AnilistButtomSheet(mediaStorage, sm, state) {
             showAnilistSheet = false
         }
     }
     if (showMalSheet) {
         val state = nav.rememberNavigatorScreenModel("mal-sheet-${mediaStorage.media.GUID}") { MALBottomSheetModel() }
         val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
-        MALButtomSheet(mediaStorage, sm, state, { openURI(it) }) {
+        MALButtomSheet(mediaStorage, sm, state) {
             showMalSheet = false
         }
     }
