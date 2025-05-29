@@ -60,7 +60,7 @@ fun RemoteMediaComponent(
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(title, modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelLarge)
-                    IconButtonWithTooltip(Icons.Filled.OpenInNewOff, "Open Anilist page") {
+                    IconButtonWithTooltip(Icons.Filled.OpenInNewOff, "Open website") {
                         onUriClick(remoteURL)
                     }
                 }
