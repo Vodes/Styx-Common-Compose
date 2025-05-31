@@ -18,7 +18,7 @@ import moe.styx.common.compose.viewmodels.MediaStorage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MALButtomSheet(
+fun MALBottomSheet(
     mediaStorage: MediaStorage,
     mainVm: MainDataViewModel,
     sheetModel: MALBottomSheetModel,

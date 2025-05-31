@@ -18,10 +18,10 @@ import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import io.kamel.core.Resource
 import io.kamel.image.KamelImage
 import moe.styx.common.compose.components.AppShapes
+import moe.styx.common.compose.components.tracking.anilist.AnilistBottomSheet
 import moe.styx.common.compose.components.tracking.anilist.AnilistBottomSheetModel
-import moe.styx.common.compose.components.tracking.anilist.AnilistButtomSheet
+import moe.styx.common.compose.components.tracking.mal.MALBottomSheet
 import moe.styx.common.compose.components.tracking.mal.MALBottomSheetModel
-import moe.styx.common.compose.components.tracking.mal.MALButtomSheet
 import moe.styx.common.compose.extensions.getPainter
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.openURI
@@ -138,14 +138,14 @@ fun MappingIcons(mediaStorage: MediaStorage, modifier: Modifier) {
     if (showAnilistSheet) {
         val state = nav.rememberNavigatorScreenModel("al-sheet-${mediaStorage.media.GUID}") { AnilistBottomSheetModel() }
         val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
-        AnilistButtomSheet(mediaStorage, sm, state) {
+        AnilistBottomSheet(mediaStorage, sm, state) {
             showAnilistSheet = false
         }
     }
     if (showMalSheet) {
         val state = nav.rememberNavigatorScreenModel("mal-sheet-${mediaStorage.media.GUID}") { MALBottomSheetModel() }
         val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
-        MALButtomSheet(mediaStorage, sm, state) {
+        MALBottomSheet(mediaStorage, sm, state) {
             showMalSheet = false
         }
     }
