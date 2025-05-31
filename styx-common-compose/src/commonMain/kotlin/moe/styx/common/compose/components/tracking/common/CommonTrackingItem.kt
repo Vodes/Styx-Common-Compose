@@ -150,7 +150,7 @@ fun RemoteMediaComponent(
                     }
                 }
                 Row(Modifier.fillMaxWidth()) {
-                    RatingComponent(status.score ?: 0.0F, scoreFormat, isLoggedIn && isEnabled) {
+                    RatingComponent(status.score ?: 0.0F, scoreFormat, isLoggedIn && isEnabled && status.progress > 0) {
                         onStatusUpdate(status.copy(score = it))
                     }
                 }
