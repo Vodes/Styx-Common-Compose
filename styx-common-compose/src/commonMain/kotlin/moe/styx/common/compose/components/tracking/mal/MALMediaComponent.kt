@@ -12,6 +12,7 @@ import moe.styx.common.compose.components.tracking.common.CommonMediaStatus
 import moe.styx.common.compose.components.tracking.common.RemoteMediaComponent
 import moe.styx.libs.mal.types.MALMedia
 import moe.styx.libs.mal.types.MALUser
+import pw.vodes.anilistkmp.graphql.type.ScoreFormat
 
 @Composable
 fun MALMediaComponent(
@@ -28,7 +29,8 @@ fun MALMediaComponent(
                     malMedia.id,
                     malMedia.listStatus?.let { CommonMediaListStatus.fromMalStatus(it.status, it.isRewatching) } ?: CommonMediaListStatus.NONE,
                     malMedia.listStatus?.watchedEpisodes ?: -1,
-                    malMedia.numEpisodes ?: Int.MAX_VALUE
+                    malMedia.numEpisodes ?: Int.MAX_VALUE,
+                    malMedia.listStatus?.score?.toFloat()
                 )
             )
         }
@@ -39,6 +41,7 @@ fun MALMediaComponent(
             "https://myanimelist.net/anime/${malMedia.id}",
             malUser != null,
             isEnabled,
+            ScoreFormat.POINT_10,
             status
         ) {
             onStatusUpdate(it)

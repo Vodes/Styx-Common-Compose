@@ -21,6 +21,7 @@ import moe.styx.libs.mal.ext.update.deleteMediaListEntry
 import moe.styx.libs.mal.ext.update.saveMediaListEntry
 import moe.styx.libs.mal.types.MALMedia
 import moe.styx.libs.mal.types.MALUser
+import kotlin.math.roundToInt
 
 object MALTracking {
     private fun handleClientUser(client: MalApiClient? = null, user: MALUser? = null): Pair<MalApiClient?, MALUser?> {
@@ -45,6 +46,7 @@ object MALTracking {
                 status.mediaID,
                 converted.first,
                 if (status.progress != -1) status.progress else 0,
+                score = status.score?.roundToInt(),
                 isRewatching = converted.second
             )
             if (!updateResponse.isSuccess)
@@ -113,7 +115,7 @@ object MALTracking {
                 continue
 
             val knownMax = malDataEntry.numEpisodes
-            
+
             val listStatus = if (knownMax != null && knownMax <= group.value.first().remoteNum) CommonMediaListStatus.COMPLETED
             else if (malDataEntry.listStatus?.isRewatching == true) CommonMediaListStatus.REPEATING else CommonMediaListStatus.WATCHING
 
@@ -122,7 +124,8 @@ object MALTracking {
                 malDataEntry.id,
                 status = listStatus,
                 progress = group.value.first().remoteNum,
-                knownMax = knownMax ?: Int.MAX_VALUE
+                knownMax = knownMax ?: Int.MAX_VALUE,
+                score = malDataEntry.listStatus?.score?.toFloat()
             )
             val result = updateRemoteStatus(status, client, user)
             if (!result.success)

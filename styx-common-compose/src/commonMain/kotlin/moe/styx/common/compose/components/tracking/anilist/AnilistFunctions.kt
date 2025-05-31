@@ -43,6 +43,7 @@ object AnilistTracking {
                 if (status.entryID != -1) status.entryID else null,
                 status.mediaID,
                 status = status.status.toAnilistStatus(),
+                score = status.score?.toDouble(),
                 progress = if (status.progress != -1) status.progress else null
             )
             if (updateResponse.data == null && (!updateResponse.errors.isNullOrEmpty() || updateResponse.exception != null)) {
@@ -125,7 +126,8 @@ object AnilistTracking {
                 anilistDataEntry.key.id,
                 if (knownMax != null && knownMax <= group.value.first().remoteNum) CommonMediaListStatus.COMPLETED else CommonMediaListStatus.WATCHING,
                 group.value.first().remoteNum,
-                knownMax ?: Int.MAX_VALUE
+                knownMax ?: Int.MAX_VALUE,
+                anilistDataEntry.value?.listEntry?.score?.toFloat()
             )
             val result = updateRemoteStatus(status, client, user)
             if (!result.success)

@@ -62,7 +62,8 @@ data class CommonMediaStatus(
     val mediaID: Int,
     val status: CommonMediaListStatus,
     val progress: Int = -1,
-    val knownMax: Int = Int.MAX_VALUE
+    val knownMax: Int = Int.MAX_VALUE,
+    val score: Float? = 0.0F
 ) {
     val hasProgress get() = progress > 0
     val hasKnownMax get() = knownMax != Int.MAX_VALUE
