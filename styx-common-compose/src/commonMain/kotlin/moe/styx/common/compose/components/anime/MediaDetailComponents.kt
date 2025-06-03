@@ -31,7 +31,7 @@ import moe.styx.common.data.tmdb.decodeMapping
 import moe.styx.common.extension.toBoolean
 import moe.styx.styx_common_compose.generated.resources.Res
 import moe.styx.styx_common_compose.generated.resources.al
-import moe.styx.styx_common_compose.generated.resources.myanimelist
+import moe.styx.styx_common_compose.generated.resources.mal
 import moe.styx.styx_common_compose.generated.resources.tmdb
 import org.jetbrains.compose.resources.painterResource
 
@@ -39,7 +39,7 @@ import org.jetbrains.compose.resources.painterResource
 fun StupidImageNameArea(
     mediaStorage: MediaStorage,
     modifier: Modifier = Modifier,
-    mappingIconModifier: Modifier = Modifier.padding(8.dp, 3.dp).size(25.dp),
+    mappingIconModifier: Modifier = Modifier.padding(8.dp, 3.dp).size(27.dp),
     dynamicMaxWidth: Dp = 760.dp,
     requiredMinHeight: Dp = 150.dp,
     requiredMaxHeight: Dp = 500.dp,
@@ -116,7 +116,7 @@ fun MappingIcons(mediaStorage: MediaStorage, modifier: Modifier) {
             )
         if (mappings.malMappings.isNotEmpty())
             Image(
-                painterResource(Res.drawable.myanimelist),
+                painterResource(Res.drawable.mal),
                 "MyAnimeList",
                 modifier.clip(AppShapes.small).clickable {
                     showMalSheet = !showMalSheet
