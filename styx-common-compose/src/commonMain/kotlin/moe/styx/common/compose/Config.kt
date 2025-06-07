@@ -25,7 +25,9 @@ data class AppConfig(
     val debugToken: String? = null,
     val appCachePath: String = "",
     val appStoragePath: String = "",
-    val versionCheckURL: String = ""
+    val versionCheckURL: String = "",
+    val site: String = "",
+    val siteURL: String = "",
 )
 
 abstract class AppContext {
