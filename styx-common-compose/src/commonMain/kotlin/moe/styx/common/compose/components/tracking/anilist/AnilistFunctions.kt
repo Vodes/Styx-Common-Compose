@@ -52,7 +52,10 @@ object AnilistTracking {
                 return CommonTrackingResult(false, "$message: $errors", updateResponse.exception)
             }
         }
-        return CommonTrackingResult(true)
+        return CommonTrackingResult(
+            true,
+            "Updated AniList status for ${status.mediaID} to ${status.progress} / ${status.knownMax} (${status.status})!"
+        )
     }
 
     suspend fun fetchAnilistTrackingData(media: Media, client: AnilistApiClient? = null, user: AlUser? = null): Result<AlTrackingData> {

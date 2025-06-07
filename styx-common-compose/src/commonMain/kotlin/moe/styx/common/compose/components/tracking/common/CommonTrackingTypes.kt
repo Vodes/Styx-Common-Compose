@@ -69,10 +69,14 @@ data class CommonMediaStatus(
     val hasKnownMax get() = knownMax != Int.MAX_VALUE
 }
 
-data class CommonTrackingResult(val success: Boolean, val errorMessage: String? = null, val exception: Exception? = null) {
+data class CommonTrackingResult(val success: Boolean, val message: String? = null, val exception: Exception? = null) {
     init {
-        if (!success && (!errorMessage.isNullOrBlank() || exception != null)) {
-            Log.e(exception = exception) { errorMessage ?: "Failed to update tracking on remote site!" }
+        if (!message.isNullOrBlank() || exception != null) {
+            if (!success) {
+                Log.e(exception = exception) { message ?: "Failed to update tracking on remote site!" }
+            } else {
+                Log.d { message ?: "Updated tracking data on remote site!" }
+            }
         }
     }
 }

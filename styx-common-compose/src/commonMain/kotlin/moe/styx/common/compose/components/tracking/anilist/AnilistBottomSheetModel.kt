@@ -38,7 +38,7 @@ class AnilistBottomSheetModel : ScreenModel {
         if (result.success)
             fetchMediaState(mainVm, media).join()
         else
-            errorString = result.errorMessage!!.substringBefore(":") + "!"
+            errorString = result.message!!.substringBefore(":") + "!"
         isLoading = false
     }
 }

@@ -64,7 +64,7 @@ fun AnilistBottomSheet(
                                     mainVm.anilistUser
                                 )
                                 if (!result.success)
-                                    sheetModel.errorString = result.errorMessage!!.also { sheetModel.isLoading = false }
+                                    sheetModel.errorString = result.message!!.also { sheetModel.isLoading = false }
                                 else {
                                     delay(300)
                                     sheetModel.fetchMediaState(mainVm, media).join()

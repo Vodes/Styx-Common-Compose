@@ -55,7 +55,7 @@ class MALBottomSheetModel : ScreenModel {
         if (result.success)
             fetchMediaState(mainVm, media).join()
         else
-            errorString = result.errorMessage
+            errorString = result.message
         isLoading = false
     }
 }

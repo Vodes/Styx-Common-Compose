@@ -52,7 +52,7 @@ object MALTracking {
             if (!updateResponse.isSuccess)
                 return CommonTrackingResult(false, "Failed to update media list entry on MAL!")
         }
-        return CommonTrackingResult(true)
+        return CommonTrackingResult(true, "Updated MAL status for ${status.mediaID} to ${status.progress} / ${status.knownMax} (${status.status})!")
     }
 
     suspend fun fetchMALTrackingData(media: Media, client: MalApiClient? = null, user: MALUser? = null): Result<List<MALMedia>> {
