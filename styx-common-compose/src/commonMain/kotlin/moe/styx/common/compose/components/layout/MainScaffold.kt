@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.buttons.PopButton
+import moe.styx.common.compose.extensions.clickableNoIndicator
 
 @Composable
 fun MainScaffold(
@@ -28,6 +29,7 @@ fun MainScaffold(
     actions: @Composable (RowScope.() -> Unit) = {},
     bottomBarContent: (@Composable () -> Unit)? = null,
     addAnimatedTitleBackground: Boolean = false,
+    titleClickable: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
@@ -41,7 +43,10 @@ fun MainScaffold(
         if (!addAnimatedTitleBackground)
             Text(title, overflow = TextOverflow.Ellipsis, maxLines = 2)
         else {
-            Surface(Modifier.clip(AppShapes.medium), shadowElevation = 1.dp, color = animatedColor) {
+            val surfaceModifier = Modifier.clip(AppShapes.medium).let { mod ->
+                titleClickable?.let { mod.clickableNoIndicator(onClick = it) } ?: mod
+            }
+            Surface(surfaceModifier, shadowElevation = 1.dp, color = animatedColor) {
                 Text(title, Modifier.padding(5.dp), overflow = TextOverflow.Ellipsis, maxLines = 2)
             }
         }
