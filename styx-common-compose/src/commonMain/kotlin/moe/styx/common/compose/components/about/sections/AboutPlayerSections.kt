@@ -1,12 +1,13 @@
 package moe.styx.common.compose.components.about.sections
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import moe.styx.common.compose.components.about.BasicChip
@@ -22,7 +23,7 @@ internal fun DesktopPlayerSection() {
     Column(Modifier.padding(4.dp)) {
         Text("The player is mpv with a modified uosc UI and custom configs provided by the package this app downloads.")
         Text("Controlled via a custom tool written in go on Windows and via junixsocket on Linux.")
-        Row {
+        FlowRow(itemVerticalAlignment = Alignment.CenterVertically) {
             BasicChip("mpv.io", Icons.Default.PlayCircle, "Player") { openURI("https://mpv.io/") }
             BasicChip("uosc", Icons.Default.FormatPaint, "Player UI") { openURI("https://github.com/tomasklaen/uosc") }
             BasicChip(
@@ -39,7 +40,7 @@ internal fun AndroidPlayerSection() {
     Column(Modifier.padding(4.dp)) {
         Text("The player uses the libmpv-android library by the Findroid author with a custom Styx UI on top.")
         Text("This just embeds the mpv player into an android view.")
-        Row {
+        FlowRow(itemVerticalAlignment = Alignment.CenterVertically) {
             BasicChip(
                 "libmpv-android",
                 Icons.Default.DeveloperBoard,
@@ -55,7 +56,7 @@ internal fun TrackingPlayerSection() {
     Column(Modifier.padding(4.dp)) {
         Text("Supported tracking sites, be it automatically, if enabled, or manually through their respective icons are AniList and MyAnimeList.")
         Text("Both use a custom API wrapper implementation specifically for Styx.")
-        Row {
+        FlowRow(itemVerticalAlignment = Alignment.CenterVertically) {
             val alPainter = painterResource(Res.drawable.al)
             BasicChipPainter("AniList", alPainter, "Open AniList", enforceSize = 25.dp) { openURI("https://anilist.co") }
             val malPainter = painterResource(Res.drawable.mal)
