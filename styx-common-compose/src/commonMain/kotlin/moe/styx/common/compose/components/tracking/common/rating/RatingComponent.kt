@@ -1,8 +1,11 @@
 package moe.styx.common.compose.components.tracking.common.rating
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
@@ -15,32 +18,45 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import moe.styx.common.compose.components.tracking.common.ElevatedSurface
 import moe.styx.common.compose.components.tracking.common.NumberDialog
+import moe.styx.common.compose.utils.LocalLayoutSize
 import moe.styx.common.extension.padString
 import pw.vodes.anilistkmp.graphql.type.ScoreFormat
 
 @Composable
 fun RatingComponent(scoreIn: Float, scoreFormat: ScoreFormat, isEnabled: Boolean = true, onUpdate: (Float) -> Unit) {
+    val layoutSizes = LocalLayoutSize.current
     var showDialog by remember { mutableStateOf(false) }
     var showInlineOptions by remember { mutableStateOf(false) }
     var score by remember { mutableStateOf(scoreIn) }
+    val shouldBeInline = when (scoreFormat) {
+        ScoreFormat.POINT_3, ScoreFormat.POINT_5 -> true
+        else -> false
+    }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
+        val mainButtonWidth by animateDpAsState(
+            if (!layoutSizes.isWide && showInlineOptions) 46.dp else 150.dp,
+            tween()
+        )
         ElevatedSurface(
             Modifier.padding(3.dp),
             enabled = isEnabled,
             onClick = {
-                when (scoreFormat) {
-                    ScoreFormat.POINT_3, ScoreFormat.POINT_5 -> showInlineOptions = !showInlineOptions
-                    else -> showDialog = true
-                }
+                if (shouldBeInline) showInlineOptions = !showInlineOptions else showDialog = true
             }
         ) {
-            Column(Modifier.widthIn(150.dp, Dp.Unspecified), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(Modifier.widthIn(mainButtonWidth, Dp.Unspecified), horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(
                     Modifier.padding(4.dp).defaultMinSize(Dp.Unspecified, if (scoreFormat == ScoreFormat.POINT_3) 33.dp else Dp.Unspecified),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    RatingSurfaceContent(score, scoreFormat)
+                    if (!layoutSizes.isWide && showInlineOptions) {
+                        val iconSizeModifier = Modifier.padding(4.dp, 1.dp).let {
+                            if (scoreFormat == ScoreFormat.POINT_3) it.size(40.dp) else it.size(40.dp, 36.dp)
+                        }
+                        Icon(Icons.Default.Close, "Close score selection", iconSizeModifier)
+                    } else
+                        RatingSurfaceContent(score, scoreFormat)
                 }
             }
         }
