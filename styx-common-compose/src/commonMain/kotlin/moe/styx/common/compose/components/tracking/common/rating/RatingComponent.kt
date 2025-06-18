@@ -1,11 +1,8 @@
 package moe.styx.common.compose.components.tracking.common.rating
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
@@ -23,6 +20,14 @@ import moe.styx.common.extension.padString
 import pw.vodes.anilistkmp.graphql.type.ScoreFormat
 
 @Composable
+internal fun Container(useColumn: Boolean, content: @Composable () -> Unit) {
+    if (!useColumn)
+        Row(verticalAlignment = Alignment.CenterVertically) { content() }
+    else
+        Column { content() }
+}
+
+@Composable
 fun RatingComponent(scoreIn: Float, scoreFormat: ScoreFormat, isEnabled: Boolean = true, onUpdate: (Float) -> Unit) {
     val layoutSizes = LocalLayoutSize.current
     var showDialog by remember { mutableStateOf(false) }
@@ -33,11 +38,8 @@ fun RatingComponent(scoreIn: Float, scoreFormat: ScoreFormat, isEnabled: Boolean
         else -> false
     }
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        val mainButtonWidth by animateDpAsState(
-            if (!layoutSizes.isWide && showInlineOptions) 46.dp else 150.dp,
-            tween()
-        )
+
+    Container(!layoutSizes.isWide && shouldBeInline) {
         ElevatedSurface(
             Modifier.padding(3.dp),
             enabled = isEnabled,
@@ -45,18 +47,12 @@ fun RatingComponent(scoreIn: Float, scoreFormat: ScoreFormat, isEnabled: Boolean
                 if (shouldBeInline) showInlineOptions = !showInlineOptions else showDialog = true
             }
         ) {
-            Column(Modifier.widthIn(mainButtonWidth, Dp.Unspecified), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(Modifier.widthIn(150.dp, Dp.Unspecified), horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(
-                    Modifier.padding(4.dp).defaultMinSize(Dp.Unspecified, if (scoreFormat == ScoreFormat.POINT_3) 33.dp else Dp.Unspecified),
+                    Modifier.padding(4.dp).defaultMinSize(Dp.Unspecified, if (scoreFormat == ScoreFormat.POINT_3) 34.dp else Dp.Unspecified),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (!layoutSizes.isWide && showInlineOptions) {
-                        val iconSizeModifier = Modifier.padding(4.dp, 1.dp).let {
-                            if (scoreFormat == ScoreFormat.POINT_3) it.size(40.dp) else it.size(40.dp, 36.dp)
-                        }
-                        Icon(Icons.Default.Close, "Close score selection", iconSizeModifier)
-                    } else
-                        RatingSurfaceContent(score, scoreFormat)
+                    RatingSurfaceContent(score, scoreFormat)
                 }
             }
         }
@@ -110,13 +106,13 @@ internal fun RatingSurfaceContent(score: Float, scoreFormat: ScoreFormat) {
                 }
                 Text(
                     "$visibleScore / $maxScore",
-                    Modifier.padding(4.dp, 1.dp),
+                    Modifier.padding(4.dp, 2.dp),
                     style = MaterialTheme.typography.labelLarge
                 )
             }
 
             ScoreFormat.POINT_5 -> {
-                Row(Modifier.padding(4.dp, 1.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.padding(4.dp, 2.dp), verticalAlignment = Alignment.CenterVertically) {
                     Row(Modifier.padding(3.dp, 0.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(score.toInt().toString(), style = MaterialTheme.typography.labelLarge)
                     }
@@ -129,7 +125,7 @@ internal fun RatingSurfaceContent(score: Float, scoreFormat: ScoreFormat) {
             }
 
             ScoreFormat.POINT_3 -> {
-                Row(Modifier.padding(4.dp, 1.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.padding(4.dp, 2.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text("Mood:", style = MaterialTheme.typography.labelLarge)
                     Point3ScoreIcon(score)
                 }

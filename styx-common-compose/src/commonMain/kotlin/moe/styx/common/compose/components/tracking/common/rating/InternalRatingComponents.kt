@@ -3,7 +3,6 @@ package moe.styx.common.compose.components.tracking.common.rating
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -49,12 +48,12 @@ fun Point3ScoreIcon(score: Float) {
 }
 
 @Composable
-fun RowScope.InlineScoreOptions(score: Float, scoreFormat: ScoreFormat, isEnabled: Boolean = true, onChanged: (Float) -> Unit) {
+fun InlineScoreOptions(score: Float, scoreFormat: ScoreFormat, isEnabled: Boolean = true, onChanged: (Float) -> Unit) {
     val iconSizeModifier = Modifier.padding(4.dp, 1.dp).let {
         if (scoreFormat == ScoreFormat.POINT_3)
-            it.size(40.dp)
+            it.size(41.dp)
         else
-            it.size(40.dp, 36.dp)
+            it.size(41.dp, 37.dp)
     }.clip(CardDefaults.elevatedShape)
     Row {
         if (scoreFormat == ScoreFormat.POINT_3) {

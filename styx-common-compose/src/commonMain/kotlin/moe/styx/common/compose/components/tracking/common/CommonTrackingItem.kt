@@ -61,7 +61,7 @@ fun RemoteMediaComponent(
             )
             val painter = image.getPainter()
             Box(
-                Modifier.padding(10.dp).clip(AppShapes.large).width(96.dp).heightIn(0.dp, 145.dp).fillMaxHeight().clickableNoIndicator {
+                Modifier.padding(10.dp).clip(AppShapes.large).width(100.dp).heightIn(0.dp, 153.dp).fillMaxHeight().clickableNoIndicator {
                     openURI(imageURL)
                 }
             ) {
@@ -95,7 +95,7 @@ fun RemoteMediaComponent(
 
                 Row(Modifier.fillMaxWidth()) {
                     ElevatedSurface(
-                        modifier = Modifier.padding(3.dp).heightIn(36.dp, Dp.Unspecified),
+                        modifier = Modifier.padding(3.dp).heightIn(38.dp, Dp.Unspecified),
                         onClick = { showStatusDialog = true },
                         enabled = isLoggedIn && isEnabled,
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer
@@ -112,7 +112,7 @@ fun RemoteMediaComponent(
                     }
 
                     ElevatedSurface(
-                        modifier = Modifier.padding(3.dp).heightIn(36.dp, Dp.Unspecified),
+                        modifier = Modifier.padding(3.dp).heightIn(38.dp, Dp.Unspecified),
                         onClick = { showEpisodeDialog = true },
                         enabled = isLoggedIn && isEnabled,
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer
@@ -126,7 +126,7 @@ fun RemoteMediaComponent(
                     }
                     Spacer(Modifier.weight(1f))
                     ElevatedSurface(
-                        modifier = Modifier.padding(3.dp, 3.dp, 11.dp, 3.dp).heightIn(36.dp, Dp.Unspecified),
+                        modifier = Modifier.padding(3.dp, 3.dp, 11.dp, 3.dp).heightIn(38.dp, Dp.Unspecified),
                         enabled = if (status.hasProgress && status.hasKnownMax && isLoggedIn)
                             status.progress < status.knownMax
                         else
