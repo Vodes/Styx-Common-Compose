@@ -2,9 +2,13 @@ package moe.styx.common.compose.components.tracking.common.rating
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -55,7 +59,8 @@ fun InlineScoreOptions(score: Float, scoreFormat: ScoreFormat, isEnabled: Boolea
         else
             it.size(41.dp, 37.dp)
     }.clip(CardDefaults.elevatedShape)
-    Row {
+    val scrollState = rememberScrollState()
+    Row(Modifier.fillMaxWidth().scrollable(scrollState, Orientation.Horizontal)) {
         if (scoreFormat == ScoreFormat.POINT_3) {
             (1..3).forEach {
                 Surface(
