@@ -127,7 +127,7 @@ object AnilistTracking {
             val status = CommonMediaStatus(
                 anilistDataEntry.value?.listEntry?.id ?: -1,
                 anilistDataEntry.key.id,
-                if (knownMax != null && knownMax <= group.value.first().remoteNum) CommonMediaListStatus.COMPLETED else CommonMediaListStatus.WATCHING,
+                if (knownMax != null && knownMax > 0 && knownMax <= group.value.first().remoteNum) CommonMediaListStatus.COMPLETED else CommonMediaListStatus.WATCHING,
                 group.value.first().remoteNum,
                 knownMax ?: Int.MAX_VALUE,
                 anilistDataEntry.value?.listEntry?.score?.toFloat()

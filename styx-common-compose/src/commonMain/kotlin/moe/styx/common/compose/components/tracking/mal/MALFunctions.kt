@@ -116,7 +116,7 @@ object MALTracking {
 
             val knownMax = malDataEntry.numEpisodes
 
-            val listStatus = if (knownMax != null && knownMax <= group.value.first().remoteNum) CommonMediaListStatus.COMPLETED
+            val listStatus = if (knownMax != null && knownMax > 0 && knownMax <= group.value.first().remoteNum) CommonMediaListStatus.COMPLETED
             else if (malDataEntry.listStatus?.isRewatching == true) CommonMediaListStatus.REPEATING else CommonMediaListStatus.WATCHING
 
             val status = CommonMediaStatus(
