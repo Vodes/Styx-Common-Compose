@@ -6,8 +6,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
-import kotlinx.datetime.Clock
 import moe.styx.common.compose.utils.LocalGlobalNavigator
+import kotlin.time.Clock
 
 internal var lastPop = 0L
 
