@@ -43,14 +43,14 @@ fun MediaNameListing(media: Media, modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun MediaGenreListing(media: Media) {
-    var isExpanded by remember { mutableStateOf(false) }
+fun MediaGenreListing(media: Media, alwaysExpanded: Boolean = false) {
+    var isExpanded by remember { mutableStateOf(alwaysExpanded) }
     if (!media.genres.isNullOrBlank()) {
         FlowRow(Modifier.padding(5.dp), horizontalArrangement = Arrangement.Start, verticalArrangement = Arrangement.Center) {
             for (genre in media.genres!!.split(",")) {
                 OutlinedText(genre.trim(), MaterialTheme.colorScheme.primary)
             }
-            if (!media.tags.isNullOrBlank()) {
+            if (!media.tags.isNullOrBlank() && !alwaysExpanded) {
                 ExpandIconButton(tooltip = "Show tags", tooltipExpanded = "Hide tags", isExpanded = isExpanded) { isExpanded = !isExpanded }
             }
         }

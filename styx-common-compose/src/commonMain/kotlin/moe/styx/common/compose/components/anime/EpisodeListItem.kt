@@ -43,7 +43,7 @@ fun LazyItemScope.EpisodeListItem(
     isInQueue: Boolean = false,
     downloadProgress: DownloadProgress? = null,
     modifier: Modifier = Modifier,
-    onMediaInfoClick: () -> Unit
+    onMediaInfoClick: (() -> Unit)? = null
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHover by interactionSource.collectIsHoveredAsState()
@@ -108,7 +108,7 @@ fun EpisodeListItemOverline(
     isDownloaded: Boolean = false,
     isInQueue: Boolean = false,
     downloadProgress: DownloadProgress? = null,
-    onMediaInfoClick: () -> Unit
+    onMediaInfoClick: (() -> Unit)? = null
 ) {
     Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(
@@ -118,7 +118,11 @@ fun EpisodeListItemOverline(
         )
         Text(
             item.fileSize.readableSize(),
-            Modifier.padding(5.dp).clickable { onMediaInfoClick() },
+            Modifier.padding(5.dp).let {
+                onMediaInfoClick?.let { onClick ->
+                    it.clickable { onClick() }
+                } ?: it
+            },
             style = MaterialTheme.typography.labelMedium
         )
 

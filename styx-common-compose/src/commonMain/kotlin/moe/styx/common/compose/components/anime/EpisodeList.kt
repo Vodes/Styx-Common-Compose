@@ -49,6 +49,7 @@ fun EpisodeList(
     settingsView: Screen?,
     listState: LazyListState? = null,
     onPlay: (MediaEntry) -> String,
+    canShowMediaInfo: Boolean = true,
     headerContent: (@Composable ColumnScope.() -> Unit)? = null
 ) {
     val nav = LocalGlobalNavigator.current
@@ -100,6 +101,10 @@ fun EpisodeList(
                     val isDownloaded =
                         remember(downloaded) { downloaded.find { it.entryID eqI item.first.GUID } != null }
                     Column(Modifier.fillMaxWidth()) {
+                        val showMediaInfoUnit = {
+                            showMediaInfoDialog = true
+                            selectedMedia = item.first
+                        }
                         EpisodeListItem(
                             item.first, item.second,
                             showSelection.value, selected,
@@ -117,11 +122,9 @@ fun EpisodeList(
                                             selected.add(item.first.GUID)
                                 }) {
                                     showSelection.value = !showSelection.value
-                                }
-                        ) {
-                            showMediaInfoDialog = true
-                            selectedMedia = item.first
-                        }
+                                },
+                            onMediaInfoClick = if (canShowMediaInfo) showMediaInfoUnit else null
+                        )
                         if (idx != associatedEntries.size - 1) {
                             HorizontalDivider(
                                 Modifier.fillMaxWidth().padding(0.dp, 3.dp, 0.dp, 3.dp),

@@ -45,7 +45,8 @@ fun StupidImageNameArea(
     requiredMaxHeight: Dp = 500.dp,
     requiredMaxWidth: Dp = 385.dp,
     enforceConstraints: Boolean = false,
-    otherContent: @Composable () -> Unit = {}
+    showMappingIcons: Boolean = true,
+    otherContent: @Composable ColumnScope.() -> Unit = {}
 ) {
     val (media, img) = mediaStorage.media to mediaStorage.image
     val painter = img?.getPainter()
@@ -70,8 +71,10 @@ fun StupidImageNameArea(
             Column(Modifier.fillMaxWidth().weight(1f, true)) {
                 MediaNameListing(media, Modifier.align(Alignment.Start))
                 otherContent()
-                Spacer(Modifier.weight(1f, true))
-                MappingIcons(mediaStorage, mappingIconModifier)
+                if (showMappingIcons) {
+                    Spacer(Modifier.weight(1f, true))
+                    MappingIcons(mediaStorage, mappingIconModifier)
+                }
             }
         }
     }

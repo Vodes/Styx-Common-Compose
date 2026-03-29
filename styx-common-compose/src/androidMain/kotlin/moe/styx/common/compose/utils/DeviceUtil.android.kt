@@ -14,7 +14,7 @@ actual fun fetchDeviceInfo(): DeviceInfo {
     val supportedABIs = Build.SUPPORTED_ABIS.joinToString()
     val supportSOC = Build.VERSION.SDK_INT >= 31
     return DeviceInfo(
-        if (settings["is-tablet", false]) "Tablet" else "Phone",
+        if (settings["is-tv", false]) "TV" else (if (settings["is-tablet", false]) "Tablet" else "Phone"),
         "",
         "${Build.MANUFACTURER}/${Build.BRAND} ${Build.MODEL}",
         if (supportSOC) "${Build.SOC_MANUFACTURER} ${Build.SOC_MODEL} ($supportedABIs)" else "Unknown ($supportedABIs)",
