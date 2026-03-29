@@ -1,7 +1,7 @@
 [versions]
 android-minSdk = "27"
 android-compileSdk = "36"
-agp = "8.7.3"
+agp = "8.9.1"
 kotlin = "2.3.20"
 styx-common = "0.6.0"
 styx-mal = "0.0.4"
