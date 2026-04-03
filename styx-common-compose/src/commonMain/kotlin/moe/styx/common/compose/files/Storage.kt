@@ -34,7 +34,7 @@ object Storage {
             if (refreshDataJob == null || refreshDataJob!!.isCompleted)
                 refreshDataJob = launchGlobal {
                     if (Stores.needsRefresh()) {
-                        runBlocking { loadData() }
+                        loadData()
                     }
                 }
             return Stores

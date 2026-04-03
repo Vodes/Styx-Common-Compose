@@ -58,7 +58,7 @@ class MainDataViewModel : ScreenModel {
 
     private fun startUpdateLoop() = screenModelScope.launch {
         _isLoadingStateFlow.emit(true)
-        updateData()
+        emitCachedStorageSnapshot()
         while ((ServerStatus.continueChecking || login == null) && isActive) {
             delay(2000)
             checkTimeout++;
@@ -68,7 +68,7 @@ class MainDataViewModel : ScreenModel {
             }
         }
         ensureActive()
-        updateData(forceUpdate = true, updateStores = true)
+        updateData(forceUpdate = true, updateStores = true).join()
         _isLoadingStateFlow.emit(false)
 
         delay(20000)
@@ -77,9 +77,14 @@ class MainDataViewModel : ScreenModel {
             ensureActive()
             Log.d("MainDataViewModel") { "Running automatic data refresh." }
             _isLoadingStateFlow.emit(true)
-            updateData(updateStores = true)
+            updateData(updateStores = true).join()
             _isLoadingStateFlow.emit(false)
         }
+    }
+
+    private suspend fun emitCachedStorageSnapshot() {
+        Log.d { "Loading cached storage snapshot..." }
+        _storageFlow.emit(withContext(Dispatchers.IO) { getUpdatedStorage() })
     }
 
     fun updateData(forceUpdate: Boolean = false, updateStores: Boolean = false) = screenModelScope.launch {
@@ -87,14 +92,22 @@ class MainDataViewModel : ScreenModel {
             launch { runAnilistCheck() }
             launch { runMALCheck() }
             Log.d { "Updating storage with stores..." }
-            launch { Storage.loadData() }.also { Storage.refreshDataJob = it }.join()
-            Storage.refreshDataJob = null
+            try {
+                if (Storage.refreshDataJob == null || Storage.refreshDataJob?.isCompleted == true)
+                    withContext(Dispatchers.IO) {
+                        launch { Storage.loadData() }.also { Storage.refreshDataJob = it }.join()
+                    }
+            } finally {
+                Storage.refreshDataJob = null
+            }
         } else
             Log.d { "Updating storage without stores..." }
-        if (forceUpdate)
-            _storageFlow.emit(getUpdatedStorage())
-        else
-            _storageFlow.getAndUpdate { getUpdatedStorage(it.updated) }
+        val previousUpdated = _storageFlow.value.updated
+        val nextStorage = withContext(Dispatchers.IO) {
+            if (forceUpdate) getUpdatedStorage()
+            else getUpdatedStorage(previousUpdated)
+        }
+        _storageFlow.emit(nextStorage)
     }
 
     private fun getUpdatedStorage(unixSeconds: Long? = null): MainDataViewModelStorage {
