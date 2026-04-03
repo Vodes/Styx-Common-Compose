@@ -14,10 +14,14 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.components.misc.ScrollToTopContainer
@@ -50,6 +54,8 @@ fun EpisodeList(
     listState: LazyListState? = null,
     onPlay: (MediaEntry) -> String,
     canShowMediaInfo: Boolean = true,
+    focusedEntryId: String? = null,
+    onEntryFocused: ((MediaEntry, Int) -> Unit)? = null,
     headerContent: (@Composable ColumnScope.() -> Unit)? = null
 ) {
     val nav = LocalGlobalNavigator.current
@@ -85,6 +91,22 @@ fun EpisodeList(
         }
 
         val lazyListState = listState ?: rememberLazyListState()
+        val entryIds = remember(associatedEntries) { associatedEntries.map { it.first.GUID } }
+        val focusRequesters = remember(entryIds) {
+            List(associatedEntries.size) { FocusRequester() }
+        }
+        val headerOffset = if (headerContent != null) 1 else 0
+
+        LaunchedEffect(entryIds, focusedEntryId) {
+            val targetId = focusedEntryId?.takeIf { it.isNotBlank() } ?: return@LaunchedEffect
+            val targetIndex = associatedEntries.indexOfFirst { it.first.GUID eqI targetId }
+            if (targetIndex < 0) {
+                return@LaunchedEffect
+            }
+            lazyListState.scrollToItem(targetIndex + headerOffset)
+            delay(32)
+            focusRequesters.getOrNull(targetIndex)?.requestFocus()
+        }
 
         ScrollToTopContainer(
             scrollableState = lazyListState,
@@ -112,6 +134,12 @@ fun EpisodeList(
                             downloadQueue.contains(item.first.GUID),
                             currentlyDownloading?.let { if (it.entryID != item.first.GUID) null else it },
                             Modifier.defaultMinSize(0.dp, 75.dp)
+                                .focusRequester(focusRequesters[idx])
+                                .onFocusChanged {
+                                    if (it.isFocused) {
+                                        onEntryFocused?.invoke(item.first, idx)
+                                    }
+                                }
                                 .dynamicClick(regularClick = {
                                     if (!showSelection.value)
                                         onPlay(item.first)

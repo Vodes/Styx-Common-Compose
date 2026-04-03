@@ -8,3 +8,5 @@ import com.dokar.sonner.ToasterState
 val LocalGlobalNavigator: ProvidableCompositionLocal<Navigator> = staticCompositionLocalOf { error("LocalGlobalNavigator not initialized") }
 
 val LocalToaster: ProvidableCompositionLocal<ToasterState> = staticCompositionLocalOf { error("LocalToaster not initialized") }
+
+val LocalIsTv: ProvidableCompositionLocal<Boolean> = staticCompositionLocalOf { false }

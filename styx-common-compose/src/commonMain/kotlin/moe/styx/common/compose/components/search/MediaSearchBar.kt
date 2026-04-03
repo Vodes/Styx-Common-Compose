@@ -1,6 +1,7 @@
 package moe.styx.common.compose.components.search
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,27 +33,39 @@ class MediaSearch(
     private val _stateEmitter = MutableStateFlow(initialState)
     val stateEmitter: MutableStateFlow<SearchState>
         get() = _stateEmitter
+    val currentState: SearchState
+        get() = _stateEmitter.value
+    val genres: List<String>
+        get() = availableGenres
+    val categories: List<Category>
+        get() = availableCategories
+    val supportsFilters: Boolean
+        get() = !favs
+
+    fun updateState(transform: (SearchState) -> SearchState) {
+        val updatedState = transform(_stateEmitter.value)
+        if (updatedState == _stateEmitter.value) {
+            return
+        }
+        _stateEmitter.value = updatedState
+        launchGlobal { searchStore.set(updatedState) }
+    }
 
     @Composable
     fun Component(modifier: Modifier = Modifier) {
         var showFilters by remember { mutableStateOf(false) }
-        val scope = rememberCoroutineScope()
-        var internalState by remember { mutableStateOf(initialState) }
+        val internalState by stateEmitter.collectAsState(initialState)
 
         OutlinedTextField(modifier = modifier, singleLine = true, value = internalState.search, shape = AppShapes.medium, label = { Text("Search") },
             onValueChange = {
-                scope.launch {
-                    internalState = internalState.copy(search = it)
-                    _stateEmitter.emit(internalState)
-                    launchGlobal { searchStore.set(internalState) }
-                }
+                updateState { state -> state.copy(search = it) }
             },
             leadingIcon = {
                 Icon(Icons.Default.Search, "Search")
             },
             trailingIcon = {
                 var showSort by remember { mutableStateOf(false) }
-                Row {
+                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                     if (!favs) {
                         IconButtonWithTooltip(if (showFilters) Icons.Filled.FilterAltOff else Icons.Filled.FilterAlt, "Show filters") {
                             showFilters = !showFilters
@@ -61,11 +74,7 @@ class MediaSearch(
                     IconButtonWithTooltip(Icons.Filled.MoreVert, "Sorting") { showSort = true }
                 }
                 SortDropdown(showSort, internalState, onDismiss = { showSort = false }) {
-                    scope.launch {
-                        internalState = internalState.copy(sortType = it.first, sortDescending = it.second)
-                        _stateEmitter.emit(internalState)
-                        launchGlobal { searchStore.set(internalState) }
-                    }
+                    updateState { state -> state.copy(sortType = it.first, sortDescending = it.second) }
                 }
             })
 
@@ -75,20 +84,12 @@ class MediaSearch(
                     Column {
                         Text("Category", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
                         CategoryFilterBar(internalState, availableCategories) {
-                            scope.launch {
-                                internalState = internalState.copy(selectedCategories = it)
-                                _stateEmitter.emit(internalState)
-                                launchGlobal { searchStore.set(internalState) }
-                            }
+                            updateState { state -> state.copy(selectedCategories = it) }
                         }
 
                         Text("Genre", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
                         GenreFilterBar(internalState, availableGenres) {
-                            scope.launch {
-                                internalState = internalState.copy(selectedGenres = it)
-                                _stateEmitter.emit(internalState)
-                                launchGlobal { searchStore.set(internalState) }
-                            }
+                            updateState { state -> state.copy(selectedGenres = it) }
                         }
                     }
                 }

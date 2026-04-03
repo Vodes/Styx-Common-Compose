@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -12,12 +13,14 @@ import com.russhwolf.settings.set
 import moe.styx.common.Platform
 import moe.styx.common.compose.components.misc.Toggles
 import moe.styx.common.compose.settings
+import moe.styx.common.compose.utils.LocalIsTv
 
 private val portraitCardChoices = listOf("3", "4", "5")
 private val landScapeCardChoices = listOf("Adaptive", "7", "8", "9", "10")
 
 @Composable
 fun MetadataSettings() {
+    val isTv = LocalIsTv.current
     Toggles.ContainerSwitch(
         "Show episode summaries",
         value = settings["display-ep-synopsis", false]
@@ -26,19 +29,21 @@ fun MetadataSettings() {
         "Prefer german titles and summaries",
         value = settings["prefer-german-metadata", false]
     ) { settings["prefer-german-metadata"] = it }
-    Row(Modifier.fillMaxWidth()) {
-        Toggles.ContainerSwitch(
-            "Use list for shows",
-            modifier = Modifier.weight(1f),
-            value = settings["shows-list", false],
-            paddingValues = Toggles.rowStartPadding
-        ) { settings["shows-list"] = it }
-        Toggles.ContainerSwitch(
-            "Use list for movies",
-            modifier = Modifier.weight(1f),
-            value = settings["movies-list", false],
-            paddingValues = Toggles.rowEndPadding
-        ) { settings["movies-list"] = it }
+    if (!isTv) {
+        Row(Modifier.fillMaxWidth()) {
+            Toggles.ContainerSwitch(
+                "Use list for shows",
+                modifier = Modifier.weight(1f),
+                value = settings["shows-list", false],
+                paddingValues = Toggles.rowStartPadding
+            ) { settings["shows-list"] = it }
+            Toggles.ContainerSwitch(
+                "Use list for movies",
+                modifier = Modifier.weight(1f),
+                value = settings["movies-list", false],
+                paddingValues = Toggles.rowEndPadding
+            ) { settings["movies-list"] = it }
+        }
     }
     Toggles.ContainerSwitch(
         "Sort episodes ascendingly",
@@ -47,7 +52,7 @@ fun MetadataSettings() {
     ) { settings["episode-asc"] = it }
 
     // Should only be available on Mobile
-    if (Platform.current != Platform.JVM) {
+    if (Platform.current != Platform.JVM && !isTv) {
         Toggles.ContainerRadioSelect(
             "Number of cards to show in portrait",
             value = settings["portrait-cards", "3"],

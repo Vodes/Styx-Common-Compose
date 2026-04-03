@@ -26,32 +26,45 @@ data class SearchState(
 ) {
     fun filterMedia(mediaList: List<Media>, favourites: List<Favourite> = emptyList()): List<Media> {
         var filtered = mediaList
+        val lowerSearch = search.trim().lowercase()
 
         if (favourites.isEmpty() && selectedCategories.isNotEmpty()) {
+            val selectedCategoryIds = selectedCategories.asSequence()
+                .map { it.GUID.lowercase() }
+                .toSet()
             filtered = filtered.filter { media ->
-                selectedCategories.find { it.GUID eqI media.categoryID } != null
+                (media.categoryID?.lowercase() ?: "") in selectedCategoryIds
             }
         }
 
         if (favourites.isEmpty() && selectedGenres.isNotEmpty()) {
+            val selectedGenreNames = selectedGenres.asSequence()
+                .map { it.lowercase() }
+                .toSet()
             filtered = filtered.filter { media ->
-                val genresOfMedia = if (media.genres != null) media.genres!!.split(",") else listOf()
-                selectedGenres.find { it.equalsAny(genresOfMedia) } != null
+                val genresOfMedia = media.genres
+                    ?.split(",")
+                    ?.asSequence()
+                    ?.map { it.trim().lowercase() }
+                    ?.toSet()
+                    .orEmpty()
+                genresOfMedia.any { it in selectedGenreNames }
             }
         }
 
-        if (search.isNotBlank() && search.length > 2)
-            filtered = filtered.filter { it.find(search) }
+        if (lowerSearch.length > 2)
+            filtered = filtered.filter { it.find(lowerSearch) }
 
         return if (favourites.isNotEmpty() && sortType == SortType.ADDED) {
+            val favouritesByMediaId = favourites.associateBy { it.mediaID.lowercase() }
             if (sortDescending)
                 filtered.sortedByDescending { m ->
-                    val fav = favourites.find { it.mediaID eqI m.GUID }
+                    val fav = favouritesByMediaId[m.GUID.lowercase()]
                     fav?.added ?: 0L
                 }
             else
                 filtered.sortedBy { m ->
-                    val fav = favourites.find { it.mediaID eqI m.GUID }
+                    val fav = favouritesByMediaId[m.GUID.lowercase()]
                     fav?.added ?: 0L
                 }
         } else {

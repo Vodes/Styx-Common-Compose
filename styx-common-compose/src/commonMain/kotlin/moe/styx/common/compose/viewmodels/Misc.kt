@@ -20,6 +20,8 @@ import moe.styx.common.util.Log
 class ListPosViewModel : ScreenModel {
     var scrollIndex: Int by mutableStateOf(0)
     var scrollOffset: Int by mutableStateOf(0)
+    var focusedKey: String by mutableStateOf("")
+    var restoreFocus: Boolean by mutableStateOf(false)
 }
 
 abstract class OverviewViewModel : ScreenModel {

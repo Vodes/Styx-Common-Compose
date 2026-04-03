@@ -14,12 +14,13 @@ import com.russhwolf.settings.get
 import io.kamel.image.KamelImage
 import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.extensions.getPainter
-import moe.styx.common.compose.settings
+import moe.styx.common.compose.utils.LocalIsTv
 import moe.styx.common.data.Image
 import moe.styx.common.data.Media
 
 @Composable
 fun AnimeListItem(media: Media, image: Image?, targetEpisodeNum: Int = 0, modifier: Modifier = Modifier.padding(5.dp, 2.dp), onClick: () -> Unit) {
+    val isTv = LocalIsTv.current
     val painter = image?.getPainter()
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
@@ -73,7 +74,7 @@ fun AnimeListItem(media: Media, image: Image?, targetEpisodeNum: Int = 0, modifi
             if (targetEpisodeNum != 0) {
                 SuggestionChip(onClick, {
                     Text("$targetEpisodeNum episodes")
-                }, modifier = Modifier.padding(8.dp, 1.dp), enabled = !settings["is-tv", false])
+                }, modifier = Modifier.padding(8.dp, 1.dp), enabled = !isTv)
             }
         }
     }

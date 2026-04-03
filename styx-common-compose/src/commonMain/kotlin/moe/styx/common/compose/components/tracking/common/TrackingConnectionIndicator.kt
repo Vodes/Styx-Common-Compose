@@ -11,14 +11,21 @@ import androidx.compose.ui.unit.dp
 import moe.styx.common.compose.utils.openURI
 
 @Composable
-fun TrackingConnectionIndicator(modifier: Modifier = Modifier, username: String?, siteName: String, userBaseURL: String) {
+fun TrackingConnectionIndicator(
+    modifier: Modifier = Modifier,
+    username: String?,
+    siteName: String,
+    userBaseURL: String,
+    clickable: Boolean = true
+) {
     FilterChip(
         !username.isNullOrBlank(),
         onClick = {
+            if (!clickable) return@FilterChip
             if (username == null) return@FilterChip
             openURI("$userBaseURL/$username")
         },
-        enabled = !username.isNullOrBlank(),
+        enabled = clickable && !username.isNullOrBlank(),
         label = {
             Text(siteName)
         },
