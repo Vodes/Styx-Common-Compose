@@ -1,13 +1,11 @@
 package moe.styx.common.compose.http
 
-import com.russhwolf.settings.get
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import moe.styx.common.compose.AppContextImpl.appConfig
-import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.compose.utils.ServerStatus.Companion.setLastKnown
 import moe.styx.common.compose.utils.fetchDeviceInfo
@@ -22,7 +20,7 @@ suspend fun isLoggedIn(): Boolean {
     val token = if (!appConfig().debugToken.isNullOrBlank()) {
         appConfig().debugToken!!
     } else {
-        settings["refreshToken", ""]
+        loadRefreshToken()
     }
 
     if (token.isBlank()) {
@@ -80,7 +78,7 @@ suspend fun checkLogin(token: String, first: Boolean = false): LoginResponse? {
         val log = json.decodeFromString<LoginResponse>(response.bodyAsText())
         login = log
         if (first && log.refreshToken != null)
-            settings.putString("refreshToken", log.refreshToken!!)
+            saveRefreshToken(log.refreshToken!!)
         return login
     } else {
         println(response.bodyAsText())

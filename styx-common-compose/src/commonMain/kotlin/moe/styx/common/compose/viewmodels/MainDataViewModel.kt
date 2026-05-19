@@ -16,6 +16,7 @@ import moe.styx.common.compose.files.getBlocking
 import moe.styx.common.compose.http.MalApiClient
 import moe.styx.common.compose.http.checkLogin
 import moe.styx.common.compose.http.login
+import moe.styx.common.compose.http.loadRefreshToken
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.data.*
@@ -157,7 +158,7 @@ class MainDataViewModel : ScreenModel {
         val token = if (!appConfig().debugToken.isNullOrBlank()) {
             appConfig().debugToken!!
         } else {
-            settings["refreshToken", ""]
+            loadRefreshToken()
         }
         val attempt = checkLogin(token)
         if (attempt != null) {

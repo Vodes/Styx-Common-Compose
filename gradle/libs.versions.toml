@@ -3,6 +3,7 @@ android-minSdk = "27"
 android-compileSdk = "36"
 agp = "8.9.1"
 kotlin = "2.3.20"
+ksafe = "1.8.1"
 styx-common = "0.6.0"
 styx-mal = "0.0.4"
 anilist-kmp = "0.0.4"
@@ -36,6 +37,7 @@ multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg
 multiplatform-lifecycle = { module = "io.github.kevinnzou:compose-multiplatform-lifecycle-tracker", version.ref = "multiplatform-lifecycle" }
 multiplatform-islandtime = { module = "io.islandtime:core", version.ref = "islandtime" }
 multiplatform-semver = { module = "io.github.z4kn4fein:semver", version.ref = "semver" }
+ksafe = { module = "eu.anifantakis:ksafe", version.ref = "ksafe" }
 sonner = { module = "moe.styx.forks.dokar3:sonner", version.ref = "sonner" }
 kamel-image = { module = "media.kamel:kamel-image-default", version.ref = "kamel" }
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }

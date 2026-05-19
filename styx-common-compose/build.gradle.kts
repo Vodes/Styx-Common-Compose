@@ -38,6 +38,7 @@ kotlin {
                 api(libs.multiplatform.semver)
                 api(libs.kamel.image)
                 api(libs.sonner)
+                implementation(libs.ksafe)
 
                 // IO
                 api(libs.kstore)
