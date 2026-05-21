@@ -92,14 +92,7 @@ class MainDataViewModel : ScreenModel {
             launch { runAnilistCheck() }
             launch { runMALCheck() }
             Log.d { "Updating storage with stores..." }
-            try {
-                if (Storage.refreshDataJob == null || Storage.refreshDataJob?.isCompleted == true)
-                    withContext(Dispatchers.IO) {
-                        launch { Storage.loadData() }.also { Storage.refreshDataJob = it }.join()
-                    }
-            } finally {
-                Storage.refreshDataJob = null
-            }
+            Storage.refreshData()
         } else
             Log.d { "Updating storage without stores..." }
         val previousUpdated = _storageFlow.value.updated

@@ -3,6 +3,8 @@ package moe.styx.common.compose.files
 import io.github.xxfast.kstore.extensions.getOrEmpty
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import moe.styx.common.compose.AppContextImpl.appConfig
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.getList
@@ -25,6 +27,7 @@ import kotlin.math.abs
  */
 object Storage {
     var refreshDataJob: Job? = null
+    private val refreshDataLock = Mutex()
 
     /**
      * This property getter ensures presence of data in the stores.
@@ -34,7 +37,7 @@ object Storage {
             if (refreshDataJob == null || refreshDataJob!!.isCompleted)
                 refreshDataJob = launchGlobal {
                     if (Stores.needsRefresh()) {
-                        loadData()
+                        loadDataLocked()
                     }
                 }
             return Stores
@@ -43,6 +46,34 @@ object Storage {
     val loadingProgress = MutableStateFlow("")
     val isLoaded = MutableStateFlow(false)
     val dataLoaderDispatcher = Dispatchers.IO.limitedParallelism(100, "Storage DataLoader")
+
+    suspend fun refreshData(runPreImages: () -> Unit = {}) = coroutineScope {
+        val runningRefreshJob = refreshDataJob
+        if (runningRefreshJob != null && !runningRefreshJob.isCompleted) {
+            runningRefreshJob.join()
+            clearRefreshDataJob(runningRefreshJob)
+            return@coroutineScope
+        }
+
+        val refreshJob = launch(dataLoaderDispatcher) { loadDataLocked(runPreImages) }
+        refreshDataJob = refreshJob
+        try {
+            refreshJob.join()
+        } finally {
+            clearRefreshDataJob(refreshJob)
+        }
+    }
+
+    private suspend fun loadDataLocked(runPreImages: () -> Unit = {}) {
+        refreshDataLock.withLock {
+            loadData(runPreImages)
+        }
+    }
+
+    private fun clearRefreshDataJob(job: Job) {
+        if (refreshDataJob == job && job.isCompleted)
+            refreshDataJob = null
+    }
 
     suspend fun loadData(runPreImages: () -> Unit = {}) = coroutineScope {
         // This is a bad workaround to avoid insane amounts of reads and requests
