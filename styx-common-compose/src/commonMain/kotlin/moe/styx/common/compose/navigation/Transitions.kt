@@ -18,6 +18,11 @@ val DefaultStyxSlideAnimationSpec: FiniteAnimationSpec<IntOffset> = spring(
     visibilityThreshold = IntOffset.VisibilityThreshold
 )
 
+val DefaultStyxPredictiveBackSlideAnimationSpec: FiniteAnimationSpec<IntOffset> = spring(
+    stiffness = Spring.StiffnessMediumLow * 2.5f,
+    visibilityThreshold = IntOffset.VisibilityThreshold
+)
+
 data class StyxScreenTransitions(
     val appear: ScreenTransition,
     val disappear: ScreenTransition
@@ -71,3 +76,11 @@ fun StyxCurrentScreen(
         content = content
     )
 }
+
+@Composable
+expect fun StyxCurrentScreenPredictiveBack(
+    navigator: Navigator,
+    slideAnimationSpec: FiniteAnimationSpec<IntOffset> = DefaultStyxPredictiveBackSlideAnimationSpec,
+    enabled: Boolean = true,
+    content: @Composable AnimatedVisibilityScope.(Screen) -> Unit = { it.Content() }
+)
