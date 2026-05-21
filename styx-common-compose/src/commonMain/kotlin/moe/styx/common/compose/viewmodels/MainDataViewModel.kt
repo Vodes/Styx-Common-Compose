@@ -3,11 +3,11 @@ package moe.styx.common.compose.viewmodels
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
 import com.russhwolf.settings.get
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import moe.styx.common.compose.navigation.ScreenModel
+import moe.styx.common.compose.navigation.screenModelScope
 import moe.styx.common.compose.AppContextImpl.appConfig
 import moe.styx.common.compose.components.tracking.anilist.AlUser
 import moe.styx.common.compose.files.Storage

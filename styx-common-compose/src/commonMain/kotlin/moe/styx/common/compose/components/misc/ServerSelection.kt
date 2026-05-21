@@ -20,10 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import com.russhwolf.settings.get
 import com.russhwolf.settings.set
 import moe.styx.common.compose.components.misc.Toggles.settingsContainer
+import moe.styx.common.compose.navigation.rememberNavigatorScreenModel
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.LocalIsTv

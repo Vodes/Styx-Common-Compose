@@ -18,9 +18,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
-import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
@@ -31,6 +28,9 @@ import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.collectWithEmptyInitial
 import moe.styx.common.compose.files.updateList
 import moe.styx.common.compose.http.login
+import moe.styx.common.compose.navigation.Screen
+import moe.styx.common.compose.navigation.rememberNavigatorScreenModel
+import moe.styx.common.compose.navigation.screenModelScope
 import moe.styx.common.compose.threads.DownloadQueue
 import moe.styx.common.compose.threads.RequestQueue
 import moe.styx.common.compose.utils.LocalGlobalNavigator

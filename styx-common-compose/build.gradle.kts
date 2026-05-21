@@ -43,12 +43,8 @@ kotlin {
                 api(libs.kstore)
                 api(libs.kstore.file)
 
-                // Navigation (Voyager)
-                api(libs.voyager.nav)
-                api(libs.voyager.transitions)
-                api(libs.voyager.screenmodel)
-                api(libs.voyager.tabnav)
-                api(libs.voyager.bottomsheetnav)
+                // Navigation
+                api(libs.vortex)
 
                 // Dialogs
                 api(libs.dialogs.core)

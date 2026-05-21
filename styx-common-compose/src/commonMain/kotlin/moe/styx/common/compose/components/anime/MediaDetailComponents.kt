@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import io.kamel.core.Resource
 import io.kamel.image.KamelImage
 import moe.styx.common.compose.components.AppShapes
@@ -23,6 +22,7 @@ import moe.styx.common.compose.components.tracking.anilist.AnilistBottomSheetMod
 import moe.styx.common.compose.components.tracking.mal.MALBottomSheet
 import moe.styx.common.compose.components.tracking.mal.MALBottomSheetModel
 import moe.styx.common.compose.extensions.getPainter
+import moe.styx.common.compose.navigation.rememberNavigatorScreenModel
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.openURI
 import moe.styx.common.compose.viewmodels.MainDataViewModel

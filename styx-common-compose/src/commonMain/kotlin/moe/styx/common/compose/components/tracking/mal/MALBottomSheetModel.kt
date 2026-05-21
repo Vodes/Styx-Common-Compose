@@ -3,14 +3,14 @@ package moe.styx.common.compose.components.tracking.mal
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import moe.styx.common.compose.components.tracking.common.CommonMediaStatus
 import moe.styx.common.compose.extensions.minimalSearchString
+import moe.styx.common.compose.navigation.ScreenModel
+import moe.styx.common.compose.navigation.screenModelScope
 import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.data.Media
 import moe.styx.common.data.tmdb.decodeMapping

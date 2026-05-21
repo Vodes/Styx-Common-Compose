@@ -5,7 +5,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import cafe.adriel.voyager.navigator.Navigator
+import moe.styx.common.compose.navigation.Navigator
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import kotlin.time.Clock
 

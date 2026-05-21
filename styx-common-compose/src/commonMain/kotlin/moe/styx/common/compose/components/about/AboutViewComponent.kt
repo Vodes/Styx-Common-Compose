@@ -19,12 +19,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import moe.styx.common.Platform
 import moe.styx.common.compose.AppContextImpl
 import moe.styx.common.compose.components.about.sections.*
 import moe.styx.common.compose.components.misc.ExpandableSettings
 import moe.styx.common.compose.components.tracking.common.ElevatedSurface
+import moe.styx.common.compose.navigation.rememberNavigatorScreenModel
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.fetchDeviceInfo
 import moe.styx.common.compose.utils.openURI

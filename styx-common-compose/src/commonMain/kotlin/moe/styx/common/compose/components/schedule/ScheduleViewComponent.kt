@@ -14,10 +14,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import moe.styx.common.compose.components.anime.AnimeListItem
 import moe.styx.common.compose.extensions.dayOfWeek
 import moe.styx.common.compose.extensions.getTargetTime
+import moe.styx.common.compose.navigation.rememberNavigatorScreenModel
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.data.Media

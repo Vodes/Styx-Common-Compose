@@ -12,13 +12,13 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import com.russhwolf.settings.get
 import com.russhwolf.settings.set
 import moe.styx.common.compose.AppContextImpl.appConfig
 import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.misc.Toggles
 import moe.styx.common.compose.components.tracking.common.TrackingConnectionIndicator
+import moe.styx.common.compose.navigation.rememberNavigatorScreenModel
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.LocalIsTv
