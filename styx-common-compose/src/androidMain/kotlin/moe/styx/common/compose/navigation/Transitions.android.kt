@@ -1,6 +1,5 @@
 package moe.styx.common.compose.navigation
 
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -13,7 +12,7 @@ actual fun StyxCurrentScreenPredictiveBack(
     navigator: Navigator,
     slideAnimationSpec: FiniteAnimationSpec<IntOffset>,
     enabled: Boolean,
-    content: @Composable AnimatedVisibilityScope.(Screen) -> Unit
+    content: @Composable (Screen) -> Unit
 ) {
     val density = LocalDensity.current
     val slideTransitions = remember(slideAnimationSpec) {
@@ -26,6 +25,6 @@ actual fun StyxCurrentScreenPredictiveBack(
         enabled = enabled,
         defaultOnScreenAppearTransition = slideTransitions.appear,
         defaultOnScreenDisappearTransition = slideTransitions.disappear,
-        content = content
+        content = { content(it) }
     )
 }

@@ -82,5 +82,5 @@ expect fun StyxCurrentScreenPredictiveBack(
     navigator: Navigator,
     slideAnimationSpec: FiniteAnimationSpec<IntOffset> = DefaultStyxPredictiveBackSlideAnimationSpec,
     enabled: Boolean = true,
-    content: @Composable AnimatedVisibilityScope.(Screen) -> Unit = { it.Content() }
+    content: @Composable (Screen) -> Unit = { it.Content() }
 )

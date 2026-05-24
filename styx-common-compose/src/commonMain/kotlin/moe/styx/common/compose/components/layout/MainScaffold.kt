@@ -7,6 +7,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
@@ -65,7 +66,7 @@ fun MainScaffold(
     topAppBarExpandedHeight: Dp = TopAppBarDefaults.TopAppBarExpandedHeight,
     content: @Composable () -> Unit
 ) {
-    Scaffold(modifier = modifier, topBar = {
+    Scaffold(modifier = modifier, contentWindowInsets = WindowInsets(0, 0, 0, 0), topBar = {
         TopAppBar(
             title = {
                 titleContent()
