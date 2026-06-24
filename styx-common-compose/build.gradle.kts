@@ -8,14 +8,13 @@ plugins {
 }
 
 group = "moe.styx"
-version = (System.getenv("SNAPSHOT_COMMIT") ?: "").ifBlank { "0.5.0" }
+version = (System.getenv("SNAPSHOT_COMMIT") ?: "").ifBlank { "0.5.1" }
 
 kotlin {
     applyDefaultHierarchyTemplate()
     jvmToolchain(17)
     jvm { withSourcesJar() }
     androidTarget { publishLibraryVariants("release") }
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
 
