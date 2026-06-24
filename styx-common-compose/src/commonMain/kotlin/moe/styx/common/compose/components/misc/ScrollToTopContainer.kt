@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -24,6 +25,7 @@ fun ScrollToTopContainer(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     scrollableState: ScrollableState,
+    fabPadding: PaddingValues = PaddingValues(20.dp),
     fabModifier: Modifier = Modifier,
     fabShape: Shape = FloatingActionButtonDefaults.shape,
     fabContainerColor: Color = FloatingActionButtonDefaults.containerColor,
@@ -41,7 +43,7 @@ fun ScrollToTopContainer(
     Box(modifier) {
         AnimatedVisibility(
             showScrollUpButton && enabled,
-            modifier = Modifier.zIndex(2f).align(Alignment.BottomEnd).padding(20.dp),
+            modifier = Modifier.zIndex(2f).align(Alignment.BottomEnd).padding(fabPadding),
             enter = expandIn() + fadeIn(),
             exit = shrinkOut() + fadeOut()
         ) {
