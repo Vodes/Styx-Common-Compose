@@ -15,7 +15,9 @@ import moe.styx.common.compose.AppContextImpl.appConfig
 import moe.styx.common.compose.settings
 import moe.styx.common.data.DeviceInfo
 import moe.styx.common.util.Log
+import platform.Foundation.NSURL
 import platform.darwin.sysctlbyname
+import platform.UIKit.UIApplication
 import platform.UIKit.UIDevice
 
 actual fun fetchDeviceInfo(): DeviceInfo {
@@ -47,5 +49,22 @@ private fun sysctlString(name: String): String? = memScoped {
 }
 
 actual fun openURI(uri: String?) {
-    TODO("Not implemented yet.")
+    if (uri.isNullOrBlank())
+        return
+
+    val url = NSURL.URLWithString(uri)
+    if (url == null) {
+        Log.e { "Failed to parse URI: $uri" }
+        return
+    }
+
+    UIApplication.sharedApplication.openURL(
+        url = url,
+        options = emptyMap<Any?, Any>(),
+        completionHandler = { success ->
+            if (!success) {
+                Log.e { "Failed to open URI: $uri" }
+            }
+        }
+    )
 }
