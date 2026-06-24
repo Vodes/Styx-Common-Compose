@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
@@ -45,7 +45,7 @@ actual fun StyxCurrentScreenPredictiveBack(
         )
     } else {
         Box(
-            modifier = Modifier.onPreviewKeyEvent { event ->
+            modifier = Modifier.onKeyEvent { event ->
                 if (event.key == Key.Back && event.type == KeyEventType.KeyUp && navigator.canPop && navigator.current.canPop) {
                     navigator.pop()
                     true
