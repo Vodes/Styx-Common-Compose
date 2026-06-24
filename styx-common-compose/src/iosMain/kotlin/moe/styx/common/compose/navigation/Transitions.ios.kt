@@ -57,6 +57,7 @@ import kotlin.math.roundToInt
 private const val BackgroundDisplacementFraction = 0.3f
 private const val PositionalCompletionThreshold = 0.28f
 private const val VelocityCompletionFraction = 3.5f
+private const val DestinationInputReleaseThreshold = 0.08f
 
 @Composable
 actual fun StyxCurrentScreenPredictiveBack(
@@ -249,8 +250,13 @@ private fun StyxCurrentScreenIOSSwipe(
                     }
                 }
 
-                val peeking = isBackground
-                val moving = offset > 0f && offset < stableWidthPx
+                val acceptsInput = when {
+                    screens.size == 1 -> true
+                    screen.key != navigator.current.key -> false
+                    isForeground -> offset <= stableWidthPx * DestinationInputReleaseThreshold
+                    isBackground -> offset >= stableWidthPx * (1f - DestinationInputReleaseThreshold)
+                    else -> error("Screen size must be either 1 or 2")
+                }
 
                 key(screen.key) {
                     if (render) {
@@ -270,7 +276,7 @@ private fun StyxCurrentScreenIOSSwipe(
                                         content(it)
                                     }
 
-                                    if (peeking || moving) {
+                                    if (!acceptsInput) {
                                         Box(
                                             modifier = Modifier
                                                 .zIndex(1f)
