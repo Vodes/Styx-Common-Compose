@@ -29,6 +29,7 @@ import moe.styx.common.extension.padString
 @Composable
 fun ScheduleViewComponent(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     dayLabelModifier: Modifier = Modifier.padding(4.dp, 3.dp),
     itemColModifier: Modifier = Modifier,
     onClick: (Media) -> Unit
@@ -52,7 +53,7 @@ fun ScheduleViewComponent(
     }
 
     AnimatedVisibility(mapped.isNotEmpty()) {
-        LazyColumn(modifier.fillMaxSize()) {
+        LazyColumn(modifier.fillMaxSize(), contentPadding = contentPadding) {
             mapped.forEachIndexed { index, mappedDay ->
                 item {
                     Column {
