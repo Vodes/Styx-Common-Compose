@@ -3,7 +3,7 @@ package moe.styx.common.compose.viewmodels
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.russhwolf.settings.get
+import io.github.z4kn4fein.semver.Version
 import io.github.z4kn4fein.semver.toVersion
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -12,7 +12,6 @@ import moe.styx.common.compose.http.isLoggedIn
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.navigation.ScreenModel
 import moe.styx.common.compose.navigation.screenModelScope
-import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.compose.utils.fetchVersions
 import moe.styx.common.util.Log
@@ -24,6 +23,28 @@ class ListPosViewModel : ScreenModel {
     var restoreFocus: Boolean by mutableStateOf(false)
 }
 
+data class VersionState(
+    val installed: Version,
+    val latest: Version?,
+    val latestPreRelease: Version?,
+) {
+    init {
+        Log.i { this.toString() }
+    }
+
+    fun canUpdate() = latest?.let { installed < it } == true || latestPreRelease?.let { installed < it } == true
+    fun shouldForceUpdate() = latest?.let { installed < it } == true
+
+    val availableUpdate: String
+        get() {
+            if (latest != null && latestPreRelease != null) {
+                return (latest.takeIf { latest > latestPreRelease } ?: latestPreRelease).toString()
+            }
+            return (latest ?: latestPreRelease)?.toString() ?: ""
+        }
+    var toastShown = false
+}
+
 abstract class OverviewViewModel : ScreenModel {
     var isLoggedIn by mutableStateOf<Boolean?>(null)
         private set
@@ -31,10 +52,8 @@ abstract class OverviewViewModel : ScreenModel {
     var isOffline by mutableStateOf<Boolean?>(null)
         private set
 
-    var isOutdated by mutableStateOf<Boolean?>(null)
+    var versionState by mutableStateOf<VersionState?>(null)
         private set
-
-    var availablePreRelease by mutableStateOf<String?>(null)
 
     init {
         Log.d { "Initializing overview model" }
@@ -73,19 +92,7 @@ abstract class OverviewViewModel : ScreenModel {
                 val appVersion = AppContextImpl.appConfig().appVersion.toVersion(false)
                 val latestVersion = versions.firstOrNull { !it.isPreRelease }
                 val latestPreRelease = versions.firstOrNull { it.isPreRelease }
-                if (latestVersion != null) {
-                    if (appVersion < latestVersion) {
-                        Log.i { "Found new version, enforcing update: $latestVersion" }
-                        isOutdated = true
-                    }
-                }
-                if (latestPreRelease != null) {
-                    if (appVersion < latestPreRelease && isOutdated != true) {
-                        if (settings["check-for-pre-release", true])
-                            availablePreRelease = latestPreRelease.toString()
-                        Log.i { "Found newer pre-release version! ($availablePreRelease)" }
-                    }
-                }
+                versionState = VersionState(appVersion, latestVersion, latestPreRelease)
             }
             isOffline =
                 ServerStatus.lastKnown in arrayOf(ServerStatus.OFFLINE, ServerStatus.UNKNOWN, ServerStatus.TIMEOUT)
