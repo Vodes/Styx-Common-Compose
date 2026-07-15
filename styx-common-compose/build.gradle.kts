@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "moe.styx"
-version = (System.getenv("SNAPSHOT_COMMIT") ?: "").ifBlank { "0.5.3" }
+version = (System.getenv("SNAPSHOT_COMMIT") ?: "").ifBlank { "0.5.4" }
 
 kotlin {
     applyDefaultHierarchyTemplate()
