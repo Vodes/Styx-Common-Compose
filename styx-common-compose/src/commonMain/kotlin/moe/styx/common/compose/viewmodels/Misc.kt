@@ -35,6 +35,8 @@ data class VersionState(
     fun canUpdate() = latest?.let { installed < it } == true || latestPreRelease?.let { installed < it } == true
     fun shouldForceUpdate() = latest?.let { installed < it } == true
 
+    fun shouldShowToast() = !toastShown && latestPreRelease != null && !shouldForceUpdate() && canUpdate()
+
     val availableUpdate: String
         get() {
             if (latest != null && latestPreRelease != null) {
