@@ -36,7 +36,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,9 +47,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import io.github.hristogochev.vortex.screen.CurrentScreenNoTransitionsDisposable
 import io.github.hristogochev.vortex.screen.render
-import io.github.hristogochev.vortex.stack.StackEvent
+import io.github.hristogochev.vortex.transitions.IOSSlideTransitionPredictiveBack
 import io.github.hristogochev.vortex.util.BackHandler
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -66,20 +68,46 @@ actual fun StyxCurrentScreenPredictiveBack(
     enabled: Boolean,
     content: @Composable (Screen) -> Unit
 ) {
-    StyxCurrentScreenIOSSwipe(
+    val slideTransitions = remember(slideAnimationSpec) {
+        StyxSlideTransition.horizontal(slideAnimationSpec)
+    }
+    CurrentScreenPredictiveBack(
         navigator = navigator,
+        defaultPredictiveBackTransition = IOSSlideTransitionPredictiveBack,
         enabled = enabled,
-        content = content
-    )
+        defaultOnScreenAppearTransition = slideTransitions.appear,
+        defaultOnScreenDisappearTransition = slideTransitions.disappear
+    ) { content(it) }
 }
 
 @Composable
-private fun StyxCurrentScreenIOSSwipe(
+internal fun StyxCurrentScreenIOSSwipe(
     navigator: Navigator,
     enabled: Boolean,
     draggableHandlePadding: PaddingValues = PaddingValues(top = 80.dp),
     draggableHandleWidth: Dp = 24.dp,
     draggableHandleFillMaxHeight: Boolean = true,
+    content: @Composable (Screen) -> Unit
+) {
+    key(navigator) {
+        StyxCurrentScreenIOSSwipeContent(
+            navigator = navigator,
+            enabled = enabled,
+            draggableHandlePadding = draggableHandlePadding,
+            draggableHandleWidth = draggableHandleWidth,
+            draggableHandleFillMaxHeight = draggableHandleFillMaxHeight,
+            content = content
+        )
+    }
+}
+
+@Composable
+private fun StyxCurrentScreenIOSSwipeContent(
+    navigator: Navigator,
+    enabled: Boolean,
+    draggableHandlePadding: PaddingValues,
+    draggableHandleWidth: Dp,
+    draggableHandleFillMaxHeight: Boolean,
     content: @Composable (Screen) -> Unit
 ) {
     CurrentScreenNoTransitionsDisposable(navigator)
@@ -116,6 +144,8 @@ private fun StyxCurrentScreenIOSSwipe(
         }
 
         var autoSwipe by remember { mutableStateOf(false) }
+        var completedGesture by remember { mutableStateOf(false) }
+        val transitionMutex = remember { Mutex() }
 
         LaunchedEffect(maxWidthPx, isGestureInFlight, autoSwipe) {
             if (!isGestureInFlight && !autoSwipe) {
@@ -135,9 +165,9 @@ private fun StyxCurrentScreenIOSSwipe(
             anchoredDraggableState.updateAnchors(anchors)
         }
 
-        val last2NavigatorItems by remember(navigator.items) {
-            derivedStateOf { navigator.items.takeLast(2) }
-        }
+        val navigatorItems = navigator.items
+        val last2NavigatorItems = remember(navigatorItems) { navigatorItems.takeLast(2) }
+        val transitionHistory = remember(navigator) { StackTransitionHistory(navigatorItems) }
 
         val screens = remember {
             when (last2NavigatorItems.size) {
@@ -148,56 +178,69 @@ private fun StyxCurrentScreenIOSSwipe(
 
         val lastEventUpdated by rememberUpdatedState(navigator.lastEvent)
 
-        LaunchedEffect(last2NavigatorItems) {
-            when (lastEventUpdated) {
-                StackEvent.Push, StackEvent.Replace -> {
-                    autoSwipe = true
-
-                    if (screens.size == 2) {
-                        screens.removeAt(0)
+        LaunchedEffect(navigatorItems) {
+            transitionMutex.withLock {
+                when (val transition = transitionHistory.onStackChanged(navigatorItems, lastEventUpdated)) {
+                    StackTransition.Forward, StackTransition.Back -> {
+                        autoSwipe = true
+                        var completed = false
+                        try {
+                            if (transition == StackTransition.Back) {
+                                syncScreens(listOf(last2NavigatorItems.last(), screens.last()), screens)
+                                anchoredDraggableState.animateTo(DismissValue.End, SpringSpec(stiffness = Spring.StiffnessLow))
+                                anchoredDraggableState.snapTo(DismissValue.Start)
+                            } else {
+                                if (screens.size == 2) screens.removeAt(0)
+                                anchoredDraggableState.snapTo(DismissValue.End)
+                                syncScreens(listOf(screens.last(), last2NavigatorItems.last()), screens)
+                                anchoredDraggableState.animateTo(DismissValue.Start, SpringSpec(stiffness = Spring.StiffnessLow))
+                            }
+                            syncScreens(last2NavigatorItems, screens)
+                            completed = true
+                        } finally {
+                            try {
+                                if (!completed) withContext(NonCancellable) {
+                                    anchoredDraggableState.snapTo(DismissValue.Start)
+                                    val currentStack = navigator.items
+                                    syncScreens(currentStack.takeLast(2), screens)
+                                    transitionHistory.syncToStack(currentStack)
+                                }
+                            } finally {
+                                autoSwipe = false
+                            }
+                        }
                     }
 
-                    anchoredDraggableState.snapTo(DismissValue.End)
-                    syncScreens(listOf(screens.last(), last2NavigatorItems.last()), screens)
-
-                    snapshotFlow { autoSwipe }.first { !it }
-
-                    anchoredDraggableState.animateTo(DismissValue.Start, SpringSpec(stiffness = Spring.StiffnessLow))
-                    syncScreens(last2NavigatorItems, screens)
-                }
-
-                StackEvent.Pop -> {
-                    autoSwipe = true
-
-                    syncScreens(listOf(last2NavigatorItems.last(), screens.last()), screens)
-                    anchoredDraggableState.animateTo(DismissValue.End, SpringSpec(stiffness = Spring.StiffnessLow))
-
-                    snapshotFlow { autoSwipe }.first { !it }
-
-                    anchoredDraggableState.snapTo(DismissValue.Start)
-                    syncScreens(last2NavigatorItems, screens)
-                }
-
-                StackEvent.PopGesture -> {
-                    syncScreens(last2NavigatorItems, screens)
-                    anchoredDraggableState.snapTo(DismissValue.Start)
-                }
-
-                StackEvent.Idle -> {
-                    syncScreens(last2NavigatorItems, screens)
+                    StackTransition.Sync -> syncScreens(last2NavigatorItems, screens)
+                    StackTransition.None -> Unit
                 }
             }
         }
 
-        LaunchedEffect(offset, stableWidthPx) {
-            if (screens.size == 1 || offset != stableWidthPx) return@LaunchedEffect
-
-            if (autoSwipe) {
-                autoSwipe = false
+        LaunchedEffect(offset, stableWidthPx, enabled) {
+            if (offset != stableWidthPx) {
+                if (offset <= 0f) completedGesture = false
                 return@LaunchedEffect
             }
+            transitionMutex.withLock {
+                if (screens.size == 1 || autoSwipe || !transitionHistory.isHandled(navigator.items)) return@withLock
 
-            navigator.popGesture()
+                if (!completedGesture) {
+                    completedGesture = true
+                    if (enabled && navigator.canPop && navigator.current.canPop && navigator.pop()) {
+                        val remaining = navigator.items
+                        transitionHistory.syncToStack(remaining)
+                        syncScreens(remaining.takeLast(2), screens)
+                    }
+                }
+                try {
+                    anchoredDraggableState.snapTo(DismissValue.Start)
+                } finally {
+                    if (anchoredDraggableState.offset != 0f) withContext(NonCancellable) {
+                        anchoredDraggableState.snapTo(DismissValue.Start)
+                    }
+                }
+            }
         }
 
         Box(
@@ -230,7 +273,8 @@ private fun StyxCurrentScreenIOSSwipe(
                 val draggableModifier = when {
                     screens.size == 1 -> Modifier
                     isBackground -> Modifier
-                    isForeground && enabled && navigator.current.canPop -> Modifier.anchoredDraggable(
+                    isForeground && enabled && !autoSwipe && !completedGesture && navigator.canPop &&
+                        navigator.current.canPop && transitionHistory.isHandled(navigatorItems) -> Modifier.anchoredDraggable(
                         state = anchoredDraggableState,
                         orientation = Orientation.Horizontal,
                         flingBehavior = flingBehavior
