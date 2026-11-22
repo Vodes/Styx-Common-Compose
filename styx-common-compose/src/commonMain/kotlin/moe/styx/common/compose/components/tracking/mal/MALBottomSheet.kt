@@ -12,6 +12,7 @@ import com.dokar.sonner.ToastType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
+import moe.styx.common.compose.components.tracking.common.trackingErrorMessage
 import moe.styx.common.compose.utils.LocalToaster
 import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.compose.viewmodels.MediaStorage
@@ -44,9 +45,7 @@ fun MALBottomSheet(
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             if (malData == null) {
-                Text("Loading MAL data...", style = MaterialTheme.typography.headlineMedium)
-            } else if (malData == null && !sheetModel.errorString.isNullOrBlank()) {
-                Text(sheetModel.errorString!!, style = MaterialTheme.typography.headlineMedium)
+                Text(if (sheetModel.isLoading) "Loading MAL data..." else "Unable to load MAL data.", style = MaterialTheme.typography.headlineMedium)
             } else {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text("MyAnimeList", Modifier.padding(10.dp, 3.dp).weight(1f), style = MaterialTheme.typography.headlineMedium)
@@ -58,19 +57,20 @@ fun MALBottomSheet(
                     if (malData != null && mainVm.malUser != null) {
                         IconButtonWithTooltip(Icons.Default.Sync, "Sync progress", modifier = Modifier.padding(5.dp, 0.dp)) {
                             scope.launch {
-                                sheetModel.isLoading = true
-                                val result = MALTracking.syncMALProgress(
-                                    mediaStorage,
-                                    storage.watchedList,
-                                    malData,
-                                    mainVm.malApiClient,
-                                    mainVm.malUser
-                                )
-                                if (!result.success)
-                                    sheetModel.errorString = result.message!!.also { sheetModel.isLoading = false }
-                                else {
-                                    delay(300)
-                                    sheetModel.fetchMediaState(mainVm, media).join()
+                                sheetModel.runTrackingRequest {
+                                    val result = MALTracking.syncMALProgress(
+                                        mediaStorage,
+                                        storage.watchedList,
+                                        malData,
+                                        mainVm.malApiClient,
+                                        mainVm.malUser
+                                    )
+                                    if (!result.success)
+                                        sheetModel.errorString = trackingErrorMessage(result.message)
+                                    else {
+                                        delay(300)
+                                        sheetModel.fetchMediaState(mainVm, media).join()
+                                    }
                                 }
                             }
                         }

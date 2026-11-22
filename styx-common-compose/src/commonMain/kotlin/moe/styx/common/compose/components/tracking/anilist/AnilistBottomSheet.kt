@@ -12,6 +12,7 @@ import com.dokar.sonner.ToastType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
+import moe.styx.common.compose.components.tracking.common.trackingErrorMessage
 import moe.styx.common.compose.utils.LocalToaster
 import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.compose.viewmodels.MediaStorage
@@ -41,9 +42,7 @@ fun AnilistBottomSheet(
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             if (anilistData == null) {
-                Text("Loading anilist data...", style = MaterialTheme.typography.headlineMedium)
-            } else if (anilistData == null && !sheetModel.errorString.isNullOrBlank()) {
-                Text(sheetModel.errorString!!, style = MaterialTheme.typography.headlineMedium)
+                Text(if (sheetModel.isLoading) "Loading AniList data..." else "Unable to load AniList data.", style = MaterialTheme.typography.headlineMedium)
             } else {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text("AniList", Modifier.padding(10.dp, 3.dp).weight(1f), style = MaterialTheme.typography.headlineMedium)
@@ -55,19 +54,20 @@ fun AnilistBottomSheet(
                     if (anilistData != null && mainVm.anilistUser != null) {
                         IconButtonWithTooltip(Icons.Default.Sync, "Sync progress", modifier = Modifier.padding(5.dp, 0.dp)) {
                             scope.launch {
-                                sheetModel.isLoading = true
-                                val result = AnilistTracking.syncAnilistProgress(
-                                    mediaStorage,
-                                    storage.watchedList,
-                                    anilistData,
-                                    mainVm.anilistApiClient,
-                                    mainVm.anilistUser
-                                )
-                                if (!result.success)
-                                    sheetModel.errorString = result.message!!.also { sheetModel.isLoading = false }
-                                else {
-                                    delay(300)
-                                    sheetModel.fetchMediaState(mainVm, media).join()
+                                sheetModel.runTrackingRequest {
+                                    val result = AnilistTracking.syncAnilistProgress(
+                                        mediaStorage,
+                                        storage.watchedList,
+                                        anilistData,
+                                        mainVm.anilistApiClient,
+                                        mainVm.anilistUser
+                                    )
+                                    if (!result.success)
+                                        sheetModel.errorString = trackingErrorMessage(result.message)
+                                    else {
+                                        delay(300)
+                                        sheetModel.fetchMediaState(mainVm, media).join()
+                                    }
                                 }
                             }
                         }

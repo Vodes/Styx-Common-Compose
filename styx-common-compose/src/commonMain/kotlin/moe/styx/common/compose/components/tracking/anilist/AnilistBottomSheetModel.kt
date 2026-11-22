@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import moe.styx.common.compose.components.tracking.common.CommonMediaStatus
+import moe.styx.common.compose.components.tracking.common.TrackingSheetRequests
+import moe.styx.common.compose.components.tracking.common.trackingErrorMessage
 import moe.styx.common.compose.navigation.ScreenModel
 import moe.styx.common.compose.navigation.screenModelScope
 import moe.styx.common.compose.viewmodels.MainDataViewModel
@@ -16,29 +18,31 @@ import moe.styx.common.data.Media
 
 class AnilistBottomSheetModel : ScreenModel {
     var errorString by mutableStateOf<String?>(null)
-    var isLoading by mutableStateOf(false)
+    var isLoading by mutableStateOf(true)
+
+    private val requests = TrackingSheetRequests({ isLoading = it }, { errorString = it })
 
     private val _anilistData = MutableStateFlow<AlTrackingData?>(null)
     val anilistData = _anilistData.stateIn(screenModelScope, SharingStarted.WhileSubscribed(2000), null)
 
 
     fun fetchMediaState(mainVm: MainDataViewModel, media: Media) = screenModelScope.launch {
-        isLoading = true
-        val result = AnilistTracking.fetchAnilistTrackingData(media, mainVm.anilistApiClient, mainVm.anilistUser)
-        if (result.isFailure) {
-            errorString = result.exceptionOrNull()!!.message!!.substringBefore(":") + "!"
-        } else
+        runTrackingRequest {
+            val result = AnilistTracking.fetchAnilistTrackingData(media, mainVm.anilistApiClient, mainVm.anilistUser)
             _anilistData.emit(result.getOrThrow())
-        isLoading = false
+        }
     }
 
     fun updateRemoteStatus(mainVm: MainDataViewModel, status: CommonMediaStatus, media: Media) = screenModelScope.launch {
-        isLoading = true
-        val result = AnilistTracking.updateRemoteStatus(status, mainVm.anilistApiClient, mainVm.anilistUser)
-        if (result.success)
-            fetchMediaState(mainVm, media).join()
-        else
-            errorString = result.message!!.substringBefore(":") + "!"
-        isLoading = false
+        runTrackingRequest {
+            val result = AnilistTracking.updateRemoteStatus(status, mainVm.anilistApiClient, mainVm.anilistUser)
+            if (result.success)
+                fetchMediaState(mainVm, media).join()
+            else
+                errorString = trackingErrorMessage(result.message)
+        }
     }
+
+    internal suspend fun runTrackingRequest(action: suspend () -> Unit) =
+        requests.run(action)
 }
