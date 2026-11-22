@@ -40,8 +40,8 @@ enum class Endpoints(private val path: String) {
     CHANGES("/changes"),
     WATCH("/watch"),
 
-    MPV("/mpv"),
-    MPV_DOWNLOAD("/mpv/download"),
+    MPV("/mpv/v2"),
+    MPV_DOWNLOAD("/mpv/v2/download"),
     DOWNLOAD_BUILD_BASE("/download");
 
     fun url(): String {
