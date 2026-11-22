@@ -105,8 +105,7 @@ object DownloadQueue : LifecycleTrackedJob(false) {
             Log.w("RequestQueue::start") { "This function is not designed for use outside of Desktop applications." }
             return
         }
-        runJob = true
-        currentJob = createJob()
+        startTrackedJob()
     }
 
     fun addToQueue(mediaEntry: MediaEntry) = launchGlobal {

@@ -20,6 +20,7 @@ import com.michaelflisar.composedialogs.core.DialogButtonType
 import com.michaelflisar.composedialogs.core.DialogEvent
 import com.michaelflisar.composedialogs.core.rememberDialogState
 import com.michaelflisar.composedialogs.dialogs.list.DialogList
+import com.michaelflisar.composedialogs.dialogs.list.DialogListDefaults
 import com.michaelflisar.composedialogs.dialogs.number.DialogNumberPicker
 import com.michaelflisar.composedialogs.dialogs.number.NumberPickerSetup
 import com.michaelflisar.composedialogs.dialogs.number.rememberDialogNumber
@@ -40,13 +41,13 @@ fun StatusDialog(current: String, available: List<String>, onDismiss: () -> Unit
         state = state,
         description = "Setting this to None will remove the entry from your list.",
         items = available,
-        itemIdProvider = { available.indexOf(it) },
+        key = { available.indexOf(it) },
         selectionMode = DialogList.SelectionMode.SingleSelect(
             selected = selected,
             selectOnRadioButtonClickOnly = false
         ),
-        itemContents = DialogList.ItemDefaultContent(
-            text = { it.capitalize() }
+        content = DialogListDefaults.itemContent(
+            text = { Text(it.capitalize()) }
         ),
         onEvent = {
             if (it.dismissed)

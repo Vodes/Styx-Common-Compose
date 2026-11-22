@@ -52,7 +52,6 @@ object Heartbeats : LifecycleTrackedJob() {
             Log.w("Heartbeats::start") { "This function is not designed for use outside of Desktop applications." }
             return
         }
-        runJob = true
-        currentJob = createJob()
+        startTrackedJob()
     }
 }

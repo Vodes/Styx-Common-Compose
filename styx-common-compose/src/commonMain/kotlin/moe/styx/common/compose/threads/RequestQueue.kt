@@ -68,8 +68,7 @@ object RequestQueue : LifecycleTrackedJob() {
             Log.w("RequestQueue::start") { "This function is not designed for use outside of Desktop applications." }
             return
         }
-        runJob = true
-        currentJob = createJob()
+        startTrackedJob()
     }
 
     fun updateMediaPreference(preference: UserMediaPreferences): Pair<Job, Job>? {
